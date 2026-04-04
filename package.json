@@ -1,0 +1,14 @@
+{
+  "name": "skybird-wifi-billing",
+  "version": "1.0.0",
+  "description": "Skybird WiFi Billing Web Portal",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 5173",
+    "build": "echo 'Static site - no build needed'",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": ["wifi", "billing", "management"],
+  "author": "",
+  "license": "MIT"
+}

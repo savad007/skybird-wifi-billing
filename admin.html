@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management - Skybird WiFi Billing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #1565C0;
+        }
+
+        .logout-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #b71c1c;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #e0e0e0;
+            color: #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #1565C0;
+            color: white;
+        }
+
+        .tab-btn:hover {
+            background: #1565C0;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1565C0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #1565C0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d47a1;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #bdbdbd;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .message.error {
+            background: #ffccbc;
+            color: #d84315;
+            display: block;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .users-table th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .users-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .users-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.admin {
+            background: #e3f2fd;
+            color: #1565C0;
+        }
+
+        .badge.agent {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge.subadmin {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1565C0;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            color: #1565C0;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .login-required {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .login-required h2 {
+            color: #d32f2f;
+            margin-bottom: 20px;
+        }
+
+        .login-required a {
+            display: inline-block;
+            background: #1565C0;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Admin Management</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div id="loginRequired" class="login-required" style="display: none;">
+            <h2>⚠️ Admin Access Required</h2>
+            <p>You must be logged in as admin to access this page.</p>
+            <a href="index.html">Go to Login</a>
+        </div>
+
+        <div id="adminPanel" style="display: none;">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('change-password')">Change Password</button>
+                <button class="tab-btn" onclick="switchTab('create-agent')">Create Agent</button>
+                <button class="tab-btn" onclick="switchTab('manage-users')">Manage Users</button>
+            </div>
+
+            <!-- Change Password Tab -->
+            <div id="change-password" class="tab-content active">
+                <h2>Change Admin Password</h2>
+                <div class="info-box">
+                    <h3>📝 Update Admin Credentials</h3>
+                    <p>Change the admin username and password for your account.</p>
+                </div>
+
+                <div id="changePasswordMessage" class="message"></div>
+
+                <form onsubmit="handleChangePassword(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUsername">New Username</label>
+                            <input type="text" id="newUsername" placeholder="Enter new username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update Credentials</button>
+                </form>
+            </div>
+
+            <!-- Create Agent Tab -->
+            <div id="create-agent" class="tab-content">
+                <h2>Create New Agent</h2>
+                <div class="info-box">
+                    <h3>👤 Add New Agent</h3>
+                    <p>Create a new agent account. Agents can manage their own customers.</p>
+                </div>
+
+                <div id="createAgentMessage" class="message"></div>
+
+                <form onsubmit="handleCreateAgent(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agentFullName">Full Name *</label>
+                            <input type="text" id="agentFullName" placeholder="Enter full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="agentUsername">Username *</label>
+                            <input type="text" id="agentUsername" placeholder="Enter username" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agentPassword">Password *</label>
+                            <input type="password" id="agentPassword" placeholder="Enter password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="agentRole">Role *</label>
+                            <select id="agentRole" required>
+                                <option value="">Select role</option>
+                                <option value="agent">Agent</option>
+                                <option value="subadmin">SubAdmin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Agent</button>
+                </form>
+            </div>
+
+            <!-- Manage Users Tab -->
+            <div id="manage-users" class="tab-content">
+                <h2>Manage Users</h2>
+                <div class="info-box">
+                    <h3>👥 All Users</h3>
+                    <p>View and manage all system users.</p>
+                </div>
+
+                <div id="usersTableContainer">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #999;">Loading users...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co'
+        const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf'
+
+        let supabase = null
+        let currentUser = null
+
+        // Initialize Supabase
+        async function initSupabase() {
+            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/+esm')
+            return createClient(SUPABASE_URL, SUPABASE_KEY)
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            supabase = await initSupabase()
+            
+            const savedUser = localStorage.getItem('currentUser')
+            if (!savedUser) {
+                document.getElementById('loginRequired').style.display = 'block'
+                return
+            }
+
+            currentUser = JSON.parse(savedUser)
+            
+            if (currentUser.role !== 'admin') {
+                document.getElementById('loginRequired').style.display = 'block'
+                return
+            }
+
+            document.getElementById('adminPanel').style.display = 'block'
+            loadUsers()
+        })
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active')
+            })
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active')
+            })
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active')
+            event.target.classList.add('active')
+        }
+
+        async function handleChangePassword(e) {
+            e.preventDefault()
+            const messageDiv = document.getElementById('changePasswordMessage')
+            
+            const newUsername = document.getElementById('newUsername').value
+            const currentPassword = document.getElementById('currentPassword').value
+            const newPassword = document.getElementById('newPassword').value
+            const confirmPassword = document.getElementById('confirmPassword').value
+
+            if (newPassword !== confirmPassword) {
+                showMessage(messageDiv, 'Passwords do not match', 'error')
+                return
+            }
+
+            if (currentPassword !== 'admin123') {
+                showMessage(messageDiv, 'Current password is incorrect', 'error')
+                return
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('app_users')
+                    .update({
+                        username: newUsername,
+                        password: newPassword
+                    })
+                    .eq('id', currentUser.id)
+
+                if (error) throw error
+
+                showMessage(messageDiv, '✅ Credentials updated successfully! Please login again.', 'success')
+                
+                setTimeout(() => {
+                    logout()
+                }, 2000)
+            } catch (err) {
+                showMessage(messageDiv, '❌ Error: ' + err.message, 'error')
+            }
+        }
+
+        async function handleCreateAgent(e) {
+            e.preventDefault()
+            const messageDiv = document.getElementById('createAgentMessage')
+
+            const fullName = document.getElementById('agentFullName').value
+            const username = document.getElementById('agentUsername').value
+            const password = document.getElementById('agentPassword').value
+            const role = document.getElementById('agentRole').value
+
+            try {
+                const { error } = await supabase
+                    .from('app_users')
+                    .insert([{
+                        full_name: fullName,
+                        username: username,
+                        password: password,
+                        role: role,
+                        is_active: true
+                    }])
+
+                if (error) throw error
+
+                showMessage(messageDiv, '✅ Agent created successfully!', 'success')
+                document.getElementById('agentFullName').value = ''
+                document.getElementById('agentUsername').value = ''
+                document.getElementById('agentPassword').value = ''
+                document.getElementById('agentRole').value = ''
+
+                // Reload users table
+                loadUsers()
+            } catch (err) {
+                showMessage(messageDiv, '❌ Error: ' + err.message, 'error')
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const { data, error } = await supabase
+                    .from('app_users')
+                    .select('*')
+                    .order('id', { ascending: true })
+
+                if (error) throw error
+
+                const tbody = document.getElementById('usersTableBody')
+                tbody.innerHTML = data.map(user => `
+                    <tr>
+                        <td><strong>${user.username}</strong></td>
+                        <td>${user.full_name}</td>
+                        <td><span class="badge ${user.role}">${user.role.toUpperCase()}</span></td>
+                        <td>${user.is_active ? '✅ Active' : '❌ Inactive'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                ${user.role !== 'admin' ? `
+                                    <button class="btn btn-small btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">Delete</button>
+                                ` : '<span style="color: #999;">Admin</span>'}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('')
+            } catch (err) {
+                console.error('Error loading users:', err)
+            }
+        }
+
+        async function deleteUser(userId, username) {
+            if (!confirm(`Are you sure you want to delete user "${username}"?`)) return
+
+            try {
+                const { error } = await supabase
+                    .from('app_users')
+                    .delete()
+                    .eq('id', userId)
+
+                if (error) throw error
+
+                alert('✅ User deleted successfully')
+                loadUsers()
+            } catch (err) {
+                alert('❌ Error: ' + err.message)
+            }
+        }
+
+        function showMessage(element, message, type) {
+            element.textContent = message
+            element.className = `message ${type}`
+            element.style.display = 'block'
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser')
+            window.location.href = 'index.html'
+        }
+    </script>
+</body>
+</html>
