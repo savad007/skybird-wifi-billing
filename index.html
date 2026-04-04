@@ -687,11 +687,24 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let supabase = null;
+        
+        // Wait for Supabase to load
+        function initSupabase() {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase initialized');
+            } else {
+                setTimeout(initSupabase, 100);
+            }
+        }
+        
+        initSupabase();
 
         let currentUser = null;
         let customers = [];
@@ -701,6 +714,12 @@
         // Login
         async function login(e) {
             e.preventDefault();
+            
+            if (!supabase) {
+                alert('Supabase not initialized. Please refresh the page.');
+                return;
+            }
+            
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('loginError');
@@ -710,16 +729,21 @@
                     .from('app_users')
                     .select('*')
                     .eq('username', username)
-                    .eq('password', password)
-                    .single();
+                    .eq('password', password);
 
-                if (error || !data) {
+                if (error) {
+                    errorDiv.textContent = 'Error: ' + error.message;
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+                
+                if (!data || data.length === 0) {
                     errorDiv.textContent = 'Invalid username or password';
                     errorDiv.style.display = 'block';
                     return;
                 }
 
-                currentUser = data;
+                currentUser = data[0];
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 errorDiv.style.display = 'none';
                 showDashboard();
@@ -727,6 +751,7 @@
             } catch (err) {
                 errorDiv.textContent = 'Login failed: ' + err.message;
                 errorDiv.style.display = 'block';
+                console.error('Login error:', err);
             }
         }
 
@@ -736,6 +761,8 @@
         }
 
         async function loadCustomers() {
+            if (!supabase) return;
+            
             try {
                 let query = supabase.from('customers').select('*');
 
@@ -749,13 +776,6 @@
                 customers = data || [];
                 updateStats();
                 renderCustomers();
-
-                const subscription = supabase
-                    .channel('customers')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'customers' }, () => {
-                        loadCustomers();
-                    })
-                    .subscribe();
             } catch (err) {
                 console.error('Error loading customers:', err);
             }
@@ -1006,12 +1026,18 @@
 
         // Check login on load
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('currentUser');
-            if (saved) {
-                currentUser = JSON.parse(saved);
-                showDashboard();
-                loadCustomers();
-            }
+            // Wait for Supabase to initialize
+            const checkSupabase = setInterval(() => {
+                if (supabase) {
+                    clearInterval(checkSupabase);
+                    const saved = localStorage.getItem('currentUser');
+                    if (saved) {
+                        currentUser = JSON.parse(saved);
+                        showDashboard();
+                        loadCustomers();
+                    }
+                }
+            }, 100);
         });
     </script>
 </body>
