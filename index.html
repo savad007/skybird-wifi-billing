@@ -59,6 +59,13 @@
             font-size: 14px;
             transition: border-color 0.3s;
         }
+        
+        @media (max-width: 480px) {
+            .form-group input, .form-group select {
+                font-size: 16px;
+                padding: 14px;
+            }
+        }
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
@@ -122,6 +129,31 @@
         .header h1 {
             font-size: 24px;
         }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+                width: 100%;
+            }
+            
+            .header-buttons {
+                display: flex;
+                gap: 10px;
+                width: 100%;
+            }
+            
+            .logout-btn, .admin-btn {
+                flex: 1;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
 
         .logout-btn {
             background: #d32f2f;
@@ -141,9 +173,16 @@
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
+        }
+        
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
         }
 
         .stat-card {
@@ -191,6 +230,21 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+        
+        @media (max-width: 480px) {
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .section-header input {
+                width: 100%;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+        }
 
         .add-btn {
             background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
@@ -212,6 +266,47 @@
             width: 100%;
             border-collapse: collapse;
             overflow-x: auto;
+            display: block;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .customer-table, .customer-table thead, .customer-table tbody, .customer-table th, .customer-table td, .customer-table tr {
+                display: block;
+            }
+            
+            .customer-table thead {
+                display: none;
+            }
+            
+            .customer-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            .customer-table td {
+                padding: 10px 12px;
+                text-align: right;
+                position: relative;
+                padding-left: 50%;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .customer-table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                font-weight: 600;
+                color: #666;
+                text-align: left;
+            }
+            
+            .customer-table td:last-child {
+                border-bottom: none;
+            }
         }
 
         .customer-table th {
@@ -304,18 +399,25 @@
             background: #b71c1c;
         }
 
-        .modal {
+          .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 10px;
+        }
+        
+        @media (max-width: 480px) {
+            .modal {
+                align-items: flex-end;
+            }
+        }       padding: 10px;
         }
 
         .modal.active {
@@ -327,10 +429,19 @@
             padding: 30px;
             border-radius: 12px;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 20px;
+                border-radius: 12px 12px 0 0;
+                max-width: 100%;
+                width: 100%;
+            }
         }
 
         .modal-header {
@@ -513,7 +624,10 @@
     <div class="dashboard" id="dashboard">
         <div class="header">
             <h1>📊 Dashboard</h1>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <div class="header-buttons">
+                <button class="admin-btn" onclick="window.location.href='admin.html'" style="background: #FF9800; padding: 10px 20px; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">⚙️ Admin Panel</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
         </div>
 
         <!-- Stats -->
