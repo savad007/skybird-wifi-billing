@@ -42,7 +42,12 @@
             font-size: 24px;
         }
 
-        .logout-btn {
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .logout-btn, .back-btn {
             background: #d32f2f;
             color: white;
             border: none;
@@ -53,8 +58,11 @@
             transition: all 0.3s;
         }
 
-        .logout-btn:hover {
-            background: #b71c1c;
+        .back-btn {
+            background: #FF9800;
+        }
+
+        .logout-btn:hover, .back-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -80,6 +88,7 @@
             font-weight: 600;
             transition: all 0.3s;
             font-size: 14px;
+            white-space: nowrap;
         }
 
         .tab-btn.active {
@@ -99,23 +108,11 @@
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content.active {
             display: block;
-            animation: slideIn 0.3s ease-in-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .form-group {
@@ -130,299 +127,307 @@
             font-size: 14px;
         }
 
-        .form-group input,
-        .form-group select {
+        .form-group input, .form-group select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 2px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
             transition: border-color 0.3s;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #1565C0;
             box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
         }
 
-        .form-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
         .btn {
-            padding: 10px 20px;
+            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
+            color: white;
             border: none;
+            padding: 12px 24px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
             font-size: 14px;
-            flex: 1;
-            min-width: 120px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
+        .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
         }
 
-        .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #d0d0d0;
-        }
-
-        .btn-danger {
+        .btn-delete {
             background: #d32f2f;
-            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
         }
 
-        .btn-danger:hover {
+        .btn-delete:hover {
             background: #b71c1c;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
         }
 
-        .message {
+        .success {
+            color: #2e7d32;
+            background: #c8e6c9;
             padding: 12px;
             border-radius: 6px;
             margin-bottom: 15px;
             display: none;
-            font-weight: 600;
         }
 
-        .message.success {
-            background: #c8e6c9;
-            color: #2e7d32;
-            display: block;
-        }
-
-        .message.error {
-            background: #ffcdd2;
+        .error {
             color: #c62828;
-            display: block;
+            background: #ffcdd2;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
         }
 
-        .users-table {
+        .table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            display: block;
+            overflow-x: auto;
         }
 
-        .users-table th {
+        .table th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 12px;
             text-align: left;
             font-weight: 600;
-            border-radius: 6px 6px 0 0;
+            font-size: 13px;
         }
 
-        .users-table td {
+        .table td {
             padding: 12px;
             border-bottom: 1px solid #eee;
+            font-size: 13px;
         }
 
-        .users-table tr:hover {
+        .table tr:hover {
             background: #f9f9f9;
         }
 
-        .users-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .delete-btn {
-            background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .delete-btn:hover {
-            background: #b71c1c;
-            transform: scale(1.05);
-        }
-
-        .role-badge {
+        .badge {
             display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .role-badge.admin {
-            background: #1565C0;
-            color: white;
+        .badge-admin {
+            background: #bbdefb;
+            color: #1565C0;
         }
 
-        .role-badge.agent {
-            background: #4CAF50;
-            color: white;
+        .badge-agent {
+            background: #c8e6c9;
+            color: #2e7d32;
         }
 
-        .role-badge.subadmin {
-            background: #FF9800;
-            color: white;
+        .badge-subadmin {
+            background: #ffe0b2;
+            color: #e65100;
         }
 
-        @media (max-width: 768px) {
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        @media (max-width: 480px) {
             .header {
                 flex-direction: column;
                 align-items: flex-start;
+                padding: 15px;
             }
 
             .header h1 {
-                font-size: 20px;
+                font-size: 18px;
                 width: 100%;
             }
 
-            .logout-btn {
+            .header-buttons {
                 width: 100%;
-                text-align: center;
+                gap: 8px;
+            }
+
+            .logout-btn, .back-btn {
+                flex: 1;
+                padding: 8px 12px;
+                font-size: 12px;
             }
 
             .tabs {
                 flex-direction: column;
+                gap: 5px;
             }
 
             .tab-btn {
                 width: 100%;
+                padding: 12px;
+                font-size: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group input, .form-group select {
+                font-size: 16px;
+                padding: 14px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 14px;
+            }
+
+            .container {
+                padding: 10px;
             }
 
             .tab-content {
                 padding: 15px;
             }
 
-            .form-buttons {
+            .table, .table thead, .table tbody, .table th, .table td, .table tr {
+                display: block;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .table td {
+                padding: 10px 12px;
+                text-align: right;
+                position: relative;
+                padding-left: 50%;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            .table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 12px;
+                font-weight: 600;
+                color: #666;
+                text-align: left;
+            }
+
+            .table td:last-child {
+                border-bottom: none;
+            }
+
+            .action-btns {
                 flex-direction: column;
             }
 
-            .btn {
+            .btn-delete {
                 width: 100%;
             }
-
-            .users-table {
-                font-size: 12px;
-            }
-
-            .users-table th,
-            .users-table td {
-                padding: 8px;
-            }
-
-            .delete-btn {
-                padding: 4px 8px;
-                font-size: 11px;
-            }
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #1565C0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>🔐 Admin Management Panel</h1>
-            <button class="logout-btn" onclick="logout()">← Back to Dashboard</button>
+            <h1>⚙️ Admin Management</h1>
+            <div class="header-buttons">
+                <button class="back-btn" onclick="window.location.href='index.html'">← Back to Dashboard</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
         </div>
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('change-password')">🔑 Change Password</button>
-            <button class="tab-btn" onclick="switchTab('create-agent')">👤 Create Agent</button>
-            <button class="tab-btn" onclick="switchTab('manage-users')">📋 Manage Users</button>
+            <button class="tab-btn active" onclick="switchTab('change-password')">🔐 Change Password</button>
+            <button class="tab-btn" onclick="switchTab('create-agent')">➕ Create Agent</button>
+            <button class="tab-btn" onclick="switchTab('manage-users')">👥 Manage Users</button>
         </div>
 
         <!-- Change Password Tab -->
         <div id="change-password" class="tab-content active">
-            <h2 class="section-title">🔑 Change Admin Credentials</h2>
-            <div id="changePasswordMessage" class="message"></div>
+            <h2>Change Admin Credentials</h2>
+            <div class="success" id="passwordSuccess">Password updated successfully!</div>
+            <div class="error" id="passwordError"></div>
             <form onsubmit="changePassword(event)">
                 <div class="form-group">
-                    <label for="newUsername">New Username</label>
+                    <label>New Username</label>
                     <input type="text" id="newUsername" placeholder="Enter new username" required>
                 </div>
                 <div class="form-group">
-                    <label for="currentPassword">Current Password</label>
+                    <label>Current Password</label>
                     <input type="password" id="currentPassword" placeholder="Enter current password" required>
                 </div>
                 <div class="form-group">
-                    <label for="newPassword">New Password</label>
+                    <label>New Password</label>
                     <input type="password" id="newPassword" placeholder="Enter new password" required>
                 </div>
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
+                    <label>Confirm Password</label>
                     <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
                 </div>
-                <div class="form-buttons">
-                    <button type="submit" class="btn btn-primary">✓ Update Credentials</button>
-                </div>
+                <button type="submit" class="btn">Update Credentials</button>
             </form>
         </div>
 
         <!-- Create Agent Tab -->
         <div id="create-agent" class="tab-content">
-            <h2 class="section-title">👤 Create New Agent</h2>
-            <div id="createAgentMessage" class="message"></div>
+            <h2>Create New Agent</h2>
+            <div class="success" id="agentSuccess">Agent created successfully!</div>
+            <div class="error" id="agentError"></div>
             <form onsubmit="createAgent(event)">
                 <div class="form-group">
-                    <label for="agentFullName">Full Name</label>
-                    <input type="text" id="agentFullName" placeholder="Enter agent full name" required>
+                    <label>Full Name</label>
+                    <input type="text" id="agentName" placeholder="Enter agent name" required>
                 </div>
                 <div class="form-group">
-                    <label for="agentUsername">Username</label>
-                    <input type="text" id="agentUsername" placeholder="Enter agent username" required>
+                    <label>Username</label>
+                    <input type="text" id="agentUsername" placeholder="Enter username" required>
                 </div>
                 <div class="form-group">
-                    <label for="agentPassword">Password</label>
-                    <input type="password" id="agentPassword" placeholder="Enter agent password" required>
+                    <label>Password</label>
+                    <input type="password" id="agentPassword" placeholder="Enter password" required>
                 </div>
                 <div class="form-group">
-                    <label for="agentRole">Role</label>
+                    <label>Role</label>
                     <select id="agentRole" required>
-                        <option value="">Select Role</option>
                         <option value="agent">Agent</option>
                         <option value="subadmin">SubAdmin</option>
                     </select>
                 </div>
-                <div class="form-buttons">
-                    <button type="submit" class="btn btn-primary">✓ Create Agent</button>
-                </div>
+                <button type="submit" class="btn">Create Agent</button>
             </form>
         </div>
 
         <!-- Manage Users Tab -->
         <div id="manage-users" class="tab-content">
-            <h2 class="section-title">📋 Manage Users</h2>
-            <div id="manageUsersMessage" class="message"></div>
-            <table class="users-table">
+            <h2>Manage Users</h2>
+            <div class="error" id="deleteError"></div>
+            <table class="table" id="usersTable">
                 <thead>
                     <tr>
                         <th>Username</th>
@@ -432,10 +437,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="usersList">
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: #999;">Loading users...</td>
-                    </tr>
+                <tbody id="usersTableBody">
                 </tbody>
             </table>
         </div>
@@ -445,50 +447,45 @@
         const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf';
 
-        // Switch tabs
+        let currentUser = null;
+
+        // Check login on load
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('currentUser');
+            if (!saved) {
+                window.location.href = 'index.html';
+                return;
+            }
+            currentUser = JSON.parse(saved);
+            loadUsers();
+        });
+
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
-
-            if (tabName === 'manage-users') {
-                loadUsers();
-            }
         }
 
-        // Change password
         async function changePassword(e) {
             e.preventDefault();
             const newUsername = document.getElementById('newUsername').value;
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const messageEl = document.getElementById('changePasswordMessage');
+            const errorDiv = document.getElementById('passwordError');
+            const successDiv = document.getElementById('passwordSuccess');
 
             if (newPassword !== confirmPassword) {
-                messageEl.textContent = '❌ Passwords do not match!';
-                messageEl.className = 'message error';
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.style.display = 'block';
                 return;
             }
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/app_users?username=eq.admin`, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    }
-                });
-
-                const users = await response.json();
-                if (users.length === 0 || users[0].password !== currentPassword) {
-                    messageEl.textContent = '❌ Current password is incorrect!';
-                    messageEl.className = 'message error';
-                    return;
-                }
-
-                const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/app_users?username=eq.admin`, {
+                // Update admin user
+                const url = `${SUPABASE_URL}/rest/v1/app_users?id=eq.${currentUser.id}`;
+                const response = await fetch(url, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_KEY,
@@ -501,30 +498,32 @@
                     })
                 });
 
-                if (updateResponse.ok) {
-                    messageEl.textContent = '✅ Credentials updated successfully! Redirecting...';
-                    messageEl.className = 'message success';
-                    setTimeout(() => {
-                        logout();
-                    }, 2000);
-                } else {
-                    messageEl.textContent = '❌ Failed to update credentials';
-                    messageEl.className = 'message error';
-                }
-            } catch (error) {
-                messageEl.textContent = '❌ Error: ' + error.message;
-                messageEl.className = 'message error';
+                if (!response.ok) throw new Error('Update failed');
+
+                currentUser.username = newUsername;
+                currentUser.password = newPassword;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'block';
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                    window.location.href = 'index.html';
+                }, 2000);
+            } catch (err) {
+                errorDiv.textContent = 'Error: ' + err.message;
+                errorDiv.style.display = 'block';
             }
         }
 
-        // Create agent
         async function createAgent(e) {
             e.preventDefault();
-            const fullName = document.getElementById('agentFullName').value;
+            const name = document.getElementById('agentName').value;
             const username = document.getElementById('agentUsername').value;
             const password = document.getElementById('agentPassword').value;
             const role = document.getElementById('agentRole').value;
-            const messageEl = document.getElementById('createAgentMessage');
+            const errorDiv = document.getElementById('agentError');
+            const successDiv = document.getElementById('agentSuccess');
 
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/app_users`, {
@@ -537,32 +536,33 @@
                     body: JSON.stringify({
                         username: username,
                         password: password,
-                        full_name: fullName,
+                        full_name: name,
                         role: role,
                         is_active: true
                     })
                 });
 
-                if (response.ok) {
-                    messageEl.textContent = '✅ Agent created successfully!';
-                    messageEl.className = 'message success';
-                    document.querySelector('#create-agent form').reset();
-                } else {
-                    const error = await response.json();
-                    messageEl.textContent = '❌ Error: ' + (error.message || 'Failed to create agent');
-                    messageEl.className = 'message error';
-                }
-            } catch (error) {
-                messageEl.textContent = '❌ Error: ' + error.message;
-                messageEl.className = 'message error';
+                if (!response.ok) throw new Error('Create failed');
+
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'block';
+                document.getElementById('agentName').value = '';
+                document.getElementById('agentUsername').value = '';
+                document.getElementById('agentPassword').value = '';
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                    loadUsers();
+                }, 2000);
+            } catch (err) {
+                errorDiv.textContent = 'Error: ' + err.message;
+                errorDiv.style.display = 'block';
             }
         }
 
-        // Load users
         async function loadUsers() {
-            const tbody = document.getElementById('usersList');
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/app_users`, {
+                    method: 'GET',
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -570,32 +570,32 @@
                 });
 
                 const users = await response.json();
-                tbody.innerHTML = users.map(user => `
-                    <tr>
-                        <td>${user.username}</td>
-                        <td>${user.full_name}</td>
-                        <td><span class="role-badge ${user.role}">${user.role.toUpperCase()}</span></td>
-                        <td>${user.is_active ? '✅ Active' : '❌ Inactive'}</td>
-                        <td>
-                            ${user.role !== 'admin' ? `
-                                <button class="delete-btn" onclick="deleteUser(${user.id}, '${user.username}')">🗑️ Delete</button>
-                            ` : '<span style="color: #999;">Cannot delete admin</span>'}
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+
+                users.forEach(user => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td data-label="Username">${user.username}</td>
+                        <td data-label="Full Name">${user.full_name}</td>
+                        <td data-label="Role"><span class="badge badge-${user.role}">${user.role.toUpperCase()}</span></td>
+                        <td data-label="Status">${user.is_active ? '✅ Active' : '❌ Inactive'}</td>
+                        <td data-label="Action">
+                            ${user.role !== 'admin' ? `<button class="btn-delete" onclick="deleteUser(${user.id}, '${user.username}')">Delete</button>` : 'N/A'}
                         </td>
-                    </tr>
-                `).join('');
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error loading users: ${error.message}</td></tr>`;
+                    `;
+                });
+            } catch (err) {
+                console.error('Error loading users:', err);
             }
         }
 
-        // Delete user
         async function deleteUser(userId, username) {
-            if (!confirm(`Are you sure you want to delete user "${username}"?`)) {
-                return;
-            }
+            if (!confirm(`Delete user "${username}"?`)) return;
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/app_users?id=eq.${userId}`, {
+                const url = `${SUPABASE_URL}/rest/v1/app_users?id=eq.${userId}`;
+                const response = await fetch(url, {
                     method: 'DELETE',
                     headers: {
                         'apikey': SUPABASE_KEY,
@@ -603,28 +603,17 @@
                     }
                 });
 
-                if (response.ok) {
-                    document.getElementById('manageUsersMessage').textContent = '✅ User deleted successfully!';
-                    document.getElementById('manageUsersMessage').className = 'message success';
-                    loadUsers();
-                } else {
-                    document.getElementById('manageUsersMessage').textContent = '❌ Failed to delete user';
-                    document.getElementById('manageUsersMessage').className = 'message error';
-                }
-            } catch (error) {
-                document.getElementById('manageUsersMessage').textContent = '❌ Error: ' + error.message;
-                document.getElementById('manageUsersMessage').className = 'message error';
+                if (!response.ok) throw new Error('Delete failed');
+                alert('User deleted!');
+                loadUsers();
+            } catch (err) {
+                document.getElementById('deleteError').textContent = 'Error: ' + err.message;
+                document.getElementById('deleteError').style.display = 'block';
             }
         }
 
-        // Logout
         function logout() {
-            localStorage.removeItem('adminLoggedIn');
-            window.location.href = 'index.html';
-        }
-
-        // Check if logged in
-        if (!localStorage.getItem('adminLoggedIn')) {
+            localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
     </script>
