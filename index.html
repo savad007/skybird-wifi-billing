@@ -954,13 +954,18 @@
                 mobile_number: document.getElementById('mobileNumber').value,
                 voucher_code: document.getElementById('voucherCode').value,
                 price: parseFloat(document.getElementById('price').value),
-                surcharge: parseFloat(document.getElementById('surcharge').value) || 0,
                 buy_date: document.getElementById('buyDate').value,
                 validity_days: parseInt(document.getElementById('validityDays').value),
                 plan_name: document.getElementById('planName').value,
                 payment_status: document.getElementById('paymentStatus').value,
                 notes: document.getElementById('notes').value
             };
+            
+            // Add surcharge only if it's greater than 0
+            const surchargeVal = parseFloat(document.getElementById('surcharge').value) || 0;
+            if (surchargeVal > 0) {
+                data.surcharge = surchargeVal;
+            }
 
             const buyDate = new Date(data.buy_date);
             const expiryDate = new Date(buyDate.getTime() + data.validity_days * 24 * 60 * 60 * 1000);
