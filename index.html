@@ -26,6 +26,11 @@
             max-width: 400px;
             padding: 30px;
             margin: 50px auto;
+            display: block;
+        }
+
+        .login-container.hidden {
+            display: none;
         }
 
         .logo {
@@ -58,13 +63,6 @@
             border-radius: 6px;
             font-size: 14px;
             transition: border-color 0.3s;
-        }
-        
-        @media (max-width: 480px) {
-            .form-group input, .form-group select {
-                font-size: 16px;
-                padding: 14px;
-            }
         }
 
         .form-group input:focus, .form-group select:focus {
@@ -103,9 +101,8 @@
 
         .dashboard {
             display: none;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 10px;
         }
 
         .dashboard.active {
@@ -113,76 +110,52 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             flex-wrap: wrap;
             gap: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
         .header h1 {
+            color: #333;
             font-size: 24px;
         }
-        
-        @media (max-width: 480px) {
-            .header {
-                padding: 15px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .header h1 {
-                font-size: 18px;
-                width: 100%;
-            }
-            
-            .header-buttons {
-                display: flex;
-                gap: 10px;
-                width: 100%;
-            }
-            
-            .logout-btn, .admin-btn {
-                flex: 1;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-btn, .logout-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
         .logout-btn {
             background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
         }
 
         .logout-btn:hover {
             background: #b71c1c;
-            transform: translateY(-2px);
         }
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
-        }
-        
-        @media (max-width: 480px) {
-            .stats {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
         }
 
         .stat-card {
@@ -190,14 +163,13 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            border-left: 4px solid #1565C0;
         }
 
         .stat-card h3 {
             color: #666;
             font-size: 14px;
             margin-bottom: 10px;
-            font-weight: 600;
         }
 
         .stat-card .value {
@@ -230,21 +202,6 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
-        @media (max-width: 480px) {
-            .section-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .section-header input {
-                width: 100%;
-            }
-            
-            .add-btn {
-                width: 100%;
-            }
-        }
 
         .add-btn {
             background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
@@ -265,48 +222,6 @@
         .customer-table {
             width: 100%;
             border-collapse: collapse;
-            overflow-x: auto;
-            display: block;
-            overflow-x: auto;
-        }
-        
-        @media (max-width: 768px) {
-            .customer-table, .customer-table thead, .customer-table tbody, .customer-table th, .customer-table td, .customer-table tr {
-                display: block;
-            }
-            
-            .customer-table thead {
-                display: none;
-            }
-            
-            .customer-table tr {
-                margin-bottom: 15px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-            
-            .customer-table td {
-                padding: 10px 12px;
-                text-align: right;
-                position: relative;
-                padding-left: 50%;
-                border: none;
-                border-bottom: 1px solid #eee;
-            }
-            
-            .customer-table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 12px;
-                font-weight: 600;
-                color: #666;
-                text-align: left;
-            }
-            
-            .customer-table td:last-child {
-                border-bottom: none;
-            }
         }
 
         .customer-table th {
@@ -399,7 +314,8 @@
             background: #b71c1c;
         }
 
-          .modal {
+        /* MODAL STYLES - FIXED */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -412,16 +328,9 @@
             justify-content: center;
             padding: 10px;
         }
-        
-        @media (max-width: 480px) {
-            .modal {
-                align-items: flex-end;
-            }
-        }       padding: 10px;
-        }
 
         .modal.active {
-            display: flex;
+            display: flex !important;
         }
 
         .modal-content {
@@ -433,15 +342,6 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        
-        @media (max-width: 480px) {
-            .modal-content {
-                padding: 20px;
-                border-radius: 12px 12px 0 0;
-                max-width: 100%;
-                width: 100%;
-            }
         }
 
         .modal-header {
@@ -481,7 +381,7 @@
             grid-template-columns: 1fr;
         }
 
-        .form-group {
+        .modal .form-group {
             margin-bottom: 0;
         }
 
@@ -520,15 +420,15 @@
             background: #d0d0d0;
         }
 
-        .expired-section {
-            opacity: 0.7;
-        }
-
         .no-data {
             text-align: center;
             color: #999;
             padding: 30px;
             font-size: 16px;
+        }
+
+        .expired-section {
+            opacity: 0.7;
         }
 
         @media (max-width: 768px) {
@@ -542,9 +442,8 @@
                 width: 100%;
             }
 
-            .logout-btn {
+            .header-buttons {
                 width: 100%;
-                text-align: center;
             }
 
             .stats {
@@ -578,6 +477,7 @@
 
             .modal-content {
                 padding: 20px;
+                max-width: 100%;
             }
 
             .modal-buttons {
@@ -593,10 +493,6 @@
                 margin: 30px auto;
             }
         }
-
-        .login-container.hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -606,7 +502,7 @@
             <h1>🌐 Skybird WiFi</h1>
             <p>Billing Management System</p>
         </div>
-        <form onsubmit="login(event)">
+        <form onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" placeholder="Enter username" required>
@@ -625,9 +521,9 @@
         <div class="header">
             <h1>📊 Dashboard</h1>
             <div class="header-buttons">
-                <button class="admin-btn" onclick="window.location.href='omada-sync.html'" style="background: #4CAF50; padding: 10px 20px; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">🔄 Omada Sync</button>
-                <button class="admin-btn" onclick="window.location.href='admin.html'" style="background: #FF9800; padding: 10px 20px; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">⚙️ Admin Panel</button>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+                <button class="admin-btn" onclick="goToOmadaSync()" style="background: #4CAF50;">🔄 Omada Sync</button>
+                <button class="admin-btn" onclick="goToAdmin()" style="background: #FF9800;">⚙️ Admin Panel</button>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
 
@@ -655,7 +551,7 @@
         <div class="section">
             <div class="section-header">
                 <h2>📱 Active Customers</h2>
-                <button class="add-btn" onclick="openAddModal()">+ Add Customer</button>
+                <button class="add-btn" onclick="openAddCustomerModal()">+ Add Customer</button>
             </div>
             <table class="customer-table">
                 <thead>
@@ -704,7 +600,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Add New Customer</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <button type="button" class="close-btn" onclick="closeCustomerModal()">&times;</button>
             </div>
             <form id="customerForm" onsubmit="saveCustomer(event)">
                 <div class="form-row">
@@ -780,7 +676,7 @@
                 </div>
 
                 <div class="modal-buttons">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCustomerModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Customer</button>
                 </div>
             </form>
@@ -792,12 +688,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Customer Details</h2>
-                <button class="close-btn" onclick="closeDetailsModal()">&times;</button>
+                <button type="button" class="close-btn" onclick="closeDetailsModal()">&times;</button>
             </div>
             <div id="detailsContent"></div>
             <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="editCurrentCustomer()">Edit</button>
-                <button class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editCurrentCustomer()">Edit</button>
+                <button type="button" class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
             </div>
         </div>
     </div>
@@ -805,114 +701,21 @@
     <script>
         const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf';
-        
-        // Supabase API helper using fetch
-        const supabaseAPI = {
-            async query(table, method = 'GET', data = null, filters = {}) {
-                let url = `${SUPABASE_URL}/rest/v1/${table}`;
-                
-                // Add filters to URL
-                const filterParams = new URLSearchParams();
-                Object.entries(filters).forEach(([key, value]) => {
-                    filterParams.append(key, `eq.${value}`);
-                });
-                if (filterParams.toString()) {
-                    url += '?' + filterParams.toString();
-                }
-                
-                const options = {
-                    method: method,
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json',
-                    }
-                };
-                
-                if (data) {
-                    options.body = JSON.stringify(data);
-                }
-                
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    const result = await response.json();
-                    return { data: result, error: null };
-                } catch (error) {
-                    return { data: null, error: error.message };
-                }
-            },
-            
-            async select(table, filters = {}) {
-                return this.query(table, 'GET', null, filters);
-            },
-            
-            async insert(table, data) {
-                return this.query(table, 'POST', data);
-            },
-            
-            async update(table, data, id) {
-                const url = `${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`;
-                const options = {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                };
-                
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    return { data: true, error: null };
-                } catch (error) {
-                    return { data: null, error: error.message };
-                }
-            },
-            
-            async delete(table, id) {
-                const url = `${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`;
-                const options = {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    }
-                };
-                
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    return { data: true, error: null };
-                } catch (error) {
-                    return { data: null, error: error.message };
-                }
-            }
-        };
 
         let currentUser = null;
         let customers = [];
         let editingCustomerId = null;
         let currentViewingCustomer = null;
 
-        // Login
-        async function login(e) {
+        // Login Handler
+        async function handleLogin(e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('loginError');
 
             try {
-                // Query app_users table
                 const url = `${SUPABASE_URL}/rest/v1/app_users?username=eq.${username}&password=eq.${password}`;
                 const response = await fetch(url, {
                     method: 'GET',
@@ -921,9 +724,9 @@
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                     }
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (!data || data.length === 0) {
                     errorDiv.textContent = 'Invalid username or password';
                     errorDiv.style.display = 'block';
@@ -950,11 +753,11 @@
         async function loadCustomers() {
             try {
                 let url = `${SUPABASE_URL}/rest/v1/customers`;
-                
-                if (currentUser.role === 'agent') {
+
+                if (currentUser && currentUser.role === 'agent') {
                     url += `?agent_id=eq.${currentUser.id}`;
                 }
-                
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -962,7 +765,7 @@
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                     }
                 });
-                
+
                 const data = await response.json();
                 customers = data || [];
                 updateStats();
@@ -973,7 +776,8 @@
         }
 
         function updateStats() {
-            const active = customers.filter(c => new Date(c.expiry_date) > new Date());
+            const today = new Date();
+            const active = customers.filter(c => new Date(c.expiry_date) > today);
             const total = active.length;
             const paid = active.filter(c => c.payment_status === 'paid').length;
             const unpaid = total - paid;
@@ -1108,7 +912,7 @@
             }
         }
 
-        function openAddModal() {
+        function openAddCustomerModal() {
             editingCustomerId = null;
             document.getElementById('modalTitle').textContent = 'Add New Customer';
             document.getElementById('customerForm').reset();
@@ -1136,7 +940,7 @@
             document.getElementById('customerModal').classList.add('active');
         }
 
-        function closeModal() {
+        function closeCustomerModal() {
             document.getElementById('customerModal').classList.remove('active');
             editingCustomerId = null;
         }
@@ -1158,7 +962,6 @@
                 notes: document.getElementById('notes').value
             };
 
-            // Calculate expiry date
             const buyDate = new Date(data.buy_date);
             const expiryDate = new Date(buyDate.getTime() + data.validity_days * 24 * 60 * 60 * 1000);
             data.expiry_date = expiryDate.toISOString().split('T')[0];
@@ -1175,7 +978,7 @@
                         },
                         body: JSON.stringify(data)
                     });
-                    
+
                     if (!response.ok) throw new Error('Update failed');
                     alert('Customer updated successfully!');
                 } else {
@@ -1189,12 +992,12 @@
                         },
                         body: JSON.stringify(data)
                     });
-                    
+
                     if (!response.ok) throw new Error('Insert failed');
                     alert('Customer added successfully!');
                 }
 
-                closeModal();
+                closeCustomerModal();
                 loadCustomers();
             } catch (err) {
                 alert('Error: ' + err.message);
@@ -1213,7 +1016,7 @@
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                     }
                 });
-                
+
                 if (!response.ok) throw new Error('Delete failed');
                 alert('Customer deleted!');
                 loadCustomers();
@@ -1222,7 +1025,7 @@
             }
         }
 
-        function logout() {
+        function handleLogout() {
             localStorage.removeItem('currentUser');
             currentUser = null;
             document.getElementById('loginContainer').classList.remove('hidden');
@@ -1231,20 +1034,27 @@
             document.getElementById('password').value = '';
         }
 
-        // Check login on load
+        function goToOmadaSync() {
+            window.location.href = 'omada-sync-cloud.html';
+        }
+
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+
+        // Restore session on page load
         window.addEventListener('load', () => {
-            // Wait for Supabase to initialize
-            const checkSupabase = setInterval(() => {
-                if (supabase) {
-                    clearInterval(checkSupabase);
-                    const saved = localStorage.getItem('currentUser');
-                    if (saved) {
-                        currentUser = JSON.parse(saved);
-                        showDashboard();
-                        loadCustomers();
-                    }
+            const saved = localStorage.getItem('currentUser');
+            if (saved) {
+                try {
+                    currentUser = JSON.parse(saved);
+                    showDashboard();
+                    loadCustomers();
+                } catch (err) {
+                    console.error('Error restoring session:', err);
+                    localStorage.removeItem('currentUser');
                 }
-            }, 100);
+            }
         });
     </script>
 </body>
