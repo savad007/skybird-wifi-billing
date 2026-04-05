@@ -701,7 +701,8 @@
     <script>
         const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf';
-        const TABLE_NAME = 'billing_customers'; // Using new table name
+        const BACKEND_URL = 'https://skybird-backend.vercel.app'; // Change this to your backend URL
+        const TABLE_NAME = 'billing_customers';
 
         let currentUser = null;
         let customers = [];
@@ -753,19 +754,28 @@
 
         async function loadCustomers() {
             try {
-                let url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
-
+                // Try backend first, fallback to REST API
+                let url = `${BACKEND_URL}/api/customers`;
                 if (currentUser && currentUser.role === 'agent') {
-                    url += `?agentId=eq.${currentUser.id}`;
+                    url += `?agentId=${currentUser.id}`;
                 }
 
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                let response = await fetch(url).catch(() => null);
+                
+                if (!response || !response.ok) {
+                    // Fallback to REST API
+                    url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
+                    if (currentUser && currentUser.role === 'agent') {
+                        url += `?agentId=eq.${currentUser.id}`;
                     }
-                });
+                    response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        }
+                    });
+                }
 
                 const data = await response.json();
                 customers = data || [];
@@ -970,30 +980,53 @@
             data.expiryDate = expiryDate.toISOString().split('T')[0];
 
             try {
+                let response;
+                
                 if (editingCustomerId) {
-                    const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${editingCustomerId}`;
-                    const response = await fetch(url, {
+                    // Try backend first
+                    response = await fetch(`${BACKEND_URL}/api/customers/${editingCustomerId}`, {
                         method: 'PATCH',
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
-                    });
+                    }).catch(() => null);
+
+                    if (!response || !response.ok) {
+                        // Fallback to REST API
+                        const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${editingCustomerId}`;
+                        response = await fetch(url, {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data)
+                        });
+                    }
 
                     if (!response.ok) throw new Error('Update failed');
                     alert('Customer updated successfully!');
                 } else {
-                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}`, {
+                    // Try backend first
+                    response = await fetch(`${BACKEND_URL}/api/customers`, {
                         method: 'POST',
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
-                    });
+                    }).catch(() => null);
+
+                    if (!response || !response.ok) {
+                        // Fallback to REST API
+                        const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
+                        response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data)
+                        });
+                    }
 
                     if (!response.ok) throw new Error('Insert failed');
                     alert('Customer added successfully!');
@@ -1010,14 +1043,20 @@
             if (!confirm(`Delete customer "${customerName}"?`)) return;
 
             try {
-                const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${customerId}`;
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    }
-                });
+                let response = await fetch(`${BACKEND_URL}/api/customers/${customerId}`, {
+                    method: 'DELETE'
+                }).catch(() => null);
+
+                if (!response || !response.ok) {
+                    const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${customerId}`;
+                    response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        }
+                    });
+                }
 
                 if (!response.ok) throw new Error('Delete failed');
                 alert('Customer deleted!');
