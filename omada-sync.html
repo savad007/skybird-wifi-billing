@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omada Sync - Skybird WiFi Billing</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 28px;
+    }
+
+    .header button {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 2px solid white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .header button:hover {
+      background: white;
+      color: #667eea;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .status-box {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .status-box h3 {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .status-box .value {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #7f1d1d;
+      border-left: 4px solid #ef4444;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e3a8a;
+      border-left: 4px solid #3b82f6;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f9fafb;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #999;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔄 Omada Sync Dashboard</h1>
+      <button onclick="goBack()">← Back to Dashboard</button>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <!-- Connection Status -->
+    <div class="card">
+      <h2>Connection Status</h2>
+      <div class="status-grid">
+        <div class="status-box">
+          <h3>Omada Status</h3>
+          <div class="value" id="omadaStatus">⏳</div>
+        </div>
+        <div class="status-box">
+          <h3>Last Sync</h3>
+          <div class="value" id="lastSync">Never</div>
+        </div>
+        <div class="status-box">
+          <h3>Connected Clients</h3>
+          <div class="value" id="clientCount">0</div>
+        </div>
+        <div class="status-box">
+          <h3>Active Vouchers</h3>
+          <div class="value" id="voucherCount">0</div>
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="btn-primary" onclick="testConnection()">Test Connection</button>
+        <button class="btn-success" onclick="syncNow()">Sync Now</button>
+        <button class="btn-secondary" onclick="autoSyncToggle()" id="autoSyncBtn">Enable Auto Sync (Every 5 min)</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('vouchers')">Vouchers</button>
+        <button class="tab-btn" onclick="switchTab('clients')">Connected Clients</button>
+        <button class="tab-btn" onclick="switchTab('sessions')">Active Sessions</button>
+        <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
+      </div>
+
+      <!-- Vouchers Tab -->
+      <div id="vouchers" class="tab-content active">
+        <h2>Hotspot Vouchers</h2>
+        <div class="table-responsive">
+          <table id="vouchersTable">
+            <thead>
+              <tr>
+                <th>Voucher Code</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Expires</th>
+                <th>Used By</th>
+              </tr>
+            </thead>
+            <tbody id="vouchersBody">
+              <tr>
+                <td colspan="5" class="loading">
+                  <div class="spinner"></div> Loading vouchers...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Clients Tab -->
+      <div id="clients" class="tab-content">
+        <h2>Connected Clients</h2>
+        <div class="table-responsive">
+          <table id="clientsTable">
+            <thead>
+              <tr>
+                <th>Device Name</th>
+                <th>MAC Address</th>
+                <th>IP Address</th>
+                <th>Signal</th>
+                <th>Data Used</th>
+              </tr>
+            </thead>
+            <tbody id="clientsBody">
+              <tr>
+                <td colspan="5" class="loading">
+                  <div class="spinner"></div> Loading clients...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sessions Tab -->
+      <div id="sessions" class="tab-content">
+        <h2>Active Hotspot Sessions</h2>
+        <div class="table-responsive">
+          <table id="sessionsTable">
+            <thead>
+              <tr>
+                <th>Voucher</th>
+                <th>Device</th>
+                <th>Connected</th>
+                <th>Duration</th>
+                <th>Data Used</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsBody">
+              <tr>
+                <td colspan="5" class="loading">
+                  <div class="spinner"></div> Loading sessions...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settings" class="tab-content">
+        <h2>Omada API Settings</h2>
+        <div class="form-group">
+          <label>Omada Controller URL</label>
+          <input type="text" id="omadaUrl" placeholder="https://192.168.1.4:443" value="https://192.168.1.4:443">
+        </div>
+        <div class="form-group">
+          <label>Client ID</label>
+          <input type="text" id="clientId" placeholder="Client ID" value="21d1de0f4b014ed3aeccc923164d1a3c">
+        </div>
+        <div class="form-group">
+          <label>Client Secret</label>
+          <input type="password" id="clientSecret" placeholder="Client Secret" value="4f4bd103166ce59bde98891b14e1b270">
+        </div>
+        <div class="form-group">
+          <label>Site ID (optional)</label>
+          <input type="text" id="siteId" placeholder="Leave empty to auto-detect">
+        </div>
+        <div class="form-group">
+          <label>Auto Sync Interval (minutes)</label>
+          <input type="number" id="syncInterval" min="1" max="60" value="5">
+        </div>
+        <div class="button-group">
+          <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+          <button class="btn-secondary" onclick="resetSettings()">Reset to Default</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="omada-api.js"></script>
+  <script>
+    let omadaAPI = null;
+    let autoSyncInterval = null;
+    let autoSyncEnabled = false;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      initializeOmadaAPI();
+      loadData();
+    });
+
+    function initializeOmadaAPI() {
+      const settings = JSON.parse(localStorage.getItem('omadaSettings') || '{}');
+      omadaAPI = new OmadaAPI({
+        baseUrl: settings.baseUrl || 'https://192.168.1.4:443',
+        clientId: settings.clientId || '21d1de0f4b014ed3aeccc923164d1a3c',
+        clientSecret: settings.clientSecret || '4f4bd103166ce59bde98891b14e1b270',
+      });
+    }
+
+    function showAlert(message, type = 'info') {
+      const alert = document.getElementById('alert');
+      alert.textContent = message;
+      alert.className = `alert show alert-${type}`;
+      setTimeout(() => alert.classList.remove('show'), 5000);
+    }
+
+    async function testConnection() {
+      try {
+        showAlert('Testing connection...', 'info');
+        const sites = await omadaAPI.getSites();
+        if (sites && sites.data) {
+          showAlert(`✅ Connected! Found ${sites.data.length} site(s)`, 'success');
+          document.getElementById('omadaStatus').textContent = '✅ Connected';
+        }
+      } catch (error) {
+        showAlert(`❌ Connection failed: ${error.message}`, 'error');
+        document.getElementById('omadaStatus').textContent = '❌ Failed';
+      }
+    }
+
+    async function syncNow() {
+      try {
+        showAlert('Syncing data...', 'info');
+        await loadData();
+        document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+        showAlert('✅ Sync completed successfully!', 'success');
+      } catch (error) {
+        showAlert(`❌ Sync failed: ${error.message}`, 'error');
+      }
+    }
+
+    async function loadData() {
+      try {
+        const sites = await omadaAPI.getSites();
+        if (!sites.data || sites.data.length === 0) {
+          showAlert('No sites found', 'error');
+          return;
+        }
+
+        const siteId = sites.data[0].id;
+        
+        // Load vouchers
+        const vouchers = await omadaAPI.getHotspotVouchers(siteId);
+        renderVouchers(vouchers.data || []);
+
+        // Load clients
+        const clients = await omadaAPI.getClients(siteId);
+        renderClients(clients.data || []);
+
+        // Load sessions
+        const sessions = await omadaAPI.getHotspotSessions(siteId);
+        renderSessions(sessions.data || []);
+
+        // Update status
+        document.getElementById('clientCount').textContent = (clients.data || []).length;
+        document.getElementById('voucherCount').textContent = (vouchers.data || []).length;
+        document.getElementById('omadaStatus').textContent = '✅ Connected';
+      } catch (error) {
+        console.error('Load data error:', error);
+        showAlert(`Failed to load data: ${error.message}`, 'error');
+      }
+    }
+
+    function renderVouchers(vouchers) {
+      const tbody = document.getElementById('vouchersBody');
+      if (vouchers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No vouchers found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = vouchers.map(v => `
+        <tr>
+          <td><strong>${v.code || 'N/A'}</strong></td>
+          <td><span class="badge badge-${v.used ? 'danger' : 'success'}">${v.used ? 'Used' : 'Available'}</span></td>
+          <td>${new Date(v.createdTime).toLocaleDateString()}</td>
+          <td>${new Date(v.expireTime).toLocaleDateString()}</td>
+          <td>${v.usedBy || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderClients(clients) {
+      const tbody = document.getElementById('clientsBody');
+      if (clients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No clients connected</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = clients.map(c => `
+        <tr>
+          <td>${c.name || 'Unknown'}</td>
+          <td>${c.mac || 'N/A'}</td>
+          <td>${c.ip || 'N/A'}</td>
+          <td>${c.signal || 'N/A'}%</td>
+          <td>${formatBytes(c.dataUsage || 0)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSessions(sessions) {
+      const tbody = document.getElementById('sessionsBody');
+      if (sessions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No active sessions</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sessions.map(s => `
+        <tr>
+          <td>${s.voucherCode || 'N/A'}</td>
+          <td>${s.deviceName || 'Unknown'}</td>
+          <td>${new Date(s.connectedTime).toLocaleString()}</td>
+          <td>${formatDuration(s.duration || 0)}</td>
+          <td>${formatBytes(s.dataUsed || 0)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function formatDuration(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}h ${minutes}m`;
+    }
+
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function autoSyncToggle() {
+      autoSyncEnabled = !autoSyncEnabled;
+      const btn = document.getElementById('autoSyncBtn');
+
+      if (autoSyncEnabled) {
+        const interval = parseInt(document.getElementById('syncInterval').value) * 60000;
+        autoSyncInterval = setInterval(syncNow, interval);
+        btn.textContent = 'Disable Auto Sync';
+        btn.classList.add('btn-danger');
+        btn.classList.remove('btn-secondary');
+        showAlert('Auto sync enabled', 'success');
+      } else {
+        clearInterval(autoSyncInterval);
+        btn.textContent = 'Enable Auto Sync (Every 5 min)';
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-secondary');
+        showAlert('Auto sync disabled', 'info');
+      }
+    }
+
+    function saveSettings() {
+      const settings = {
+        baseUrl: document.getElementById('omadaUrl').value,
+        clientId: document.getElementById('clientId').value,
+        clientSecret: document.getElementById('clientSecret').value,
+        siteId: document.getElementById('siteId').value,
+        syncInterval: document.getElementById('syncInterval').value,
+      };
+
+      localStorage.setItem('omadaSettings', JSON.stringify(settings));
+      initializeOmadaAPI();
+      showAlert('✅ Settings saved successfully!', 'success');
+    }
+
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem('omadaSettings') || '{}');
+      document.getElementById('omadaUrl').value = settings.baseUrl || 'https://192.168.1.4:443';
+      document.getElementById('clientId').value = settings.clientId || '21d1de0f4b014ed3aeccc923164d1a3c';
+      document.getElementById('clientSecret').value = settings.clientSecret || '4f4bd103166ce59bde98891b14e1b270';
+      document.getElementById('siteId').value = settings.siteId || '';
+      document.getElementById('syncInterval').value = settings.syncInterval || '5';
+    }
+
+    function resetSettings() {
+      localStorage.removeItem('omadaSettings');
+      loadSettings();
+      initializeOmadaAPI();
+      showAlert('Settings reset to default', 'info');
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
