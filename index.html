@@ -425,11 +425,11 @@
         <form onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="username" required>
+                <input type="text" id="username" value="admin" required>
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" required>
+                <input type="password" id="password" value="admin123" required>
             </div>
             <button type="submit" class="login-btn">Login</button>
             <div class="error" id="loginError"></div>
@@ -580,8 +580,8 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZmh5cXZleXlka2ZqcXNwdHlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDM2MzAsImV4cCI6MjA5MDg3OTYzMH0.DeMk8OOKEAb4DyaYTI4kXHt2bX61-5uI593Ks5KO85Y';
+        const SUPABASE_URL = 'https://nayxxilobsifspqmzsre.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDAwNDQsImV4cCI6MjA5MDk3NjA0NH0.49lbgMZJiEwnsDsO98d5htlRLddVoq4H3DYCGpDR2pI';
 
         let currentUser = null;
         let customers = [];
@@ -795,8 +795,8 @@
             currentUser = null;
             document.getElementById('loginContainer').classList.remove('hidden');
             document.getElementById('dashboard').classList.remove('active');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
         }
 
         // RESTORE SESSION
