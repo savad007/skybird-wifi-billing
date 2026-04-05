@@ -314,7 +314,7 @@
             background: #b71c1c;
         }
 
-        /* MODAL STYLES - FIXED */
+        /* MODAL STYLES */
         .modal {
             display: none;
             position: fixed;
@@ -605,12 +605,12 @@
             <form id="customerForm" onsubmit="saveCustomer(event)">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="customerName">Full Name *</label>
-                        <input type="text" id="customerName" required>
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required>
                     </div>
                     <div class="form-group">
-                        <label for="roomNumber">Room Number *</label>
-                        <input type="text" id="roomNumber" required>
+                        <label for="roomNo">Room Number *</label>
+                        <input type="text" id="roomNo" required>
                     </div>
                 </div>
 
@@ -631,8 +631,8 @@
                         <input type="number" id="price" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label for="surcharge">Surcharge (SAR)</label>
-                        <input type="number" id="surcharge" step="0.01" value="0">
+                        <label for="voucherAmount">Voucher Amount (SAR)</label>
+                        <input type="number" id="voucherAmount" step="0.01" value="0">
                     </div>
                 </div>
 
@@ -660,10 +660,10 @@
                         <input type="text" id="planName" placeholder="e.g., Basic, Premium">
                     </div>
                     <div class="form-group">
-                        <label for="paymentStatus">Payment Status *</label>
-                        <select id="paymentStatus" required>
-                            <option value="paid">Paid</option>
-                            <option value="unpaid">Unpaid</option>
+                        <label for="isPaid">Payment Status *</label>
+                        <select id="isPaid" required>
+                            <option value="1">Paid</option>
+                            <option value="0">Unpaid</option>
                         </select>
                     </div>
                 </div>
@@ -755,7 +755,7 @@
                 let url = `${SUPABASE_URL}/rest/v1/customers`;
 
                 if (currentUser && currentUser.role === 'agent') {
-                    url += `?agent_id=eq.${currentUser.id}`;
+                    url += `?agentId=eq.${currentUser.id}`;
                 }
 
                 const response = await fetch(url, {
@@ -777,13 +777,13 @@
 
         function updateStats() {
             const today = new Date();
-            const active = customers.filter(c => new Date(c.expiry_date) > today);
+            const active = customers.filter(c => new Date(c.expiryDate) > today);
             const total = active.length;
-            const paid = active.filter(c => c.payment_status === 'paid').length;
+            const paid = active.filter(c => c.isPaid === 1).length;
             const unpaid = total - paid;
             const revenue = active
-                .filter(c => c.payment_status === 'paid')
-                .reduce((sum, c) => sum + (c.price || 0) + (c.surcharge || 0), 0);
+                .filter(c => c.isPaid === 1)
+                .reduce((sum, c) => sum + (c.price || 0) + (c.voucherAmount || 0), 0);
 
             document.getElementById('totalCustomers').textContent = total;
             document.getElementById('paidCustomers').textContent = paid;
@@ -793,8 +793,8 @@
 
         function renderCustomers() {
             const today = new Date();
-            const active = customers.filter(c => new Date(c.expiry_date) > today);
-            const expired = customers.filter(c => new Date(c.expiry_date) <= today);
+            const active = customers.filter(c => new Date(c.expiryDate) > today);
+            const expired = customers.filter(c => new Date(c.expiryDate) <= today);
 
             renderActiveCustomers(active);
             renderExpiredCustomers(expired);
@@ -809,30 +809,31 @@
 
             tbody.innerHTML = active.map(customer => {
                 const today = new Date();
-                const expiry = new Date(customer.expiry_date);
+                const expiry = new Date(customer.expiryDate);
                 const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
                 const isNearlyExpired = daysLeft <= 7;
                 const rowClass = isNearlyExpired ? 'nearly-expired' : '';
+                const statusBadge = customer.isPaid === 1 ? 'paid' : 'unpaid';
 
                 return `
                     <tr class="${rowClass}" onclick="viewCustomerDetails(${customer.id})">
-                        <td>${customer.full_name}</td>
-                        <td>${customer.room_number}</td>
-                        <td>${customer.mobile_number}</td>
-                        <td>${customer.voucher_code}</td>
-                        <td>SAR ${(customer.price + (customer.surcharge || 0)).toFixed(2)}</td>
-                        <td>${new Date(customer.buy_date).toLocaleDateString()}</td>
-                        <td>${new Date(customer.expiry_date).toLocaleDateString()}</td>
+                        <td>${customer.fullName}</td>
+                        <td>${customer.roomNo}</td>
+                        <td>${customer.mobileNumber}</td>
+                        <td>${customer.voucherCode}</td>
+                        <td>SAR ${(customer.price + (customer.voucherAmount || 0)).toFixed(2)}</td>
+                        <td>${new Date(customer.buyDate).toLocaleDateString()}</td>
+                        <td>${new Date(customer.expiryDate).toLocaleDateString()}</td>
                         <td>
-                            <span class="badge ${customer.payment_status}">
-                                ${customer.payment_status.toUpperCase()}
+                            <span class="badge ${statusBadge}">
+                                ${statusBadge.toUpperCase()}
                             </span>
                             ${isNearlyExpired ? '<span class="badge nearly-expired">⚠️ Expiring Soon</span>' : ''}
                         </td>
                         <td onclick="event.stopPropagation()">
                             <div class="action-btns">
                                 <button class="btn-small btn-edit" onclick="editCustomer(${customer.id})">Edit</button>
-                                <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id}, '${customer.full_name}')">Delete</button>
+                                <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id}, '${customer.fullName}')">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -849,21 +850,21 @@
 
             tbody.innerHTML = expired.map(customer => {
                 const today = new Date();
-                const expiry = new Date(customer.expiry_date);
+                const expiry = new Date(customer.expiryDate);
                 const daysExpired = Math.ceil((today - expiry) / (1000 * 60 * 60 * 24));
 
                 return `
                     <tr>
-                        <td>${customer.full_name}</td>
-                        <td>${customer.room_number}</td>
-                        <td>${customer.mobile_number}</td>
-                        <td>${customer.voucher_code}</td>
-                        <td>${new Date(customer.expiry_date).toLocaleDateString()}</td>
+                        <td>${customer.fullName}</td>
+                        <td>${customer.roomNo}</td>
+                        <td>${customer.mobileNumber}</td>
+                        <td>${customer.voucherCode}</td>
+                        <td>${new Date(customer.expiryDate).toLocaleDateString()}</td>
                         <td>${daysExpired} days</td>
                         <td onclick="event.stopPropagation()">
                             <div class="action-btns">
                                 <button class="btn-small btn-edit" onclick="editCustomer(${customer.id})">Renew</button>
-                                <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id}, '${customer.full_name}')">Delete</button>
+                                <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id}, '${customer.fullName}')">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -876,22 +877,22 @@
             if (!customer) return;
 
             currentViewingCustomer = customer;
-            const daysLeft = Math.ceil((new Date(customer.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+            const daysLeft = Math.ceil((new Date(customer.expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
 
             const html = `
                 <div style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
-                    <p><strong>Name:</strong> ${customer.full_name}</p>
-                    <p><strong>Room:</strong> ${customer.room_number}</p>
-                    <p><strong>Mobile:</strong> ${customer.mobile_number}</p>
-                    <p><strong>Voucher Code:</strong> ${customer.voucher_code}</p>
-                    <p><strong>Plan:</strong> ${customer.plan_name || 'N/A'}</p>
+                    <p><strong>Name:</strong> ${customer.fullName}</p>
+                    <p><strong>Room:</strong> ${customer.roomNo}</p>
+                    <p><strong>Mobile:</strong> ${customer.mobileNumber}</p>
+                    <p><strong>Voucher Code:</strong> ${customer.voucherCode}</p>
+                    <p><strong>Plan:</strong> ${customer.planName || 'N/A'}</p>
                     <p><strong>Price:</strong> SAR ${customer.price}</p>
-                    <p><strong>Surcharge:</strong> SAR ${customer.surcharge || 0}</p>
-                    <p><strong>Total:</strong> SAR ${(customer.price + (customer.surcharge || 0)).toFixed(2)}</p>
-                    <p><strong>Buy Date:</strong> ${new Date(customer.buy_date).toLocaleDateString()}</p>
-                    <p><strong>Expiry Date:</strong> ${new Date(customer.expiry_date).toLocaleDateString()}</p>
+                    <p><strong>Voucher Amount:</strong> SAR ${customer.voucherAmount || 0}</p>
+                    <p><strong>Total:</strong> SAR ${(customer.price + (customer.voucherAmount || 0)).toFixed(2)}</p>
+                    <p><strong>Buy Date:</strong> ${new Date(customer.buyDate).toLocaleDateString()}</p>
+                    <p><strong>Expiry Date:</strong> ${new Date(customer.expiryDate).toLocaleDateString()}</p>
                     <p><strong>Days Left:</strong> ${daysLeft > 0 ? daysLeft + ' days' : 'Expired'}</p>
-                    <p><strong>Payment Status:</strong> <span class="badge ${customer.payment_status}">${customer.payment_status.toUpperCase()}</span></p>
+                    <p><strong>Payment Status:</strong> <span class="badge ${customer.isPaid === 1 ? 'paid' : 'unpaid'}">${customer.isPaid === 1 ? 'PAID' : 'UNPAID'}</span></p>
                     <p><strong>Notes:</strong> ${customer.notes || 'None'}</p>
                 </div>
             `;
@@ -925,16 +926,16 @@
 
             editingCustomerId = customerId;
             document.getElementById('modalTitle').textContent = 'Edit Customer';
-            document.getElementById('customerName').value = customer.full_name;
-            document.getElementById('roomNumber').value = customer.room_number;
-            document.getElementById('mobileNumber').value = customer.mobile_number;
-            document.getElementById('voucherCode').value = customer.voucher_code;
+            document.getElementById('fullName').value = customer.fullName;
+            document.getElementById('roomNo').value = customer.roomNo;
+            document.getElementById('mobileNumber').value = customer.mobileNumber;
+            document.getElementById('voucherCode').value = customer.voucherCode;
             document.getElementById('price').value = customer.price;
-            document.getElementById('surcharge').value = customer.surcharge || 0;
-            document.getElementById('buyDate').value = customer.buy_date;
-            document.getElementById('validityDays').value = customer.validity_days;
-            document.getElementById('planName').value = customer.plan_name || '';
-            document.getElementById('paymentStatus').value = customer.payment_status;
+            document.getElementById('voucherAmount').value = customer.voucherAmount || 0;
+            document.getElementById('buyDate').value = customer.buyDate;
+            document.getElementById('validityDays').value = customer.validityDays;
+            document.getElementById('planName').value = customer.planName || '';
+            document.getElementById('isPaid').value = customer.isPaid;
             document.getElementById('notes').value = customer.notes || '';
 
             document.getElementById('customerModal').classList.add('active');
@@ -949,27 +950,22 @@
             e.preventDefault();
 
             const data = {
-                full_name: document.getElementById('customerName').value,
-                room_number: document.getElementById('roomNumber').value,
-                mobile_number: document.getElementById('mobileNumber').value,
-                voucher_code: document.getElementById('voucherCode').value,
+                fullName: document.getElementById('fullName').value,
+                roomNo: document.getElementById('roomNo').value,
+                mobileNumber: document.getElementById('mobileNumber').value,
+                voucherCode: document.getElementById('voucherCode').value,
                 price: parseFloat(document.getElementById('price').value),
-                buy_date: document.getElementById('buyDate').value,
-                validity_days: parseInt(document.getElementById('validityDays').value),
-                plan_name: document.getElementById('planName').value,
-                payment_status: document.getElementById('paymentStatus').value,
+                voucherAmount: parseFloat(document.getElementById('voucherAmount').value) || 0,
+                buyDate: document.getElementById('buyDate').value,
+                validityDays: parseInt(document.getElementById('validityDays').value),
+                planName: document.getElementById('planName').value,
+                isPaid: parseInt(document.getElementById('isPaid').value),
                 notes: document.getElementById('notes').value
             };
-            
-            // Add surcharge only if it's greater than 0
-            const surchargeVal = parseFloat(document.getElementById('surcharge').value) || 0;
-            if (surchargeVal > 0) {
-                data.surcharge = surchargeVal;
-            }
 
-            const buyDate = new Date(data.buy_date);
-            const expiryDate = new Date(buyDate.getTime() + data.validity_days * 24 * 60 * 60 * 1000);
-            data.expiry_date = expiryDate.toISOString().split('T')[0];
+            const buyDate = new Date(data.buyDate);
+            const expiryDate = new Date(buyDate.getTime() + data.validityDays * 24 * 60 * 60 * 1000);
+            data.expiryDate = expiryDate.toISOString().split('T')[0];
 
             try {
                 if (editingCustomerId) {
@@ -987,7 +983,7 @@
                     if (!response.ok) throw new Error('Update failed');
                     alert('Customer updated successfully!');
                 } else {
-                    data.agent_id = currentUser.id;
+                    data.agentId = currentUser.id;
                     const response = await fetch(`${SUPABASE_URL}/rest/v1/customers`, {
                         method: 'POST',
                         headers: {
