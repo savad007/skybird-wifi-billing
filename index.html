@@ -217,6 +217,7 @@
         .customer-table {
             width: 100%;
             border-collapse: collapse;
+            overflow-x: auto;
         }
 
         .customer-table th {
@@ -403,6 +404,14 @@
             .modal-content {
                 padding: 20px;
             }
+
+            .customer-table {
+                font-size: 12px;
+            }
+
+            .customer-table td, .customer-table th {
+                padding: 8px;
+            }
         }
     </style>
 </head>
@@ -460,23 +469,25 @@
                 <h2>📱 Customers</h2>
                 <button class="add-btn" onclick="openAddCustomerModal()">+ Add Customer</button>
             </div>
-            <table class="customer-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Room</th>
-                        <th>Mobile</th>
-                        <th>Voucher</th>
-                        <th>Price</th>
-                        <th>Expiry</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="customersTable">
-                    <tr><td colspan="8" class="no-data">Loading...</td></tr>
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table class="customer-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Room</th>
+                            <th>Mobile</th>
+                            <th>Voucher</th>
+                            <th>Price</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTable">
+                        <tr><td colspan="8" class="no-data">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -632,6 +643,7 @@
                 renderCustomers();
             } catch (err) {
                 console.error('Error loading customers:', err);
+                document.getElementById('customersTable').innerHTML = '<tr><td colspan="8" class="no-data">Error loading customers</td></tr>';
             }
         }
 
@@ -722,8 +734,7 @@
                 validityDays: parseInt(document.getElementById('validityDays').value),
                 planName: document.getElementById('planName').value,
                 isPaid: parseInt(document.getElementById('isPaid').value),
-                notes: document.getElementById('notes').value,
-                agentId: currentUser.id
+                notes: document.getElementById('notes').value
             };
 
             const buyDate = new Date(data.buyDate);
@@ -741,6 +752,7 @@
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
                     },
                     body: JSON.stringify(data)
                 });
