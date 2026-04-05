@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skybird WiFi Billing - Web Portal</title>
+    <title>Skybird WiFi Billing</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,6 @@
             max-width: 400px;
             padding: 30px;
             margin: 50px auto;
-            display: block;
         }
 
         .login-container.hidden {
@@ -56,19 +55,17 @@
             font-size: 14px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 12px;
             border: 2px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
-            transition: border-color 0.3s;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #1565C0;
-            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
         }
 
         .login-btn {
@@ -81,7 +78,6 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
         .login-btn:hover {
@@ -133,7 +129,7 @@
             flex-wrap: wrap;
         }
 
-        .admin-btn, .logout-btn {
+        .btn {
             padding: 10px 20px;
             border: none;
             border-radius: 6px;
@@ -211,7 +207,6 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
         }
 
         .add-btn:hover {
@@ -241,16 +236,6 @@
 
         .customer-table tr:hover {
             background: #f9f9f9;
-            cursor: pointer;
-        }
-
-        .customer-table tr.nearly-expired {
-            background: #fff3cd !important;
-        }
-
-        .customer-table tr.expired {
-            background: #f8d7da !important;
-            opacity: 0.8;
         }
 
         .badge {
@@ -271,16 +256,6 @@
             color: #c62828;
         }
 
-        .badge.nearly-expired {
-            background: #ffe082;
-            color: #f57f17;
-        }
-
-        .badge.expired {
-            background: #ef5350;
-            color: white;
-        }
-
         .action-btns {
             display: flex;
             gap: 5px;
@@ -293,7 +268,6 @@
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            transition: all 0.3s;
         }
 
         .btn-edit {
@@ -301,20 +275,12 @@
             color: white;
         }
 
-        .btn-edit:hover {
-            background: #1976D2;
-        }
-
         .btn-delete {
             background: #d32f2f;
             color: white;
         }
 
-        .btn-delete:hover {
-            background: #b71c1c;
-        }
-
-        /* MODAL STYLES */
+        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -366,10 +332,6 @@
             color: #666;
         }
 
-        .close-btn:hover {
-            color: #333;
-        }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -385,6 +347,15 @@
             margin-bottom: 0;
         }
 
+        .modal .form-group input,
+        .modal .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -392,32 +363,24 @@
             justify-content: flex-end;
         }
 
-        .btn {
+        .btn-primary {
+            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
+            color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
         }
 
         .btn-secondary {
             background: #e0e0e0;
             color: #333;
-        }
-
-        .btn-secondary:hover {
-            background: #d0d0d0;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         .no-data {
@@ -427,107 +390,52 @@
             font-size: 16px;
         }
 
-        .expired-section {
-            opacity: 0.7;
-        }
-
         @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
             .header {
                 flex-direction: column;
                 align-items: flex-start;
             }
 
-            .header h1 {
-                font-size: 20px;
-                width: 100%;
-            }
-
-            .header-buttons {
-                width: 100%;
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .section {
-                padding: 15px;
-            }
-
-            .customer-table {
-                font-size: 12px;
-            }
-
-            .customer-table th,
-            .customer-table td {
-                padding: 8px;
-            }
-
-            .action-btns {
-                flex-direction: column;
-            }
-
-            .btn-small {
-                width: 100%;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
             .modal-content {
                 padding: 20px;
-                max-width: 100%;
-            }
-
-            .modal-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            .login-container {
-                padding: 20px;
-                margin: 30px auto;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Login Container -->
+    <!-- LOGIN -->
     <div class="login-container" id="loginContainer">
         <div class="logo">
             <h1>🌐 Skybird WiFi</h1>
-            <p>Billing Management System</p>
+            <p>Billing System</p>
         </div>
         <form onsubmit="handleLogin(event)">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username" required>
+                <label>Username</label>
+                <input type="text" id="username" required>
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password" required>
+                <label>Password</label>
+                <input type="password" id="password" required>
             </div>
             <button type="submit" class="login-btn">Login</button>
             <div class="error" id="loginError"></div>
         </form>
     </div>
 
-    <!-- Dashboard -->
+    <!-- DASHBOARD -->
     <div class="dashboard" id="dashboard">
         <div class="header">
             <h1>📊 Dashboard</h1>
             <div class="header-buttons">
-                <button class="admin-btn" onclick="goToOmadaSync()" style="background: #4CAF50;">🔄 Omada Sync</button>
-                <button class="admin-btn" onclick="goToAdmin()" style="background: #FF9800;">⚙️ Admin Panel</button>
-                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                <button class="btn logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
 
-        <!-- Stats -->
         <div class="stats">
             <div class="stat-card">
                 <h3>Total Customers</h3>
@@ -547,10 +455,9 @@
             </div>
         </div>
 
-        <!-- Active Customers Section -->
         <div class="section">
             <div class="section-header">
-                <h2>📱 Active Customers</h2>
+                <h2>📱 Customers</h2>
                 <button class="add-btn" onclick="openAddCustomerModal()">+ Add Customer</button>
             </div>
             <table class="customer-table">
@@ -561,90 +468,68 @@
                         <th>Mobile</th>
                         <th>Voucher</th>
                         <th>Price</th>
-                        <th>Buy Date</th>
                         <th>Expiry</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="activeCustomersTable">
-                    <tr><td colspan="9" class="no-data">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Expired Customers Section -->
-        <div class="section expired-section">
-            <h2>⏰ Expired Customers</h2>
-            <table class="customer-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Room</th>
-                        <th>Mobile</th>
-                        <th>Voucher</th>
-                        <th>Expiry Date</th>
-                        <th>Days Expired</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="expiredCustomersTable">
-                    <tr><td colspan="7" class="no-data">No expired customers</td></tr>
+                <tbody id="customersTable">
+                    <tr><td colspan="8" class="no-data">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Add/Edit Customer Modal -->
+    <!-- ADD/EDIT MODAL -->
     <div class="modal" id="customerModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Add New Customer</h2>
+                <h2 id="modalTitle">Add Customer</h2>
                 <button type="button" class="close-btn" onclick="closeCustomerModal()">&times;</button>
             </div>
             <form id="customerForm" onsubmit="saveCustomer(event)">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="fullName">Full Name *</label>
+                        <label>Full Name *</label>
                         <input type="text" id="fullName" required>
                     </div>
                     <div class="form-group">
-                        <label for="roomNo">Room Number *</label>
+                        <label>Room *</label>
                         <input type="text" id="roomNo" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="mobileNumber">Mobile Number *</label>
+                        <label>Mobile *</label>
                         <input type="tel" id="mobileNumber" required>
                     </div>
                     <div class="form-group">
-                        <label for="voucherCode">Voucher Code *</label>
+                        <label>Voucher Code *</label>
                         <input type="text" id="voucherCode" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="price">Price (SAR) *</label>
+                        <label>Price (SAR) *</label>
                         <input type="number" id="price" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label for="voucherAmount">Voucher Amount (SAR)</label>
+                        <label>Voucher Amount</label>
                         <input type="number" id="voucherAmount" step="0.01" value="0">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="buyDate">Buy Date *</label>
+                        <label>Buy Date *</label>
                         <input type="date" id="buyDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="validityDays">Validity Days *</label>
+                        <label>Validity Days *</label>
                         <select id="validityDays" required>
-                            <option value="">Select validity</option>
+                            <option value="">Select</option>
                             <option value="7">7 Days</option>
                             <option value="15">15 Days</option>
                             <option value="30">30 Days</option>
@@ -656,11 +541,11 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="planName">Plan Name</label>
-                        <input type="text" id="planName" placeholder="e.g., Basic, Premium">
+                        <label>Plan Name</label>
+                        <input type="text" id="planName">
                     </div>
                     <div class="form-group">
-                        <label for="isPaid">Payment Status *</label>
+                        <label>Payment Status *</label>
                         <select id="isPaid" required>
                             <option value="1">Paid</option>
                             <option value="0">Unpaid</option>
@@ -670,49 +555,30 @@
 
                 <div class="form-row full">
                     <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <input type="text" id="notes" placeholder="Optional notes">
+                        <label>Notes</label>
+                        <input type="text" id="notes">
                     </div>
                 </div>
 
                 <div class="modal-buttons">
-                    <button type="button" class="btn btn-secondary" onclick="closeCustomerModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                    <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Customer Details Modal -->
-    <div class="modal" id="detailsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Customer Details</h2>
-                <button type="button" class="close-btn" onclick="closeDetailsModal()">&times;</button>
-            </div>
-            <div id="detailsContent"></div>
-            <div class="modal-buttons">
-                <button type="button" class="btn btn-primary" onclick="editCurrentCustomer()">Edit</button>
-                <button type="button" class="btn btn-secondary" onclick="closeDetailsModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf';
-        const BACKEND_URL = 'https://skybird-backend.vercel.app'; // Change this to your backend URL
-        const TABLE_NAME = 'billing_customers';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZmh5cXZleXlka2ZqcXNwdHlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDM2MzAsImV4cCI6MjA5MDg3OTYzMH0.DeMk8OOKEAb4DyaYTI4kXHt2bX61-5uI593Ks5KO85Y';
 
         let currentUser = null;
         let customers = [];
-        let editingCustomerId = null;
-        let currentViewingCustomer = null;
+        let editingId = null;
 
-        // Login Handler
+        // LOGIN
         async function handleLogin(e) {
             e.preventDefault();
-
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('loginError');
@@ -720,7 +586,6 @@
             try {
                 const url = `${SUPABASE_URL}/rest/v1/app_users?username=eq.${username}&password=eq.${password}`;
                 const response = await fetch(url, {
-                    method: 'GET',
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -743,7 +608,6 @@
             } catch (err) {
                 errorDiv.textContent = 'Login failed: ' + err.message;
                 errorDiv.style.display = 'block';
-                console.error('Login error:', err);
             }
         }
 
@@ -752,33 +616,18 @@
             document.getElementById('dashboard').classList.add('active');
         }
 
+        // LOAD CUSTOMERS
         async function loadCustomers() {
             try {
-                // Try backend first, fallback to REST API
-                let url = `${BACKEND_URL}/api/customers`;
-                if (currentUser && currentUser.role === 'agent') {
-                    url += `?agentId=${currentUser.id}`;
-                }
-
-                let response = await fetch(url).catch(() => null);
-                
-                if (!response || !response.ok) {
-                    // Fallback to REST API
-                    url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
-                    if (currentUser && currentUser.role === 'agent') {
-                        url += `?agentId=eq.${currentUser.id}`;
+                const url = `${SUPABASE_URL}/rest/v1/billing_customers`;
+                const response = await fetch(url, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
                     }
-                    response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        }
-                    });
-                }
+                });
 
-                const data = await response.json();
-                customers = data || [];
+                customers = await response.json();
                 updateStats();
                 renderCustomers();
             } catch (err) {
@@ -789,153 +638,55 @@
         function updateStats() {
             const today = new Date();
             const active = customers.filter(c => new Date(c.expiryDate) > today);
-            const total = active.length;
             const paid = active.filter(c => c.isPaid === 1).length;
-            const unpaid = total - paid;
-            const revenue = active
-                .filter(c => c.isPaid === 1)
-                .reduce((sum, c) => sum + (c.price || 0) + (c.voucherAmount || 0), 0);
+            const revenue = active.filter(c => c.isPaid === 1).reduce((sum, c) => sum + (c.price || 0), 0);
 
-            document.getElementById('totalCustomers').textContent = total;
+            document.getElementById('totalCustomers').textContent = active.length;
             document.getElementById('paidCustomers').textContent = paid;
-            document.getElementById('unpaidCustomers').textContent = unpaid;
+            document.getElementById('unpaidCustomers').textContent = active.length - paid;
             document.getElementById('totalRevenue').textContent = 'SAR ' + revenue.toFixed(2);
         }
 
         function renderCustomers() {
             const today = new Date();
             const active = customers.filter(c => new Date(c.expiryDate) > today);
-            const expired = customers.filter(c => new Date(c.expiryDate) <= today);
 
-            renderActiveCustomers(active);
-            renderExpiredCustomers(expired);
-        }
-
-        function renderActiveCustomers(active) {
-            const tbody = document.getElementById('activeCustomersTable');
             if (active.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="no-data">No active customers</td></tr>';
+                document.getElementById('customersTable').innerHTML = '<tr><td colspan="8" class="no-data">No customers</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = active.map(customer => {
-                const today = new Date();
-                const expiry = new Date(customer.expiryDate);
-                const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-                const isNearlyExpired = daysLeft <= 7;
-                const rowClass = isNearlyExpired ? 'nearly-expired' : '';
-                const statusBadge = customer.isPaid === 1 ? 'paid' : 'unpaid';
-
-                return `
-                    <tr class="${rowClass}" onclick="viewCustomerDetails(${customer.id})">
-                        <td>${customer.fullName}</td>
-                        <td>${customer.roomNo}</td>
-                        <td>${customer.mobileNumber}</td>
-                        <td>${customer.voucherCode}</td>
-                        <td>SAR ${(customer.price + (customer.voucherAmount || 0)).toFixed(2)}</td>
-                        <td>${new Date(customer.buyDate).toLocaleDateString()}</td>
-                        <td>${new Date(customer.expiryDate).toLocaleDateString()}</td>
-                        <td>
-                            <span class="badge ${statusBadge}">
-                                ${statusBadge.toUpperCase()}
-                            </span>
-                            ${isNearlyExpired ? '<span class="badge nearly-expired">⚠️ Expiring Soon</span>' : ''}
-                        </td>
-                        <td onclick="event.stopPropagation()">
-                            <div class="action-btns">
-                                <button class="btn-small btn-edit" onclick="editCustomer(${customer.id})">Edit</button>
-                                <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id}, '${customer.fullName}')">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function renderExpiredCustomers(expired) {
-            const tbody = document.getElementById('expiredCustomersTable');
-            if (expired.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No expired customers</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = expired.map(customer => {
-                const today = new Date();
-                const expiry = new Date(customer.expiryDate);
-                const daysExpired = Math.ceil((today - expiry) / (1000 * 60 * 60 * 24));
-
-                return `
-                    <tr>
-                        <td>${customer.fullName}</td>
-                        <td>${customer.roomNo}</td>
-                        <td>${customer.mobileNumber}</td>
-                        <td>${customer.voucherCode}</td>
-                        <td>${new Date(customer.expiryDate).toLocaleDateString()}</td>
-                        <td>${daysExpired} days</td>
-                        <td onclick="event.stopPropagation()">
-                            <div class="action-btns">
-                                <button class="btn-small btn-edit" onclick="editCustomer(${customer.id})">Renew</button>
-                                <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id}, '${customer.fullName}')">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function viewCustomerDetails(customerId) {
-            const customer = customers.find(c => c.id === customerId);
-            if (!customer) return;
-
-            currentViewingCustomer = customer;
-            const daysLeft = Math.ceil((new Date(customer.expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
-
-            const html = `
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
-                    <p><strong>Name:</strong> ${customer.fullName}</p>
-                    <p><strong>Room:</strong> ${customer.roomNo}</p>
-                    <p><strong>Mobile:</strong> ${customer.mobileNumber}</p>
-                    <p><strong>Voucher Code:</strong> ${customer.voucherCode}</p>
-                    <p><strong>Plan:</strong> ${customer.planName || 'N/A'}</p>
-                    <p><strong>Price:</strong> SAR ${customer.price}</p>
-                    <p><strong>Voucher Amount:</strong> SAR ${customer.voucherAmount || 0}</p>
-                    <p><strong>Total:</strong> SAR ${(customer.price + (customer.voucherAmount || 0)).toFixed(2)}</p>
-                    <p><strong>Buy Date:</strong> ${new Date(customer.buyDate).toLocaleDateString()}</p>
-                    <p><strong>Expiry Date:</strong> ${new Date(customer.expiryDate).toLocaleDateString()}</p>
-                    <p><strong>Days Left:</strong> ${daysLeft > 0 ? daysLeft + ' days' : 'Expired'}</p>
-                    <p><strong>Payment Status:</strong> <span class="badge ${customer.isPaid === 1 ? 'paid' : 'unpaid'}">${customer.isPaid === 1 ? 'PAID' : 'UNPAID'}</span></p>
-                    <p><strong>Notes:</strong> ${customer.notes || 'None'}</p>
-                </div>
-            `;
-
-            document.getElementById('detailsContent').innerHTML = html;
-            document.getElementById('detailsModal').classList.add('active');
-        }
-
-        function closeDetailsModal() {
-            document.getElementById('detailsModal').classList.remove('active');
-            currentViewingCustomer = null;
-        }
-
-        function editCurrentCustomer() {
-            if (currentViewingCustomer) {
-                editCustomer(currentViewingCustomer.id);
-                closeDetailsModal();
-            }
+            document.getElementById('customersTable').innerHTML = active.map(c => `
+                <tr>
+                    <td>${c.fullName}</td>
+                    <td>${c.roomNo}</td>
+                    <td>${c.mobileNumber}</td>
+                    <td>${c.voucherCode}</td>
+                    <td>SAR ${(c.price + (c.voucherAmount || 0)).toFixed(2)}</td>
+                    <td>${new Date(c.expiryDate).toLocaleDateString()}</td>
+                    <td><span class="badge ${c.isPaid === 1 ? 'paid' : 'unpaid'}">${c.isPaid === 1 ? 'PAID' : 'UNPAID'}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-small btn-edit" onclick="editCustomer(${c.id})">Edit</button>
+                            <button class="btn-small btn-delete" onclick="deleteCustomer(${c.id})">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         function openAddCustomerModal() {
-            editingCustomerId = null;
-            document.getElementById('modalTitle').textContent = 'Add New Customer';
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Add Customer';
             document.getElementById('customerForm').reset();
             document.getElementById('customerModal').classList.add('active');
         }
 
-        function editCustomer(customerId) {
-            const customer = customers.find(c => c.id === customerId);
+        function editCustomer(id) {
+            const customer = customers.find(c => c.id === id);
             if (!customer) return;
 
-            editingCustomerId = customerId;
+            editingId = id;
             document.getElementById('modalTitle').textContent = 'Edit Customer';
             document.getElementById('fullName').value = customer.fullName;
             document.getElementById('roomNo').value = customer.roomNo;
@@ -954,7 +705,7 @@
 
         function closeCustomerModal() {
             document.getElementById('customerModal').classList.remove('active');
-            editingCustomerId = null;
+            editingId = null;
         }
 
         async function saveCustomer(e) {
@@ -980,58 +731,26 @@
             data.expiryDate = expiryDate.toISOString().split('T')[0];
 
             try {
-                let response;
-                
-                if (editingCustomerId) {
-                    // Try backend first
-                    response = await fetch(`${BACKEND_URL}/api/customers/${editingCustomerId}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    }).catch(() => null);
+                const url = editingId 
+                    ? `${SUPABASE_URL}/rest/v1/billing_customers?id=eq.${editingId}`
+                    : `${SUPABASE_URL}/rest/v1/billing_customers`;
 
-                    if (!response || !response.ok) {
-                        // Fallback to REST API
-                        const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${editingCustomerId}`;
-                        response = await fetch(url, {
-                            method: 'PATCH',
-                            headers: {
-                                'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(data)
-                        });
-                    }
+                const response = await fetch(url, {
+                    method: editingId ? 'PATCH' : 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
 
-                    if (!response.ok) throw new Error('Update failed');
-                    alert('Customer updated successfully!');
-                } else {
-                    // Try backend first
-                    response = await fetch(`${BACKEND_URL}/api/customers`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    }).catch(() => null);
-
-                    if (!response || !response.ok) {
-                        // Fallback to REST API
-                        const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
-                        response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(data)
-                        });
-                    }
-
-                    if (!response.ok) throw new Error('Insert failed');
-                    alert('Customer added successfully!');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Save failed');
                 }
 
+                alert(editingId ? 'Updated!' : 'Added!');
                 closeCustomerModal();
                 loadCustomers();
             } catch (err) {
@@ -1039,27 +758,20 @@
             }
         }
 
-        async function deleteCustomer(customerId, customerName) {
-            if (!confirm(`Delete customer "${customerName}"?`)) return;
+        async function deleteCustomer(id) {
+            if (!confirm('Delete this customer?')) return;
 
             try {
-                let response = await fetch(`${BACKEND_URL}/api/customers/${customerId}`, {
-                    method: 'DELETE'
-                }).catch(() => null);
-
-                if (!response || !response.ok) {
-                    const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${customerId}`;
-                    response = await fetch(url, {
-                        method: 'DELETE',
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        }
-                    });
-                }
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/billing_customers?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    }
+                });
 
                 if (!response.ok) throw new Error('Delete failed');
-                alert('Customer deleted!');
+                alert('Deleted!');
                 loadCustomers();
             } catch (err) {
                 alert('Error: ' + err.message);
@@ -1075,15 +787,7 @@
             document.getElementById('password').value = '';
         }
 
-        function goToOmadaSync() {
-            window.location.href = 'omada-sync-cloud.html';
-        }
-
-        function goToAdmin() {
-            window.location.href = 'admin.html';
-        }
-
-        // Restore session on page load
+        // RESTORE SESSION
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('currentUser');
             if (saved) {
@@ -1092,7 +796,6 @@
                     showDashboard();
                     loadCustomers();
                 } catch (err) {
-                    console.error('Error restoring session:', err);
                     localStorage.removeItem('currentUser');
                 }
             }
