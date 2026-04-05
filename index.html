@@ -701,6 +701,7 @@
     <script>
         const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_qPf_4ZyFWxfwOz5GjBergg_SRnUqtXf';
+        const TABLE_NAME = 'billing_customers'; // Using new table name
 
         let currentUser = null;
         let customers = [];
@@ -752,7 +753,7 @@
 
         async function loadCustomers() {
             try {
-                let url = `${SUPABASE_URL}/rest/v1/customers`;
+                let url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
 
                 if (currentUser && currentUser.role === 'agent') {
                     url += `?agentId=eq.${currentUser.id}`;
@@ -960,7 +961,8 @@
                 validityDays: parseInt(document.getElementById('validityDays').value),
                 planName: document.getElementById('planName').value,
                 isPaid: parseInt(document.getElementById('isPaid').value),
-                notes: document.getElementById('notes').value
+                notes: document.getElementById('notes').value,
+                agentId: currentUser.id
             };
 
             const buyDate = new Date(data.buyDate);
@@ -969,7 +971,7 @@
 
             try {
                 if (editingCustomerId) {
-                    const url = `${SUPABASE_URL}/rest/v1/customers?id=eq.${editingCustomerId}`;
+                    const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${editingCustomerId}`;
                     const response = await fetch(url, {
                         method: 'PATCH',
                         headers: {
@@ -983,8 +985,7 @@
                     if (!response.ok) throw new Error('Update failed');
                     alert('Customer updated successfully!');
                 } else {
-                    data.agentId = currentUser.id;
-                    const response = await fetch(`${SUPABASE_URL}/rest/v1/customers`, {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}`, {
                         method: 'POST',
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1009,7 +1010,7 @@
             if (!confirm(`Delete customer "${customerName}"?`)) return;
 
             try {
-                const url = `${SUPABASE_URL}/rest/v1/customers?id=eq.${customerId}`;
+                const url = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${customerId}`;
                 const response = await fetch(url, {
                     method: 'DELETE',
                     headers: {
