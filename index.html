@@ -23,6 +23,93 @@
             margin: 0 auto;
         }
 
+        /* New layout: sidebar + main */
+        .app-layout {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 18px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .brand {
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            width: 100%;
+            text-align: left;
+            padding: 12px 12px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            background: white;
+            cursor: pointer;
+            font-weight: 700;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .nav-item.active {
+            border-color: rgba(46,125,50,0.35);
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 14px;
+        }
+
+        .search-row input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-row input:focus {
+            border-color: rgba(46,125,50,0.6);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+        }
+
         .header {
             background: white;
             padding: 20px 30px;
@@ -444,6 +531,29 @@
             margin-top: 20px;
         }
 
+        @media (max-width: 980px) {
+            .app-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+
+            .nav-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 160px;
+                text-align: center;
+            }
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -454,8 +564,14 @@
                 grid-template-columns: 1fr;
             }
 
+            /* Cleaner tables: allow horizontal scroll on small screens */
+            .tab-content {
+                overflow-x: auto;
+            }
+
             .customer-table {
                 font-size: 12px;
+                min-width: 720px;
             }
 
             .customer-table th,
@@ -468,11 +584,7 @@
             }
 
             .tabs {
-                padding: 0 15px;
-            }
-
-            .tab-content {
-                padding: 15px;
+                display: none; /* sidebar navigation used instead */
             }
         }
     </style>
@@ -497,47 +609,72 @@
 
         <!-- Dashboard Screen -->
         <div id="dashboardScreen" style="display: none;">
-            <div class="header">
-                <h1>📊 Skybird WiFi Billing</h1>
-                <div class="header-buttons">
-                    <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
-                    <button class="btn btn-primary" onclick="openVoiceAssistant()" title="Malayalam voice input">🎤 AI Assist (Malayalam)</button>
-                    <button class="btn btn-secondary" onclick="window.location.href='omada-sync.html'">🔄 Omada Sync</button>
-                    <button class="btn btn-primary" onclick="openAdminPanel()">⚙️ Admin</button>
-                    <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
-                </div>
-            </div>
+            <div class="app-layout">
+                <aside class="sidebar">
+                    <div class="brand">🌐 Skybird WiFi Billing</div>
+                    <div class="nav-group">
+                        <button class="nav-item active" id="nav-active" onclick="switchTab('active')">👥 Active</button>
+                        <button class="nav-item" id="nav-expiring" onclick="switchTab('expiring')">⚠️ Expiring</button>
+                        <button class="nav-item" id="nav-expired" onclick="switchTab('expired')">📦 Expired</button>
+                    </div>
+                    <div style="margin-top: 14px; display:flex; flex-direction:column; gap:10px;">
+                        <button class="btn btn-secondary" onclick="openAddCustomerModal()" style="width:100%;">➕ Add Customer</button>
+                        <button class="btn btn-primary" onclick="openVoiceAssistant()" style="width:100%;" title="English voice input">🎤 Voice Assist</button>
+                        <button class="btn btn-secondary" onclick="window.location.href='omada-sync.html'" style="width:100%;">🔄 Omada Sync</button>
+                        <button class="btn btn-primary" onclick="openAdminPanel()" style="width:100%;">⚙️ Admin</button>
+                        <button class="btn btn-danger" onclick="handleLogout()" style="width:100%;">Logout</button>
+                    </div>
+                </aside>
 
-            <div class="stats-grid">
-                <div class="stat-card success">
-                    <div class="stat-label">Total Customers</div>
-                    <div class="stat-value" id="totalCustomers">0</div>
-                    <div class="stat-subtext">Active subscriptions</div>
-                </div>
-                <div class="stat-card success">
-                    <div class="stat-label">Paid</div>
-                    <div class="stat-value" id="paidCount">0</div>
-                    <div class="stat-subtext">Payments received</div>
-                </div>
-                <div class="stat-card danger">
-                    <div class="stat-label">Unpaid</div>
-                    <div class="stat-value" id="unpaidCount">0</div>
-                    <div class="stat-subtext">Pending payments</div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-label">Expiring Soon</div>
-                    <div class="stat-value" id="expiringCount">0</div>
-                    <div class="stat-subtext">Next 7 days</div>
-                </div>
-            </div>
+                <main class="main">
+                    <div class="header">
+                        <h1>📊 Dashboard</h1>
+                        <div class="header-buttons">
+                            <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
+                            <button class="btn btn-primary" onclick="openVoiceAssistant()" title="English voice input">🎤 Voice Assist</button>
+                        </div>
+                    </div>
 
-            <div class="alert alert-warning" id="alertBox"></div>
+                    <div class="stats-grid">
+                        <div class="stat-card success">
+                            <div class="stat-label">Total Profit</div>
+                            <div class="stat-value" id="totalProfit">SAR 0.00</div>
+                            <div class="stat-subtext">Paid active total</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Total Customers</div>
+                            <div class="stat-value" id="totalCustomers">0</div>
+                            <div class="stat-subtext">Active subscriptions</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Paid</div>
+                            <div class="stat-value" id="paidCount">0</div>
+                            <div class="stat-subtext">Payments received</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">Unpaid</div>
+                            <div class="stat-value" id="unpaidCount">0</div>
+                            <div class="stat-subtext">Pending payments</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">Expiring Soon</div>
+                            <div class="stat-value" id="expiringCount">0</div>
+                            <div class="stat-subtext">Next 7 days</div>
+                        </div>
+                    </div>
 
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('active')">Active Customers</button>
-                <button class="tab" onclick="switchTab('expiring')">⚠️ Expiring Soon</button>
-                <button class="tab" onclick="switchTab('expired')">📦 Expired</button>
-            </div>
+                    <div class="search-row">
+                        <input id="customerSearch" type="text" placeholder="Search name / room / mobile / voucher..." />
+                        <button class="btn btn-secondary" onclick="clearSearch()" style="padding:10px 14px;">Clear</button>
+                    </div>
+
+                    <div class="alert alert-warning" id="alertBox"></div>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('active')">Active Customers</button>
+                        <button class="tab" onclick="switchTab('expiring')">⚠️ Expiring Soon</button>
+                        <button class="tab" onclick="switchTab('expired')">📦 Expired</button>
+                    </div>
 
             <div id="activeTab" class="tab-content active">
                 <table class="customer-table">
@@ -547,7 +684,7 @@
                             <th>Room</th>
                             <th>Mobile</th>
                             <th>Voucher</th>
-                            <th>Price</th>
+                            <th>Price (SAR)</th>
                             <th>Status</th>
                             <th>Expiry</th>
                             <th>Actions</th>
@@ -567,7 +704,7 @@
                             <th>Room</th>
                             <th>Mobile</th>
                             <th>Voucher</th>
-                            <th>Price</th>
+                            <th>Price (SAR)</th>
                             <th>Status</th>
                             <th>Expiry</th>
                             <th>Days Left</th>
@@ -588,7 +725,7 @@
                             <th>Room</th>
                             <th>Mobile</th>
                             <th>Voucher</th>
-                            <th>Price</th>
+                            <th>Price (SAR)</th>
                             <th>Status</th>
                             <th>Expired Date</th>
                             <th>Actions</th>
@@ -598,6 +735,8 @@
                         <tr><td colspan="8" class="empty-state">No expired customers</td></tr>
                     </tbody>
                 </table>
+            </div>
+                </main>
             </div>
         </div>
     </div>
@@ -711,8 +850,8 @@
     <!-- Voice Assistant Modal (Free, Browser-based) -->
     <div id="voiceModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">🎤 AI Assist (Malayalam)</div>
-            <div id="voiceAlert" class="alert alert-warning show" style="display:block;">Tip: Click Start and speak in Malayalam. The text will go to the focused input, or it will try to auto-fill Name/Room/Voucher/Date/Paid.</div>
+            <div class="modal-header">🎤 Voice Assistant</div>
+            <div id="voiceAlert" class="alert alert-warning show" style="display:block;">Tip: Click Start and speak in English. It can auto-fill Name/Room/Voucher/Date/Paid (and open New Customer).</div>
             <div class="form-group">
                 <label>Recognized Text</label>
                 <textarea id="voiceTranscript" rows="4" placeholder="Speech will appear here..."></textarea>
@@ -736,6 +875,7 @@
         let currentUser = null;
         let currentEditingId = null;
         let allCustomers = [];
+        let customerSearchQuery = '';
 
         // Initialize
         window.addEventListener('load', () => {
@@ -743,9 +883,26 @@
             if (saved) {
                 currentUser = JSON.parse(saved);
                 showDashboard();
+                bindSearch();
                 loadCustomers();
             }
         });
+
+        function bindSearch() {
+            const input = document.getElementById('customerSearch');
+            if (!input) return;
+            input.addEventListener('input', () => {
+                customerSearchQuery = input.value.trim().toLowerCase();
+                renderCustomers();
+            });
+        }
+
+        function clearSearch() {
+            customerSearchQuery = '';
+            const input = document.getElementById('customerSearch');
+            if (input) input.value = '';
+            renderCustomers();
+        }
 
         // Login
         async function handleLogin() {
@@ -773,6 +930,7 @@
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
+            bindSearch();
         }
 
         // Load Customers
@@ -804,8 +962,10 @@
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
             const active = allCustomers.filter(c => new Date(c.expiry_date) >= today);
-            const paid = active.filter(c => c.is_paid === 1).length;
+            const paidActive = active.filter(c => c.is_paid === 1);
+            const paid = paidActive.length;
             const unpaid = active.filter(c => c.is_paid === 0).length;
+            const profit = paidActive.reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
             const expiring = active.filter(c => {
                 const expiry = new Date(c.expiry_date);
                 return expiry >= today && expiry <= sevenDaysLater;
@@ -815,6 +975,8 @@
             document.getElementById('paidCount').textContent = paid;
             document.getElementById('unpaidCount').textContent = unpaid;
             document.getElementById('expiringCount').textContent = expiring;
+            const profitEl = document.getElementById('totalProfit');
+            if (profitEl) profitEl.textContent = `SAR ${profit.toFixed(2)}`;
         }
 
         // Render Customers
@@ -822,12 +984,21 @@
             const today = new Date();
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            const active = allCustomers.filter(c => new Date(c.expiry_date) >= today);
+            // Apply search filter (name / room / mobile / voucher)
+            let list = allCustomers;
+            if (customerSearchQuery) {
+                list = allCustomers.filter(c => {
+                    const hay = `${c.full_name || ''} ${c.room_no || ''} ${c.mobile_number || ''} ${c.voucher_code || ''}`.toLowerCase();
+                    return hay.includes(customerSearchQuery);
+                });
+            }
+
+            const active = list.filter(c => new Date(c.expiry_date) >= today);
             const expiring = active.filter(c => {
                 const expiry = new Date(c.expiry_date);
                 return expiry >= today && expiry <= sevenDaysLater;
             });
-            const expired = allCustomers.filter(c => new Date(c.expiry_date) < today);
+            const expired = list.filter(c => new Date(c.expiry_date) < today);
 
             renderTable('activeCustomersTable', active.filter(c => !expiring.includes(c)));
             renderTable('expiringCustomersTable', expiring, true);
@@ -859,7 +1030,7 @@
                         <td>${c.room_no}</td>
                         <td>${c.mobile_number}</td>
                         <td>${c.voucher_code}</td>
-                        <td>$${c.price}</td>
+                        <td>SAR ${Number(c.price || 0).toFixed(2)}</td>
                         <td><span class="status-badge ${c.is_paid ? 'status-paid' : 'status-unpaid'}">${c.is_paid ? 'Paid' : 'Unpaid'}</span></td>
                         <td>${new Date(c.expiry_date).toLocaleDateString()}</td>
                         ${daysColumn}
@@ -878,16 +1049,26 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
             if (tab === 'active') {
                 document.getElementById('activeTab').classList.add('active');
-                document.querySelectorAll('.tab')[0].classList.add('active');
+                const tabs = document.querySelectorAll('.tab');
+                if (tabs[0]) tabs[0].classList.add('active');
+                const nav = document.getElementById('nav-active');
+                if (nav) nav.classList.add('active');
             } else if (tab === 'expiring') {
                 document.getElementById('expiringTab').classList.add('active');
-                document.querySelectorAll('.tab')[1].classList.add('active');
+                const tabs = document.querySelectorAll('.tab');
+                if (tabs[1]) tabs[1].classList.add('active');
+                const nav = document.getElementById('nav-expiring');
+                if (nav) nav.classList.add('active');
             } else if (tab === 'expired') {
                 document.getElementById('expiredTab').classList.add('active');
-                document.querySelectorAll('.tab')[2].classList.add('active');
+                const tabs = document.querySelectorAll('.tab');
+                if (tabs[2]) tabs[2].classList.add('active');
+                const nav = document.getElementById('nav-expired');
+                if (nav) nav.classList.add('active');
             }
         }
 
@@ -1165,7 +1346,7 @@
             }
 
             voiceRecognition = new SpeechRecognition();
-            voiceRecognition.lang = 'ml-IN';
+            voiceRecognition.lang = 'en-US';
             voiceRecognition.interimResults = true;
             voiceRecognition.continuous = true;
 
@@ -1204,7 +1385,7 @@
             voiceIsRunning = true;
             document.getElementById('voiceStartBtn').disabled = true;
             document.getElementById('voiceStopBtn').disabled = false;
-            showVoiceInfo('Listening... speak Malayalam (ml-IN).', 'success');
+            showVoiceInfo('Listening... speak English (en-US).', 'success');
             try { voiceRecognition.start(); } catch (e) {}
         }
 
@@ -1244,51 +1425,106 @@
             showVoiceInfo('Inserted into focused field.', 'success');
         }
 
-        function tryAutoFillFromSpeech(raw) {
-            // Only try to fill when customer modal is open
-            const isCustomerModalOpen = document.getElementById('customerModal').classList.contains('active');
-            if (!isCustomerModalOpen) return;
+        function normalizeSpeechText(s) {
+            return (s || '').trim();
+        }
 
-            const t = raw.trim();
+        function parseCustomerFromSpeech(raw) {
+            const t = normalizeSpeechText(raw);
+            const lower = t.toLowerCase();
 
-            // Helper: extract text after keyword
             const extractAfter = (text, kwRegex) => {
                 const m = text.match(kwRegex);
                 if (!m) return null;
                 return (m[1] || '').trim();
             };
 
-            // Name: "name Ali" or "പേര് അലി"
-            const nameVal = extractAfter(t, /(?:name|full name|പേര്|പേരു)\s*[:\-]?\s*(.+)$/i);
-            if (nameVal) document.getElementById('fullName').value = nameVal;
+            // Support a few Malayalam keywords too
+            const name = extractAfter(t, /(?:name|full name|പേര്|പേരു)\s*[:\-]?\s*(.+)$/i);
+            const room = extractAfter(t, /(?:room|room number|റൂം|റൂമ്)\s*[:\-]?\s*([A-Za-z0-9\- ]+)$/i);
+            const voucher = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*([A-Za-z0-9\-]+)$/i);
 
-            // Room: "room 101" or "റൂം 101"
-            const roomVal = extractAfter(t, /(?:room|room number|റൂം)\s*[:\-]?\s*([A-Za-z0-9\- ]+)$/i);
-            if (roomVal) document.getElementById('roomNo').value = roomVal;
-
-            // Voucher: "voucher ABC" or "വൗച്ചർ ABC"
-            const voucherVal = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*([A-Za-z0-9\-]+)$/i);
-            if (voucherVal) document.getElementById('voucherCode').value = voucherVal;
-
-            // Date: prefer yyyy-mm-dd spoken as digits, or dd/mm/yyyy
+            // Date: yyyy-mm-dd OR dd/mm/yyyy
+            let buyDate = null;
             const dateIso = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
             if (dateIso) {
-                document.getElementById('buyDate').value = dateIso;
+                buyDate = dateIso;
             } else {
                 const dateSlash = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4})/i);
                 if (dateSlash) {
                     const [dd, mm, yyyy] = dateSlash.split('/');
-                    const iso = `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-                    document.getElementById('buyDate').value = iso;
+                    buyDate = `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
                 }
             }
 
-            // Paid/unpaid
-            const lower = t.toLowerCase();
-            if (lower.includes('unpaid') || lower.includes('അൺപെയ്ഡ്') || lower.includes('അന്‍പെയ്ഡ്')) {
-                document.getElementById('isPaid').value = '0';
-            } else if (lower.includes('paid') || lower.includes('പെയ്ഡ്')) {
-                document.getElementById('isPaid').value = '1';
+            let isPaid = null;
+            if (lower.includes('unpaid') || lower.includes('അൺപെയ്ഡ്') || lower.includes('അന്‍പെയ്ഡ്')) isPaid = '0';
+            if (lower.includes('paid') || lower.includes('പെയ്ഡ്')) isPaid = '1';
+
+            // “create new customer” command (Malayalam + English)
+            const wantsNewCustomer = (
+                lower.includes('new customer') ||
+                lower.includes('add customer') ||
+                lower.includes('create customer') ||
+                lower.includes('പുതിയ കസ്റ്റമർ') ||
+                lower.includes('പുതിയ കസ്റ്റമര്') ||
+                lower.includes('കസ്റ്റമർ ചേർക്കുക') ||
+                lower.includes('കസ്റ്റമര് ചേർക്കുക')
+            );
+
+            // “save” command
+            const wantsSave = (
+                lower.includes('save') ||
+                lower.includes('submit') ||
+                lower.includes('സേവ്') ||
+                lower.includes('സേവ് ചെയ്യുക')
+            );
+
+            return { name, room, voucher, buyDate, isPaid, wantsNewCustomer, wantsSave, raw: t };
+        }
+
+        function ensureCustomerModalOpen() {
+            const isOpen = document.getElementById('customerModal').classList.contains('active');
+            if (!isOpen) {
+                openAddCustomerModal();
+            }
+        }
+
+        function fillCustomerFieldsFromParsed(p) {
+            if (p.name) document.getElementById('fullName').value = p.name;
+            if (p.room) document.getElementById('roomNo').value = p.room;
+            if (p.voucher) document.getElementById('voucherCode').value = p.voucher;
+            if (p.buyDate) document.getElementById('buyDate').value = p.buyDate;
+            if (p.isPaid !== null) document.getElementById('isPaid').value = p.isPaid;
+        }
+
+        function hasMinimumCustomerFields() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const roomNo = document.getElementById('roomNo').value.trim();
+            const voucherCode = document.getElementById('voucherCode').value.trim();
+            const buyDateVal = document.getElementById('buyDate').value;
+            const isPaidVal = document.getElementById('isPaid').value;
+            return !!(fullName && roomNo && voucherCode && buyDateVal && (isPaidVal === '0' || isPaidVal === '1'));
+        }
+
+        function tryAutoFillFromSpeech(raw) {
+            const p = parseCustomerFromSpeech(raw);
+
+            // If user says “new customer”, open the add customer modal automatically
+            if (p.wantsNewCustomer) {
+                ensureCustomerModalOpen();
+            }
+
+            // Only fill when customer modal is open
+            const isCustomerModalOpen = document.getElementById('customerModal').classList.contains('active');
+            if (!isCustomerModalOpen) return;
+
+            fillCustomerFieldsFromParsed(p);
+
+            // If user said “save” and we have required fields, confirm and save
+            if (p.wantsSave && hasMinimumCustomerFields()) {
+                const ok = confirm('Save this customer now?');
+                if (ok) saveCustomer();
             }
         }
     </script>
