@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skybird WiFi Billing - Dashboard</title>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -108,6 +110,20 @@
         }
 
         .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+            border-left: 4px solid #3c3;
+        }
+
+        .success-message.show {
             display: block;
         }
 
@@ -435,15 +451,25 @@
             opacity: 0.8;
         }
 
-        .empty-state {
+        .loading {
             text-align: center;
             padding: 40px;
             color: #666;
         }
 
-        .empty-state p {
-            font-size: 16px;
-            margin-bottom: 20px;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -502,6 +528,9 @@
         </div>
 
         <div class="main-content">
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage"></div>
+
             <!-- Stats -->
             <div class="stats-container">
                 <div class="stat-box">
@@ -547,7 +576,8 @@
                         <tbody id="activeCustomersTable">
                             <tr>
                                 <td colspan="7" style="text-align: center; padding: 40px;">
-                                    <p style="color: #999;">No customers found</p>
+                                    <div class="spinner"></div>
+                                    <p>Loading customers...</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -572,7 +602,8 @@
                         <tbody id="expiredCustomersTable">
                             <tr>
                                 <td colspan="6" style="text-align: center; padding: 40px;">
-                                    <p style="color: #999;">No expired customers</p>
+                                    <div class="spinner"></div>
+                                    <p>Loading customers...</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -653,7 +684,14 @@
     </div>
 
     <script>
-        // Simple local authentication
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://nayxxilobsifspqmzsre.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAwNDU3NzAsImV4cCI6MTg4Nzc2NTc3MH0.Hs-K9BhF5Jw8L0xQ1V2W3X4Y5Z6A7B8C9D0E1F2G3H4';
+
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Local authentication
         const VALID_USERNAME = 'admin';
         const VALID_PASSWORD = 'admin123';
 
@@ -664,7 +702,6 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded');
-            loadCustomers();
         });
 
         function handleLogin() {
@@ -699,55 +736,26 @@
             document.getElementById('errorMessage').classList.remove('show');
         }
 
-        function loadCustomers() {
-            // Simulated customer data
-            customers = [
-                {
-                    id: 1,
-                    full_name: 'Ahmed Hassan',
-                    room_no: '101',
-                    voucher_code: 'VOC001',
-                    buy_date: '2026-03-01',
-                    expiry_date: '2026-04-10',
-                    mobile_number: '971501234567',
-                    price: 100,
-                    validity_days: 30,
-                    plan_name: 'Monthly Plan',
-                    is_paid: true,
-                    notes: 'Regular customer'
-                },
-                {
-                    id: 2,
-                    full_name: 'Fatima Ali',
-                    room_no: '102',
-                    voucher_code: 'VOC002',
-                    buy_date: '2026-02-15',
-                    expiry_date: '2026-03-20',
-                    mobile_number: '971502345678',
-                    price: 100,
-                    validity_days: 30,
-                    plan_name: 'Monthly Plan',
-                    is_paid: true,
-                    notes: 'VIP customer'
-                },
-                {
-                    id: 3,
-                    full_name: 'Mohammed Saeed',
-                    room_no: '103',
-                    voucher_code: 'VOC003',
-                    buy_date: '2026-01-10',
-                    expiry_date: '2026-02-10',
-                    mobile_number: '971503456789',
-                    price: 150,
-                    validity_days: 30,
-                    plan_name: 'Premium Plan',
-                    is_paid: false,
-                    notes: 'Pending payment'
-                }
-            ];
+        async function loadCustomers() {
+            try {
+                const { data, error } = await supabase
+                    .from('billing_customers')
+                    .select('*')
+                    .order('id', { ascending: false });
 
-            updateStats();
-            renderCustomers();
+                if (error) {
+                    console.error('Error loading customers:', error);
+                    showError('Failed to load customers from database');
+                    return;
+                }
+
+                customers = data || [];
+                updateStats();
+                renderCustomers();
+            } catch (err) {
+                console.error('Exception loading customers:', err);
+                showError('Error connecting to database');
+            }
         }
 
         function updateStats() {
@@ -865,7 +873,7 @@
             document.getElementById('modalRoomNo').value = customer.room_no;
             document.getElementById('modalVoucherCode').value = customer.voucher_code;
             document.getElementById('modalBuyDate').value = customer.buy_date;
-            document.getElementById('modalExpiryDate').value = customer.expiry_date;
+            document.getElementById('modalExpiryDate').value = customer.expiry_date || '';
             document.getElementById('modalMobileNumber').value = customer.mobile_number || '';
             document.getElementById('modalPrice').value = customer.price || '';
             document.getElementById('modalValidityDays').value = customer.validity_days || '';
@@ -876,7 +884,7 @@
             document.getElementById('customerModal').classList.add('show');
         }
 
-        function saveCustomer() {
+        async function saveCustomer() {
             const fullName = document.getElementById('modalFullName').value.trim();
             const roomNo = document.getElementById('modalRoomNo').value.trim();
             const voucherCode = document.getElementById('modalVoucherCode').value.trim();
@@ -892,35 +900,71 @@
                 room_no: roomNo,
                 voucher_code: voucherCode,
                 buy_date: buyDate,
-                expiry_date: document.getElementById('modalExpiryDate').value,
-                mobile_number: document.getElementById('modalMobileNumber').value,
-                price: parseFloat(document.getElementById('modalPrice').value) || 0,
-                validity_days: parseInt(document.getElementById('modalValidityDays').value) || 0,
-                plan_name: document.getElementById('modalPlanName').value,
+                expiry_date: document.getElementById('modalExpiryDate').value || null,
+                mobile_number: document.getElementById('modalMobileNumber').value || null,
+                price: parseFloat(document.getElementById('modalPrice').value) || null,
+                validity_days: parseInt(document.getElementById('modalValidityDays').value) || null,
+                plan_name: document.getElementById('modalPlanName').value || null,
                 is_paid: document.getElementById('modalIsPaid').value === 'true',
-                notes: document.getElementById('modalNotes').value
+                notes: document.getElementById('modalNotes').value || null
             };
 
-            if (editingCustomerId) {
-                const customer = customers.find(c => c.id === editingCustomerId);
-                if (customer) {
-                    Object.assign(customer, customerData);
-                }
-            } else {
-                const newId = Math.max(...customers.map(c => c.id), 0) + 1;
-                customers.push({ id: newId, ...customerData });
-            }
+            try {
+                if (editingCustomerId) {
+                    // Update existing customer
+                    const { error } = await supabase
+                        .from('billing_customers')
+                        .update(customerData)
+                        .eq('id', editingCustomerId);
 
-            closeCustomerModal();
-            updateStats();
-            renderCustomers();
+                    if (error) {
+                        console.error('Error updating customer:', error);
+                        showError('Failed to update customer');
+                        return;
+                    }
+                    showSuccess('Customer updated successfully!');
+                } else {
+                    // Add new customer
+                    const { error } = await supabase
+                        .from('billing_customers')
+                        .insert([customerData]);
+
+                    if (error) {
+                        console.error('Error adding customer:', error);
+                        showError('Failed to add customer');
+                        return;
+                    }
+                    showSuccess('Customer added successfully!');
+                }
+
+                closeCustomerModal();
+                loadCustomers();
+            } catch (err) {
+                console.error('Exception saving customer:', err);
+                showError('Error saving customer');
+            }
         }
 
-        function deleteCustomer(id) {
+        async function deleteCustomer(id) {
             if (confirm('Are you sure you want to delete this customer?')) {
-                customers = customers.filter(c => c.id !== id);
-                updateStats();
-                renderCustomers();
+                try {
+                    const { error } = await supabase
+                        .from('billing_customers')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) {
+                        console.error('Error deleting customer:', error);
+                        showError('Failed to delete customer');
+                        return;
+                    }
+
+                    showSuccess('Customer deleted successfully!');
+                    loadCustomers();
+                } catch (err) {
+                    console.error('Exception deleting customer:', err);
+                    showError('Error deleting customer');
+                }
             }
         }
 
@@ -942,6 +986,20 @@
             document.getElementById('modalPlanName').value = '';
             document.getElementById('modalIsPaid').value = 'true';
             document.getElementById('modalNotes').value = '';
+        }
+
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMessage');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+            setTimeout(() => errorMsg.classList.remove('show'), 5000);
+        }
+
+        function showSuccess(message) {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.textContent = message;
+            successMsg.classList.add('show');
+            setTimeout(() => successMsg.classList.remove('show'), 3000);
         }
 
         // Close modal when clicking outside
