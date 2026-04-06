@@ -41,12 +41,29 @@
         }
 
         .brand {
-            font-weight: 800;
-            color: #1f2937;
             margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+        }
+
+        .brand img {
+            max-width: 100%;
+            height: 44px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .login-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .login-logo img {
+            height: 54px;
+            object-fit: contain;
         }
 
         .nav-group {
@@ -96,29 +113,6 @@
             margin-bottom: 14px;
         }
 
-        .chart-card {
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 14px;
-            margin-bottom: 14px;
-        }
-
-        .chart-title {
-            font-weight: 800;
-            color: #111827;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .chart-subtitle {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 600;
-        }
 
         .search-row input {
             flex: 1;
@@ -583,11 +577,25 @@
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px;
+                padding: 16px;
             }
 
+            .header-buttons {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .header-buttons .btn {
+                flex: 1;
+                min-width: 150px;
+            }
+
+            /* 2-column stats on mobile */
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
             }
 
             /* Cleaner tables: allow horizontal scroll on small screens */
@@ -613,6 +621,35 @@
                 display: none; /* sidebar navigation used instead */
             }
         }
+
+        @media (max-width: 420px) {
+            body {
+                padding: 12px;
+            }
+
+            .sidebar {
+                padding: 14px;
+            }
+
+            .nav-item {
+                min-width: 120px;
+                padding: 10px;
+            }
+
+            /* 1-column stats on very small phones */
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-row button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -620,7 +657,7 @@
         <!-- Login Screen -->
         <div id="loginScreen" class="login-container">
             <div class="login-box">
-                <h2>🌐 Skybird WiFi Billing</h2>
+                <div class="login-logo"><img src="assets/skybird-logo.png" alt="Skybird"></div>
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="loginUsername" placeholder="Enter username">
@@ -637,7 +674,7 @@
         <div id="dashboardScreen" style="display: none;">
             <div class="app-layout">
                 <aside class="sidebar">
-                    <div class="brand">🌐 Skybird WiFi Billing</div>
+                    <div class="brand"><img src="assets/skybird-logo.png" alt="Skybird"></div>
                     <div class="nav-group">
                         <button class="nav-item active" id="nav-active" onclick="switchTab('active')">👥 Active</button>
                         <button class="nav-item" id="nav-expiring" onclick="switchTab('expiring')">⚠️ Expiring</button>
@@ -654,7 +691,7 @@
 
                 <main class="main">
                     <div class="header">
-                        <h1>📊 Dashboard</h1>
+                        <h1>Dashboard</h1>
                         <div class="header-buttons">
                             <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
                             <button class="btn btn-primary" onclick="openVoiceAssistant()" title="English voice input">🎤 Voice Assist</button>
@@ -689,13 +726,6 @@
                         </div>
                     </div>
 
-                    <div class="chart-card">
-                        <div class="chart-title">
-                            <span>Monthly Revenue Trend</span>
-                            <span class="chart-subtitle">SAR (paid customers)</span>
-                        </div>
-                        <canvas id="revenueChart" height="110"></canvas>
-                    </div>
 
                     <div class="search-row">
                         <input id="customerSearch" type="text" placeholder="Search name / room / mobile / voucher..." />
@@ -901,7 +931,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://nayxxilobsifspqmzsre.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDAwNDQsImV4cCI6MjA5MDk3NjA0NH0.49lbgMZJiEwnsDsO98d5htlRLddVoq4H3DYCGpDR2pI';
@@ -911,7 +940,6 @@
         let currentEditingId = null;
         let allCustomers = [];
         let customerSearchQuery = '';
-        let revenueChart = null;
 
         // Initialize
         window.addEventListener('load', () => {
@@ -1013,89 +1041,6 @@
             document.getElementById('expiringCount').textContent = expiring;
             const profitEl = document.getElementById('totalProfit');
             if (profitEl) profitEl.textContent = `SAR ${profit.toFixed(2)}`;
-
-            updateRevenueChart();
-        }
-
-        // Render Customers
-        function updateRevenueChart() {
-            const canvas = document.getElementById('revenueChart');
-            if (!canvas || !window.Chart) return;
-
-            // Sum monthly revenue from paid customers, based on buy_date
-            const paid = allCustomers.filter(c => (c.is_paid === 1 || c.is_paid === '1'));
-            const byMonth = new Map();
-
-            for (const c of paid) {
-                const d = new Date(c.buy_date || c.created_at || c.expiry_date);
-                if (isNaN(d)) continue;
-                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                const v = parseFloat(c.price) || 0;
-                byMonth.set(key, (byMonth.get(key) || 0) + v);
-            }
-
-            // Build last 12 months labels
-            const labels = [];
-            const values = [];
-            const now = new Date();
-            for (let i = 11; i >= 0; i--) {
-                const dt = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
-                labels.push(key);
-                values.push(Number((byMonth.get(key) || 0).toFixed(2)));
-            }
-
-            const data = {
-                labels,
-                datasets: [{
-                    label: 'Revenue (SAR)',
-                    data: values,
-                    borderColor: '#2e7d32',
-                    backgroundColor: 'rgba(46,125,50,0.15)',
-                    borderWidth: 3,
-                    tension: 0.35,
-                    fill: true,
-                    pointRadius: 3,
-                    pointHoverRadius: 5
-                }]
-            };
-
-            const options = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => ` SAR ${Number(ctx.parsed.y || 0).toFixed(2)}`
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            callback: (v) => `SAR ${v}`
-                        },
-                        grid: { color: 'rgba(0,0,0,0.05)' }
-                    },
-                    x: {
-                        grid: { display: false }
-                    }
-                }
-            };
-
-            if (revenueChart) {
-                revenueChart.data = data;
-                revenueChart.options = options;
-                revenueChart.update();
-                return;
-            }
-
-            revenueChart = new Chart(canvas.getContext('2d'), {
-                type: 'line',
-                data,
-                options
-            });
         }
 
         function renderCustomers() {
