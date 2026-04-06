@@ -659,8 +659,8 @@
             <div class="login-box">
                 <div class="login-logo"><img src="assets/skybird-logo.png" alt="Skybird"></div>
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter username">
+                    <label>Email</label>
+                    <input type="email" id="loginUsername" placeholder="Enter email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -931,6 +931,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://nayxxilobsifspqmzsre.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDAwNDQsImV4cCI6MjA5MDk3NjA0NH0.49lbgMZJiEwnsDsO98d5htlRLddVoq4H3DYCGpDR2pI';
@@ -941,11 +942,16 @@
         let allCustomers = [];
         let customerSearchQuery = '';
 
+        // Supabase Auth session (required after RLS changes)
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let sbSession = null;
+
         // Initialize
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('currentUser');
-            if (saved) {
-                currentUser = JSON.parse(saved);
+        window.addEventListener('load', async () => {
+            const { data } = await sb.auth.getSession();
+            sbSession = data?.session || null;
+            if (sbSession) {
+                currentUser = { email: sbSession.user?.email || 'user' };
                 showDashboard();
                 bindSearch();
                 loadCustomers();
@@ -968,25 +974,33 @@
             renderCustomers();
         }
 
-        // Login
+        // Login (Supabase Auth)
         async function handleLogin() {
-            const username = document.getElementById('loginUsername').value;
+            const email = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
 
-            if (username === 'admin' && password === 'admin123') {
-                currentUser = { username, role: 'admin' };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                showDashboard();
-                loadCustomers();
-            } else {
-                alert('Invalid credentials');
+            if (!email || !password) {
+                alert('Enter email and password');
+                return;
             }
+
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Login failed: ' + error.message);
+                return;
+            }
+
+            sbSession = data.session;
+            currentUser = { email: data.user?.email || email };
+            showDashboard();
+            loadCustomers();
         }
 
         // Logout
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
+        async function handleLogout() {
+            await sb.auth.signOut();
             currentUser = null;
+            sbSession = null;
             location.reload();
         }
 
@@ -1000,12 +1014,17 @@
         // Load Customers
         async function loadCustomers() {
             try {
+                if (!sbSession?.access_token) {
+                    showAlert('Please login again (session expired).', 'error');
+                    return;
+                }
+
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                            'Authorization': `Bearer ${sbSession.access_token}`
                         }
                     }
                 );
@@ -1189,7 +1208,7 @@
             const data = {
                 full_name: document.getElementById('fullName').value,
                 room_no: document.getElementById('roomNo').value,
-                mobile_number: document.getElementById('mobileNumber').value,
+                mobile_number: (document.getElementById('mobileNumber').value || '0').trim(),
                 voucher_code: document.getElementById('voucherCode').value,
                 price: parseFloat(document.getElementById('price').value),
                 buy_date: document.getElementById('buyDate').value,
@@ -1213,7 +1232,7 @@
                             method: 'PATCH',
                             headers: {
                                 'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify(data)
@@ -1226,7 +1245,7 @@
                             method: 'POST',
                             headers: {
                                 'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify(data)
@@ -1258,7 +1277,7 @@
                         method: 'DELETE',
                         headers: {
                             'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`
                         }
                     }
                 );
