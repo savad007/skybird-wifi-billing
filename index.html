@@ -93,10 +93,14 @@
 
         .stat-card {
             background: white;
-            padding: 20px;
+            padding: 16px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
+            border-left: 5px solid #667eea;
+        }
+
+        .stat-card.success {
+            border-left-color: #2e7d32;
         }
 
         .stat-card.warning {
@@ -107,6 +111,11 @@
             border-left-color: #d32f2f;
         }
 
+        /* Small color tweaks for each stat box */
+        .stat-card.success .stat-value { color: #2e7d32; }
+        .stat-card.danger .stat-value { color: #d32f2f; }
+        .stat-card.warning .stat-value { color: #e65100; }
+
         .stat-label {
             color: #999;
             font-size: 12px;
@@ -115,7 +124,7 @@
         }
 
         .stat-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
             color: #333;
         }
@@ -492,6 +501,7 @@
                 <h1>📊 Skybird WiFi Billing</h1>
                 <div class="header-buttons">
                     <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
+                    <button class="btn btn-primary" onclick="openVoiceAssistant()" title="Malayalam voice input">🎤 AI Assist (Malayalam)</button>
                     <button class="btn btn-secondary" onclick="window.location.href='omada-sync.html'">🔄 Omada Sync</button>
                     <button class="btn btn-primary" onclick="openAdminPanel()">⚙️ Admin</button>
                     <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
@@ -499,24 +509,24 @@
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card success">
                     <div class="stat-label">Total Customers</div>
                     <div class="stat-value" id="totalCustomers">0</div>
                     <div class="stat-subtext">Active subscriptions</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card success">
                     <div class="stat-label">Paid</div>
-                    <div class="stat-value" id="paidCount" style="color: #2e7d32;">0</div>
+                    <div class="stat-value" id="paidCount">0</div>
                     <div class="stat-subtext">Payments received</div>
                 </div>
-                <div class="stat-card stat-card.warning">
+                <div class="stat-card danger">
                     <div class="stat-label">Unpaid</div>
-                    <div class="stat-value" id="unpaidCount" style="color: #d32f2f;">0</div>
+                    <div class="stat-value" id="unpaidCount">0</div>
                     <div class="stat-subtext">Pending payments</div>
                 </div>
-                <div class="stat-card stat-card.danger">
+                <div class="stat-card warning">
                     <div class="stat-label">Expiring Soon</div>
-                    <div class="stat-value" id="expiringCount" style="color: #FF9800;">0</div>
+                    <div class="stat-value" id="expiringCount">0</div>
                     <div class="stat-subtext">Next 7 days</div>
                 </div>
             </div>
@@ -598,11 +608,11 @@
             <div class="modal-header" id="modalTitle">Add Customer</div>
             <div class="form-group">
                 <label>Full Name *</label>
-                <input type="text" id="fullName" placeholder="Customer name">
+                <input type="text" id="fullName" placeholder="Customer name" required>
             </div>
             <div class="form-group">
                 <label>Room Number *</label>
-                <input type="text" id="roomNo" placeholder="Room number">
+                <input type="text" id="roomNo" placeholder="Room number" required>
             </div>
             <div class="form-group">
                 <label>Mobile Number *</label>
@@ -610,7 +620,7 @@
             </div>
             <div class="form-group">
                 <label>Voucher Code *</label>
-                <input type="text" id="voucherCode" placeholder="Voucher code">
+                <input type="text" id="voucherCode" placeholder="Voucher code" required>
             </div>
             <div class="form-group">
                 <label>Price *</label>
@@ -618,11 +628,11 @@
             </div>
             <div class="form-group">
                 <label>Buy Date *</label>
-                <input type="date" id="buyDate">
+                <input type="date" id="buyDate" required>
             </div>
             <div class="form-group">
                 <label>Validity Days *</label>
-                <select id="validityDays">
+                <select id="validityDays" required>
                     <option value="">Select days</option>
                     <option value="7">7 Days</option>
                     <option value="15">15 Days</option>
@@ -636,15 +646,15 @@
                 <input type="text" id="planName" placeholder="Plan name">
             </div>
             <div class="form-group">
-                <label>Payment Status</label>
-                <select id="isPaid">
+                <label>Payment Status *</label>
+                <select id="isPaid" required>
                     <option value="1">Paid</option>
                     <option value="0">Unpaid</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Notes</label>
-                <textarea id="notes" placeholder="Additional notes" rows="3"></textarea>
+                <label>Reminder (optional)</label>
+                <textarea id="notes" placeholder="Reminder / note (optional)" rows="3"></textarea>
             </div>
             <div class="form-buttons">
                 <button class="btn-save" onclick="saveCustomer()">Save Customer</button>
@@ -695,6 +705,26 @@
             </div>
 
             <button class="btn btn-danger" onclick="closeAdminPanel()" style="width: 100%; margin-top: 20px;">Close</button>
+        </div>
+    </div>
+
+    <!-- Voice Assistant Modal (Free, Browser-based) -->
+    <div id="voiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🎤 AI Assist (Malayalam)</div>
+            <div id="voiceAlert" class="alert alert-warning show" style="display:block;">Tip: Click Start and speak in Malayalam. The text will go to the focused input, or it will try to auto-fill Name/Room/Voucher/Date/Paid.</div>
+            <div class="form-group">
+                <label>Recognized Text</label>
+                <textarea id="voiceTranscript" rows="4" placeholder="Speech will appear here..."></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-save" id="voiceStartBtn" onclick="startVoiceAssistant()">Start</button>
+                <button class="btn-cancel" id="voiceStopBtn" onclick="stopVoiceAssistant()" disabled>Stop</button>
+            </div>
+            <div class="form-buttons" style="margin-top:10px;">
+                <button class="btn-save" onclick="applyVoiceTextToFocused()">Insert into focused field</button>
+                <button class="btn-cancel" onclick="closeVoiceAssistant()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -900,6 +930,18 @@
 
         // Save Customer
         async function saveCustomer() {
+            // Required fields
+            const fullName = document.getElementById('fullName').value.trim();
+            const roomNo = document.getElementById('roomNo').value.trim();
+            const voucherCode = document.getElementById('voucherCode').value.trim();
+            const buyDateVal = document.getElementById('buyDate').value;
+            const isPaidVal = document.getElementById('isPaid').value;
+
+            if (!fullName || !roomNo || !voucherCode || !buyDateVal || isPaidVal === '') {
+                showAlert('Please fill the required fields: Name, Room, Voucher, Date, Paid/Unpaid.', 'error');
+                return;
+            }
+
             const data = {
                 full_name: document.getElementById('fullName').value,
                 room_no: document.getElementById('roomNo').value,
@@ -1085,6 +1127,169 @@
             alertBox.textContent = message;
             alertBox.className = `alert show alert-${type}`;
             setTimeout(() => alertBox.classList.remove('show'), 5000);
+        }
+
+        // -----------------------------
+        // Free Voice Assistant (Malayalam)
+        // -----------------------------
+        let voiceRecognition = null;
+        let voiceIsRunning = false;
+        let lastFocusedEl = null;
+
+        // Track last focused input/textarea in customer modal
+        document.addEventListener('focusin', (e) => {
+            const el = e.target;
+            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
+                lastFocusedEl = el;
+            }
+        });
+
+        function openVoiceAssistant() {
+            document.getElementById('voiceTranscript').value = '';
+            document.getElementById('voiceModal').classList.add('active');
+            initVoiceRecognition();
+        }
+
+        function closeVoiceAssistant() {
+            stopVoiceAssistant();
+            document.getElementById('voiceModal').classList.remove('active');
+        }
+
+        function initVoiceRecognition() {
+            if (voiceRecognition) return;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showVoiceInfo('Speech recognition is not supported in this browser. Try Chrome.', 'error');
+                return;
+            }
+
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.lang = 'ml-IN';
+            voiceRecognition.interimResults = true;
+            voiceRecognition.continuous = true;
+
+            voiceRecognition.onresult = (event) => {
+                let fullText = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    fullText += event.results[i][0].transcript;
+                }
+                const current = document.getElementById('voiceTranscript').value;
+                const next = (current ? (current + ' ') : '') + fullText.trim();
+                document.getElementById('voiceTranscript').value = next.trim();
+
+                // On final result, try auto-fill
+                const last = event.results[event.results.length - 1];
+                if (last && last.isFinal) {
+                    tryAutoFillFromSpeech(last[0].transcript.trim());
+                }
+            };
+
+            voiceRecognition.onerror = (e) => {
+                showVoiceInfo('Voice error: ' + (e.error || 'unknown'), 'error');
+                stopVoiceAssistant();
+            };
+
+            voiceRecognition.onend = () => {
+                if (voiceIsRunning) {
+                    // auto-restart to feel continuous
+                    try { voiceRecognition.start(); } catch (e) {}
+                }
+            };
+        }
+
+        function startVoiceAssistant() {
+            initVoiceRecognition();
+            if (!voiceRecognition) return;
+            voiceIsRunning = true;
+            document.getElementById('voiceStartBtn').disabled = true;
+            document.getElementById('voiceStopBtn').disabled = false;
+            showVoiceInfo('Listening... speak Malayalam (ml-IN).', 'success');
+            try { voiceRecognition.start(); } catch (e) {}
+        }
+
+        function stopVoiceAssistant() {
+            voiceIsRunning = false;
+            document.getElementById('voiceStartBtn').disabled = false;
+            document.getElementById('voiceStopBtn').disabled = true;
+            if (voiceRecognition) {
+                try { voiceRecognition.stop(); } catch (e) {}
+            }
+        }
+
+        function showVoiceInfo(message, type) {
+            const el = document.getElementById('voiceAlert');
+            el.textContent = message;
+            el.className = `alert show alert-${type}`;
+        }
+
+        function applyVoiceTextToFocused() {
+            const text = document.getElementById('voiceTranscript').value.trim();
+            if (!text) return;
+
+            const el = lastFocusedEl;
+            if (!el) {
+                showVoiceInfo('Click a field (Name/Room/Voucher/Date) first, then press Insert.', 'warning');
+                return;
+            }
+
+            if (el.tagName === 'SELECT') {
+                // Try set paid/unpaid
+                const t = text.toLowerCase();
+                if (t.includes('paid') || t.includes('പെയ്ഡ്')) el.value = '1';
+                else if (t.includes('unpaid') || t.includes('അൺപെയ്ഡ്') || t.includes('അന്‍പെയ്ഡ്')) el.value = '0';
+            } else {
+                el.value = text;
+            }
+            showVoiceInfo('Inserted into focused field.', 'success');
+        }
+
+        function tryAutoFillFromSpeech(raw) {
+            // Only try to fill when customer modal is open
+            const isCustomerModalOpen = document.getElementById('customerModal').classList.contains('active');
+            if (!isCustomerModalOpen) return;
+
+            const t = raw.trim();
+
+            // Helper: extract text after keyword
+            const extractAfter = (text, kwRegex) => {
+                const m = text.match(kwRegex);
+                if (!m) return null;
+                return (m[1] || '').trim();
+            };
+
+            // Name: "name Ali" or "പേര് അലി"
+            const nameVal = extractAfter(t, /(?:name|full name|പേര്|പേരു)\s*[:\-]?\s*(.+)$/i);
+            if (nameVal) document.getElementById('fullName').value = nameVal;
+
+            // Room: "room 101" or "റൂം 101"
+            const roomVal = extractAfter(t, /(?:room|room number|റൂം)\s*[:\-]?\s*([A-Za-z0-9\- ]+)$/i);
+            if (roomVal) document.getElementById('roomNo').value = roomVal;
+
+            // Voucher: "voucher ABC" or "വൗച്ചർ ABC"
+            const voucherVal = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*([A-Za-z0-9\-]+)$/i);
+            if (voucherVal) document.getElementById('voucherCode').value = voucherVal;
+
+            // Date: prefer yyyy-mm-dd spoken as digits, or dd/mm/yyyy
+            const dateIso = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
+            if (dateIso) {
+                document.getElementById('buyDate').value = dateIso;
+            } else {
+                const dateSlash = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4})/i);
+                if (dateSlash) {
+                    const [dd, mm, yyyy] = dateSlash.split('/');
+                    const iso = `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+                    document.getElementById('buyDate').value = iso;
+                }
+            }
+
+            // Paid/unpaid
+            const lower = t.toLowerCase();
+            if (lower.includes('unpaid') || lower.includes('അൺപെയ്ഡ്') || lower.includes('അന്‍പെയ്ഡ്')) {
+                document.getElementById('isPaid').value = '0';
+            } else if (lower.includes('paid') || lower.includes('പെയ്ഡ്')) {
+                document.getElementById('isPaid').value = '1';
+            }
         }
     </script>
 </body>
