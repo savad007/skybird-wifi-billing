@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skybird WiFi Billing</title>
+    <title>Skybird WiFi Billing - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -12,795 +12,945 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .login-container {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
-            padding: 30px;
-            margin: 50px auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .login-container.hidden {
-            display: none;
-        }
-
-        .logo {
+        .login-container h1 {
             text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo h1 {
-            color: #1565C0;
+            color: #333;
             font-size: 28px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
-        .form-group {
+        .login-container p {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
             margin-bottom: 20px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
             color: #333;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 14px;
         }
 
-        .form-group input {
-            width: 100%;
+        input[type="text"],
+        input[type="password"] {
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
+            transition: border-color 0.3s;
         }
 
-        .form-group input:focus {
+        input[type="text"]:focus,
+        input[type="password"]:focus {
             outline: none;
-            border-color: #1565C0;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            padding: 12px;
             border: none;
             border-radius: 6px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .error {
-            color: #d32f2f;
-            font-size: 14px;
-            margin-top: 10px;
-            padding: 10px;
-            background: #ffcdd2;
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
             border-radius: 6px;
+            font-size: 14px;
             display: none;
+            border-left: 4px solid #c33;
+        }
+
+        .error-message.show {
+            display: block;
         }
 
         .dashboard {
             display: none;
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            min-height: 100vh;
+            background: #f5f5f5;
         }
 
-        .dashboard.active {
-            display: block;
+        .dashboard.show {
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            flex-wrap: wrap;
-            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .header h1 {
-            color: #333;
             font-size: 24px;
         }
 
-        .header-buttons {
+        .header-right {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            gap: 15px;
+            align-items: center;
         }
 
         .logout-btn {
-            background: #d32f2f;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
         }
 
         .logout-btn:hover {
-            background: #b71c1c;
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        .stats {
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .stat-card {
+        .stat-box {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #1565C0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
-        .stat-card h3 {
+        .stat-box h3 {
             color: #666;
             font-size: 14px;
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .stat-card .value {
-            color: #1565C0;
-            font-size: 28px;
-            font-weight: 700;
+        .stat-box .number {
+            color: #667eea;
+            font-size: 32px;
+            font-weight: bold;
         }
 
-        .section {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #1565C0;
-            font-size: 20px;
-        }
-
-        .section-header {
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
         }
 
-        .add-btn {
-            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
-            color: white;
+        .tab-btn {
+            background: none;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .add-customer-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 14px;
             font-weight: 600;
+            margin-bottom: 20px;
+            transition: background 0.3s;
         }
 
-        .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        .add-customer-btn:hover {
+            background: #45a049;
         }
 
         .customer-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .customer-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px;
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
             text-align: left;
+            color: #333;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
+            border-bottom: 2px solid #ddd;
         }
 
-        .customer-table td {
-            padding: 12px;
+        td {
+            padding: 15px;
             border-bottom: 1px solid #eee;
-            font-size: 13px;
+            font-size: 14px;
         }
 
-        .customer-table tr:hover {
+        tr:hover {
             background: #f9f9f9;
         }
 
-        .badge {
-            display: inline-block;
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .badge.paid {
-            background: #c8e6c9;
-            color: #2e7d32;
+        .status-unpaid {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        .badge.unpaid {
-            background: #ffcdd2;
-            color: #c62828;
+        .expiry-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .expiry-expired {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
         }
 
         .action-btns {
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
 
         .btn-small {
-            padding: 6px 10px;
+            padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
+            transition: opacity 0.3s;
         }
 
         .btn-edit {
-            background: #2196F3;
+            background: #0066cc;
             color: white;
         }
 
         .btn-delete {
-            background: #d32f2f;
+            background: #dc3545;
             color: white;
         }
 
-        /* MODAL */
+        .btn-small:hover {
+            opacity: 0.8;
+        }
+
         .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            align-items: center;
             justify-content: center;
-            padding: 10px;
+            align-items: center;
         }
 
-        .modal.active {
-            display: flex !important;
+        .modal.show {
+            display: flex;
         }
 
         .modal-content {
             background: white;
-            padding: 30px;
             border-radius: 12px;
-            width: 100%;
+            padding: 30px;
             max-width: 500px;
+            width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #1565C0;
-        }
-
-        .modal-header h2 {
-            color: #333;
             font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
         }
 
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .form-group-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             margin-bottom: 15px;
         }
 
-        .form-row.full {
-            grid-template-columns: 1fr;
+        .form-group-modal label {
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
         }
 
-        .modal .form-group {
-            margin-bottom: 0;
-        }
-
-        .modal .form-group input,
-        .modal .form-group select {
-            width: 100%;
+        .form-group-modal input,
+        .form-group-modal select,
+        .form-group-modal textarea {
             padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group-modal textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         .modal-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
-            justify-content: flex-end;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #1565C0 0%, #0d47a1 100%);
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+
+        .btn-save {
+            background: #667eea;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
         }
 
-        .btn-secondary {
-            background: #e0e0e0;
+        .btn-cancel {
+            background: #ddd;
             color: #333;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
         }
 
-        .no-data {
+        .btn-save:hover,
+        .btn-cancel:hover {
+            opacity: 0.8;
+        }
+
+        .empty-state {
             text-align: center;
-            color: #999;
-            padding: 30px;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state p {
             font-size: 16px;
+            margin-bottom: 20px;
         }
 
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
+            .main-content {
+                padding: 15px;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
             }
 
             .header {
                 flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .modal-content {
-                padding: 20px;
+                gap: 15px;
+                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- LOGIN -->
-    <div class="login-container" id="loginContainer">
-        <div class="logo">
-            <h1>🌐 Skybird WiFi</h1>
-            <p>Billing System</p>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <h1>Skybird WiFi</h1>
+        <p>Billing Management System</p>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" value="admin">
         </div>
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit" class="login-btn">Login</button>
-            <div class="error" id="loginError"></div>
-        </form>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" value="admin123">
+        </div>
+        
+        <button class="login-btn" onclick="handleLogin()">Login</button>
     </div>
 
-    <!-- DASHBOARD -->
-    <div class="dashboard" id="dashboard">
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
         <div class="header">
-            <h1>📊 Dashboard</h1>
-            <div class="header-buttons">
-                <button class="btn logout-btn" onclick="handleLogout()">Logout</button>
+            <h1>📊 Skybird WiFi Billing Dashboard</h1>
+            <div class="header-right">
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <h3>Total Customers</h3>
-                <div class="value" id="totalCustomers">0</div>
+        <div class="main-content">
+            <!-- Stats -->
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h3>Total Customers</h3>
+                    <div class="number" id="totalCustomers">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Active Customers</h3>
+                    <div class="number" id="activeCustomers">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Paid Customers</h3>
+                    <div class="number" id="paidCustomers">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Expiring Soon</h3>
+                    <div class="number" id="expiringCustomers">0</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Paid</h3>
-                <div class="value" id="paidCustomers">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Unpaid</h3>
-                <div class="value" id="unpaidCustomers">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Total Revenue</h3>
-                <div class="value" id="totalRevenue">SAR 0</div>
-            </div>
-        </div>
 
-        <div class="section">
-            <div class="section-header">
-                <h2>📱 Customers</h2>
-                <button class="add-btn" onclick="openAddCustomerModal()">+ Add Customer</button>
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('active')">Active Customers</button>
+                <button class="tab-btn" onclick="switchTab('expired')">Expired Customers</button>
             </div>
-            <table class="customer-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Room</th>
-                        <th>Mobile</th>
-                        <th>Voucher</th>
-                        <th>Price</th>
-                        <th>Expiry</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="customersTable">
-                    <tr><td colspan="8" class="no-data">Loading...</td></tr>
-                </tbody>
-            </table>
+
+            <!-- Active Customers Tab -->
+            <div id="active" class="tab-content active">
+                <button class="add-customer-btn" onclick="openAddCustomerModal()">+ Add Customer</button>
+                <div class="customer-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Room No</th>
+                                <th>Voucher Code</th>
+                                <th>Buy Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeCustomersTable">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    <p style="color: #999;">No customers found</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Expired Customers Tab -->
+            <div id="expired" class="tab-content">
+                <div class="customer-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Room No</th>
+                                <th>Voucher Code</th>
+                                <th>Buy Date</th>
+                                <th>Expiry Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expiredCustomersTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px;">
+                                    <p style="color: #999;">No expired customers</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ADD/EDIT MODAL -->
-    <div class="modal" id="customerModal">
+    <!-- Add/Edit Customer Modal -->
+    <div id="customerModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Add Customer</h2>
-                <button type="button" class="close-btn" onclick="closeCustomerModal()">&times;</button>
+            <div class="modal-header" id="modalTitle">Add New Customer</div>
+            
+            <div class="form-group-modal">
+                <label for="modalFullName">Full Name *</label>
+                <input type="text" id="modalFullName" placeholder="Enter customer name">
             </div>
-            <form id="customerForm" onsubmit="saveCustomer(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" id="fullName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Room *</label>
-                        <input type="text" id="roomNo" required>
-                    </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Mobile *</label>
-                        <input type="tel" id="mobileNumber" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Voucher Code *</label>
-                        <input type="text" id="voucherCode" required>
-                    </div>
-                </div>
+            <div class="form-group-modal">
+                <label for="modalRoomNo">Room No *</label>
+                <input type="text" id="modalRoomNo" placeholder="Enter room number">
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Price (SAR) *</label>
-                        <input type="number" id="price" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Voucher Amount</label>
-                        <input type="number" id="voucherAmount" step="0.01" value="0">
-                    </div>
-                </div>
+            <div class="form-group-modal">
+                <label for="modalVoucherCode">Voucher Code *</label>
+                <input type="text" id="modalVoucherCode" placeholder="Enter voucher code">
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Buy Date *</label>
-                        <input type="date" id="buyDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Validity Days *</label>
-                        <select id="validityDays" required>
-                            <option value="">Select</option>
-                            <option value="7">7 Days</option>
-                            <option value="15">15 Days</option>
-                            <option value="30">30 Days</option>
-                            <option value="60">60 Days</option>
-                            <option value="90">90 Days</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-group-modal">
+                <label for="modalBuyDate">Buy Date *</label>
+                <input type="date" id="modalBuyDate">
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Plan Name</label>
-                        <input type="text" id="planName">
-                    </div>
-                    <div class="form-group">
-                        <label>Payment Status *</label>
-                        <select id="isPaid" required>
-                            <option value="1">Paid</option>
-                            <option value="0">Unpaid</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-group-modal">
+                <label for="modalExpiryDate">Expiry Date</label>
+                <input type="date" id="modalExpiryDate">
+            </div>
 
-                <div class="form-row full">
-                    <div class="form-group">
-                        <label>Notes</label>
-                        <input type="text" id="notes">
-                    </div>
-                </div>
+            <div class="form-group-modal">
+                <label for="modalMobileNumber">Mobile Number</label>
+                <input type="text" id="modalMobileNumber" placeholder="Enter mobile number">
+            </div>
 
-                <div class="modal-buttons">
-                    <button type="button" class="btn-secondary" onclick="closeCustomerModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Save</button>
-                </div>
-            </form>
+            <div class="form-group-modal">
+                <label for="modalPrice">Price</label>
+                <input type="number" id="modalPrice" placeholder="Enter price" step="0.01">
+            </div>
+
+            <div class="form-group-modal">
+                <label for="modalValidityDays">Validity Days</label>
+                <input type="number" id="modalValidityDays" placeholder="Enter validity days">
+            </div>
+
+            <div class="form-group-modal">
+                <label for="modalPlanName">Plan Name</label>
+                <input type="text" id="modalPlanName" placeholder="Enter plan name">
+            </div>
+
+            <div class="form-group-modal">
+                <label for="modalIsPaid">Payment Status</label>
+                <select id="modalIsPaid">
+                    <option value="true">Paid</option>
+                    <option value="false">Unpaid</option>
+                </select>
+            </div>
+
+            <div class="form-group-modal">
+                <label for="modalNotes">Notes</label>
+                <textarea id="modalNotes" placeholder="Enter notes"></textarea>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="saveCustomer()">Save</button>
+                <button class="btn-cancel" onclick="closeCustomerModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://tlfhyqveyydkfjqsptyo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZmh5cXZleXlka2ZqcXNwdHlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDM2MzAsImV4cCI6MjA5MDg3OTYzMH0.DeMk8OOKEAb4DyaYTI4kXHt2bX61-5uI593Ks5KO85Y';
+        // Simple local authentication
+        const VALID_USERNAME = 'admin';
+        const VALID_PASSWORD = 'admin123';
 
-        let currentUser = null;
+        let isLoggedIn = false;
         let customers = [];
-        let editingId = null;
+        let editingCustomerId = null;
 
-        // LOGIN
-        async function handleLogin(e) {
-            e.preventDefault();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded');
+            loadCustomers();
+        });
+
+        function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('loginError');
+            const errorMsg = document.getElementById('errorMessage');
 
-            try {
-                const url = `${SUPABASE_URL}/rest/v1/app_users?username=eq.${username}&password=eq.${password}`;
-                const response = await fetch(url, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    }
-                });
+            if (!username || !password) {
+                errorMsg.textContent = 'Please enter username and password';
+                errorMsg.classList.add('show');
+                return;
+            }
 
-                const data = await response.json();
-
-                if (!data || data.length === 0) {
-                    errorDiv.textContent = 'Invalid username or password';
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-
-                currentUser = data[0];
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                errorDiv.style.display = 'none';
-                showDashboard();
+            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                isLoggedIn = true;
+                errorMsg.classList.remove('show');
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').classList.add('show');
                 loadCustomers();
-            } catch (err) {
-                errorDiv.textContent = 'Login failed: ' + err.message;
-                errorDiv.style.display = 'block';
+            } else {
+                errorMsg.textContent = 'Invalid username or password';
+                errorMsg.classList.add('show');
             }
         }
 
-        function showDashboard() {
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('dashboard').classList.add('active');
+        function handleLogout() {
+            isLoggedIn = false;
+            document.getElementById('dashboard').classList.remove('show');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('errorMessage').classList.remove('show');
         }
 
-        // LOAD CUSTOMERS
-        async function loadCustomers() {
-            try {
-                const url = `${SUPABASE_URL}/rest/v1/billing_customers`;
-                const response = await fetch(url, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    }
-                });
+        function loadCustomers() {
+            // Simulated customer data
+            customers = [
+                {
+                    id: 1,
+                    full_name: 'Ahmed Hassan',
+                    room_no: '101',
+                    voucher_code: 'VOC001',
+                    buy_date: '2026-03-01',
+                    expiry_date: '2026-04-10',
+                    mobile_number: '971501234567',
+                    price: 100,
+                    validity_days: 30,
+                    plan_name: 'Monthly Plan',
+                    is_paid: true,
+                    notes: 'Regular customer'
+                },
+                {
+                    id: 2,
+                    full_name: 'Fatima Ali',
+                    room_no: '102',
+                    voucher_code: 'VOC002',
+                    buy_date: '2026-02-15',
+                    expiry_date: '2026-03-20',
+                    mobile_number: '971502345678',
+                    price: 100,
+                    validity_days: 30,
+                    plan_name: 'Monthly Plan',
+                    is_paid: true,
+                    notes: 'VIP customer'
+                },
+                {
+                    id: 3,
+                    full_name: 'Mohammed Saeed',
+                    room_no: '103',
+                    voucher_code: 'VOC003',
+                    buy_date: '2026-01-10',
+                    expiry_date: '2026-02-10',
+                    mobile_number: '971503456789',
+                    price: 150,
+                    validity_days: 30,
+                    plan_name: 'Premium Plan',
+                    is_paid: false,
+                    notes: 'Pending payment'
+                }
+            ];
 
-                customers = await response.json();
-                updateStats();
-                renderCustomers();
-            } catch (err) {
-                console.error('Error loading customers:', err);
-            }
+            updateStats();
+            renderCustomers();
         }
 
         function updateStats() {
             const today = new Date();
-            const active = customers.filter(c => new Date(c.expiryDate) > today);
-            const paid = active.filter(c => c.isPaid === 1).length;
-            const revenue = active.filter(c => c.isPaid === 1).reduce((sum, c) => sum + (c.price || 0), 0);
+            const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            document.getElementById('totalCustomers').textContent = active.length;
-            document.getElementById('paidCustomers').textContent = paid;
-            document.getElementById('unpaidCustomers').textContent = active.length - paid;
-            document.getElementById('totalRevenue').textContent = 'SAR ' + revenue.toFixed(2);
+            const active = customers.filter(c => new Date(c.expiry_date) > today);
+            const paid = customers.filter(c => c.is_paid);
+            const expiring = customers.filter(c => {
+                const expDate = new Date(c.expiry_date);
+                return expDate > today && expDate <= sevenDaysLater;
+            });
+
+            document.getElementById('totalCustomers').textContent = customers.length;
+            document.getElementById('activeCustomers').textContent = active.length;
+            document.getElementById('paidCustomers').textContent = paid.length;
+            document.getElementById('expiringCustomers').textContent = expiring.length;
         }
 
         function renderCustomers() {
             const today = new Date();
-            const active = customers.filter(c => new Date(c.expiryDate) > today);
+            const activeCustomers = customers.filter(c => new Date(c.expiry_date) > today);
+            const expiredCustomers = customers.filter(c => new Date(c.expiry_date) <= today);
 
-            if (active.length === 0) {
-                document.getElementById('customersTable').innerHTML = '<tr><td colspan="8" class="no-data">No customers</td></tr>';
+            renderTable('activeCustomersTable', activeCustomers, false);
+            renderTable('expiredCustomersTable', expiredCustomers, true);
+        }
+
+        function renderTable(tableId, data, isExpired) {
+            const tbody = document.getElementById(tableId);
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${isExpired ? 6 : 7}" style="text-align: center; padding: 40px;"><p style="color: #999;">No customers found</p></td></tr>`;
                 return;
             }
 
-            document.getElementById('customersTable').innerHTML = active.map(c => `
-                <tr>
-                    <td>${c.fullName}</td>
-                    <td>${c.roomNo}</td>
-                    <td>${c.mobileNumber}</td>
-                    <td>${c.voucherCode}</td>
-                    <td>SAR ${(c.price + (c.voucherAmount || 0)).toFixed(2)}</td>
-                    <td>${new Date(c.expiryDate).toLocaleDateString()}</td>
-                    <td><span class="badge ${c.isPaid === 1 ? 'paid' : 'unpaid'}">${c.isPaid === 1 ? 'PAID' : 'UNPAID'}</span></td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn-small btn-edit" onclick="editCustomer(${c.id})">Edit</button>
-                            <button class="btn-small btn-delete" onclick="deleteCustomer(${c.id})">Delete</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = data.map(customer => {
+                const expiryDate = new Date(customer.expiry_date);
+                const today = new Date();
+                const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                
+                let expiryClass = '';
+                let expiryText = '';
+                
+                if (daysLeft < 0) {
+                    expiryClass = 'expiry-expired';
+                    expiryText = 'Expired';
+                } else if (daysLeft <= 7) {
+                    expiryClass = 'expiry-warning';
+                    expiryText = `${daysLeft} days left`;
+                } else {
+                    expiryText = `${daysLeft} days left`;
+                }
+
+                const statusClass = customer.is_paid ? 'status-paid' : 'status-unpaid';
+                const statusText = customer.is_paid ? 'Paid' : 'Unpaid';
+
+                const actionsHtml = `
+                    <div class="action-btns">
+                        <button class="btn-small btn-edit" onclick="editCustomer(${customer.id})">Edit</button>
+                        <button class="btn-small btn-delete" onclick="deleteCustomer(${customer.id})">Delete</button>
+                    </div>
+                `;
+
+                if (isExpired) {
+                    return `
+                        <tr>
+                            <td>${customer.full_name}</td>
+                            <td>${customer.room_no}</td>
+                            <td>${customer.voucher_code}</td>
+                            <td>${customer.buy_date}</td>
+                            <td><span class="expiry-expired">${customer.expiry_date}</span></td>
+                            <td>${actionsHtml}</td>
+                        </tr>
+                    `;
+                } else {
+                    return `
+                        <tr>
+                            <td>${customer.full_name}</td>
+                            <td>${customer.room_no}</td>
+                            <td>${customer.voucher_code}</td>
+                            <td>${customer.buy_date}</td>
+                            <td><span class="${expiryClass}">${customer.expiry_date}</span></td>
+                            <td><span class="${statusClass}">${statusText}</span></td>
+                            <td>${actionsHtml}</td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
         }
 
         function openAddCustomerModal() {
-            editingId = null;
-            document.getElementById('modalTitle').textContent = 'Add Customer';
-            document.getElementById('customerForm').reset();
-            document.getElementById('customerModal').classList.add('active');
+            editingCustomerId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Customer';
+            clearModalForm();
+            document.getElementById('customerModal').classList.add('show');
         }
 
         function editCustomer(id) {
             const customer = customers.find(c => c.id === id);
             if (!customer) return;
 
-            editingId = id;
+            editingCustomerId = id;
             document.getElementById('modalTitle').textContent = 'Edit Customer';
-            document.getElementById('fullName').value = customer.fullName;
-            document.getElementById('roomNo').value = customer.roomNo;
-            document.getElementById('mobileNumber').value = customer.mobileNumber;
-            document.getElementById('voucherCode').value = customer.voucherCode;
-            document.getElementById('price').value = customer.price;
-            document.getElementById('voucherAmount').value = customer.voucherAmount || 0;
-            document.getElementById('buyDate').value = customer.buyDate;
-            document.getElementById('validityDays').value = customer.validityDays;
-            document.getElementById('planName').value = customer.planName || '';
-            document.getElementById('isPaid').value = customer.isPaid;
-            document.getElementById('notes').value = customer.notes || '';
+            
+            document.getElementById('modalFullName').value = customer.full_name;
+            document.getElementById('modalRoomNo').value = customer.room_no;
+            document.getElementById('modalVoucherCode').value = customer.voucher_code;
+            document.getElementById('modalBuyDate').value = customer.buy_date;
+            document.getElementById('modalExpiryDate').value = customer.expiry_date;
+            document.getElementById('modalMobileNumber').value = customer.mobile_number || '';
+            document.getElementById('modalPrice').value = customer.price || '';
+            document.getElementById('modalValidityDays').value = customer.validity_days || '';
+            document.getElementById('modalPlanName').value = customer.plan_name || '';
+            document.getElementById('modalIsPaid').value = customer.is_paid ? 'true' : 'false';
+            document.getElementById('modalNotes').value = customer.notes || '';
+            
+            document.getElementById('customerModal').classList.add('show');
+        }
 
-            document.getElementById('customerModal').classList.add('active');
+        function saveCustomer() {
+            const fullName = document.getElementById('modalFullName').value.trim();
+            const roomNo = document.getElementById('modalRoomNo').value.trim();
+            const voucherCode = document.getElementById('modalVoucherCode').value.trim();
+            const buyDate = document.getElementById('modalBuyDate').value;
+
+            if (!fullName || !roomNo || !voucherCode || !buyDate) {
+                alert('Please fill in all required fields (marked with *)');
+                return;
+            }
+
+            const customerData = {
+                full_name: fullName,
+                room_no: roomNo,
+                voucher_code: voucherCode,
+                buy_date: buyDate,
+                expiry_date: document.getElementById('modalExpiryDate').value,
+                mobile_number: document.getElementById('modalMobileNumber').value,
+                price: parseFloat(document.getElementById('modalPrice').value) || 0,
+                validity_days: parseInt(document.getElementById('modalValidityDays').value) || 0,
+                plan_name: document.getElementById('modalPlanName').value,
+                is_paid: document.getElementById('modalIsPaid').value === 'true',
+                notes: document.getElementById('modalNotes').value
+            };
+
+            if (editingCustomerId) {
+                const customer = customers.find(c => c.id === editingCustomerId);
+                if (customer) {
+                    Object.assign(customer, customerData);
+                }
+            } else {
+                const newId = Math.max(...customers.map(c => c.id), 0) + 1;
+                customers.push({ id: newId, ...customerData });
+            }
+
+            closeCustomerModal();
+            updateStats();
+            renderCustomers();
+        }
+
+        function deleteCustomer(id) {
+            if (confirm('Are you sure you want to delete this customer?')) {
+                customers = customers.filter(c => c.id !== id);
+                updateStats();
+                renderCustomers();
+            }
         }
 
         function closeCustomerModal() {
-            document.getElementById('customerModal').classList.remove('active');
-            editingId = null;
+            document.getElementById('customerModal').classList.remove('show');
+            clearModalForm();
+            editingCustomerId = null;
         }
 
-        async function saveCustomer(e) {
-            e.preventDefault();
+        function clearModalForm() {
+            document.getElementById('modalFullName').value = '';
+            document.getElementById('modalRoomNo').value = '';
+            document.getElementById('modalVoucherCode').value = '';
+            document.getElementById('modalBuyDate').value = '';
+            document.getElementById('modalExpiryDate').value = '';
+            document.getElementById('modalMobileNumber').value = '';
+            document.getElementById('modalPrice').value = '';
+            document.getElementById('modalValidityDays').value = '';
+            document.getElementById('modalPlanName').value = '';
+            document.getElementById('modalIsPaid').value = 'true';
+            document.getElementById('modalNotes').value = '';
+        }
 
-            const data = {
-                fullName: document.getElementById('fullName').value,
-                roomNo: document.getElementById('roomNo').value,
-                mobileNumber: document.getElementById('mobileNumber').value,
-                voucherCode: document.getElementById('voucherCode').value,
-                price: parseFloat(document.getElementById('price').value),
-                voucherAmount: parseFloat(document.getElementById('voucherAmount').value) || 0,
-                buyDate: document.getElementById('buyDate').value,
-                validityDays: parseInt(document.getElementById('validityDays').value),
-                planName: document.getElementById('planName').value,
-                isPaid: parseInt(document.getElementById('isPaid').value),
-                notes: document.getElementById('notes').value,
-                agentId: currentUser.id
-            };
-
-            const buyDate = new Date(data.buyDate);
-            const expiryDate = new Date(buyDate.getTime() + data.validityDays * 24 * 60 * 60 * 1000);
-            data.expiryDate = expiryDate.toISOString().split('T')[0];
-
-            try {
-                const url = editingId 
-                    ? `${SUPABASE_URL}/rest/v1/billing_customers?id=eq.${editingId}`
-                    : `${SUPABASE_URL}/rest/v1/billing_customers`;
-
-                const response = await fetch(url, {
-                    method: editingId ? 'PATCH' : 'POST',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Save failed');
-                }
-
-                alert(editingId ? 'Updated!' : 'Added!');
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('customerModal');
+            if (event.target === modal) {
                 closeCustomerModal();
-                loadCustomers();
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
-        }
-
-        async function deleteCustomer(id) {
-            if (!confirm('Delete this customer?')) return;
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/billing_customers?id=eq.${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    }
-                });
-
-                if (!response.ok) throw new Error('Delete failed');
-                alert('Deleted!');
-                loadCustomers();
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            document.getElementById('loginContainer').classList.remove('hidden');
-            document.getElementById('dashboard').classList.remove('active');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        }
-
-        // RESTORE SESSION
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('currentUser');
-            if (saved) {
-                try {
-                    currentUser = JSON.parse(saved);
-                    showDashboard();
-                    loadCustomers();
-                } catch (err) {
-                    localStorage.removeItem('currentUser');
-                }
             }
         });
     </script>
 </body>
 </html>
- 
