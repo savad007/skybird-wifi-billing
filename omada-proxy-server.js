@@ -8,8 +8,8 @@
 //
 // Env:
 //   OMADA_URL=https://192.168.1.4:443   (or :8043 depending on your controller)
-//   OMADA_USERNAME=admin
-//   OMADA_PASSWORD=your_password
+//   OMADA_USERNAME=Savad007
+//   OMADA_PASSWORD=Aifa@1601
 //   PORT=8787
 //
 // Then in your omada-sync.html settings, set Omada Controller URL to:
