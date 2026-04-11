@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skybird WiFi Billing - Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -30,7 +31,7 @@
         }
 
         .sidebar {
-            width: 240px;
+            width: 260px;
             background: rgba(255,255,255,0.95);
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -113,7 +114,6 @@
             margin-bottom: 14px;
         }
 
-
         .search-row input {
             flex: 1;
             padding: 10px 12px;
@@ -147,6 +147,7 @@
         .header-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -189,6 +190,24 @@
             background: #b71c1c;
         }
 
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -217,10 +236,14 @@
             border-left-color: #d32f2f;
         }
 
-        /* Small color tweaks for each stat box */
+        .stat-card.info {
+            border-left-color: #17a2b8;
+        }
+
         .stat-card.success .stat-value { color: #2e7d32; }
         .stat-card.danger .stat-value { color: #d32f2f; }
         .stat-card.warning .stat-value { color: #e65100; }
+        .stat-card.info .stat-value { color: #17a2b8; }
 
         .stat-label {
             color: #6b7280;
@@ -347,6 +370,16 @@
             color: #b71c1c;
         }
 
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-assigned {
+            background: #fff3cd;
+            color: #856404;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -379,6 +412,15 @@
             background: #b71c1c;
         }
 
+        .btn-assign {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-assign:hover {
+            background: #218838;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -400,7 +442,7 @@
             background: white;
             padding: 30px;
             border-radius: 12px;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -519,6 +561,12 @@
             border-left: 4px solid #FF9800;
         }
 
+        .alert-info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            border-left: 4px solid #2196f3;
+        }
+
         .login-container {
             display: flex;
             align-items: center;
@@ -549,6 +597,58 @@
             width: 100%;
             padding: 12px;
             margin-top: 20px;
+        }
+
+        .voucher-code {
+            font-family: monospace;
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f5f7fa;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .voucher-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .voucher-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .voucher-item:last-child {
+            border-bottom: none;
         }
 
         @media (max-width: 980px) {
@@ -592,13 +692,11 @@
                 min-width: 150px;
             }
 
-            /* 2-column stats on mobile */
             .stats-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
             }
 
-            /* Cleaner tables: allow horizontal scroll on small screens */
             .tab-content {
                 overflow-x: auto;
             }
@@ -618,7 +716,11 @@
             }
 
             .tabs {
-                display: none; /* sidebar navigation used instead */
+                display: none;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -636,7 +738,6 @@
                 padding: 10px;
             }
 
-            /* 1-column stats on very small phones */
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -679,9 +780,12 @@
                         <button class="nav-item active" id="nav-active" onclick="switchTab('active')">👥 Active</button>
                         <button class="nav-item" id="nav-expiring" onclick="switchTab('expiring')">⚠️ Expiring</button>
                         <button class="nav-item" id="nav-expired" onclick="switchTab('expired')">📦 Expired</button>
+                        <button class="nav-item" id="nav-vouchers" onclick="switchTab('vouchers')">🎫 Vouchers</button>
                     </div>
                     <div style="margin-top: 14px; display:flex; flex-direction:column; gap:10px;">
                         <button class="btn btn-secondary" onclick="openAddCustomerModal()" style="width:100%;">➕ Add Customer</button>
+                        <button class="btn btn-success" onclick="openVoucherModal()" style="width:100%;">🎫 Manage Vouchers</button>
+                        <button class="btn btn-info" onclick="openAssignVoucherModal()" style="width:100%;">➕ Assign Voucher</button>
                         <button class="btn btn-primary" onclick="openVoiceAssistant()" style="width:100%;" title="English voice input">🎤 Voice Assist</button>
                         <button class="btn btn-secondary" onclick="window.location.href='omada-sync.html'" style="width:100%;">🔄 Omada Sync</button>
                         <button class="btn btn-primary" onclick="openAdminPanel()" style="width:100%;">⚙️ Admin</button>
@@ -694,6 +798,8 @@
                         <h1>Dashboard</h1>
                         <div class="header-buttons">
                             <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
+                            <button class="btn btn-success" onclick="openVoucherModal()">🎫 Vouchers</button>
+                            <button class="btn btn-info" onclick="openAssignVoucherModal()">➕ Assign Voucher</button>
                             <button class="btn btn-primary" onclick="openVoiceAssistant()" title="English voice input">🎤 Voice Assist</button>
                         </div>
                     </div>
@@ -724,8 +830,12 @@
                             <div class="stat-value" id="expiringCount">0</div>
                             <div class="stat-subtext">Next 7 days</div>
                         </div>
+                        <div class="stat-card info">
+                            <div class="stat-label">Available Vouchers</div>
+                            <div class="stat-value" id="availableVouchersCount">0</div>
+                            <div class="stat-subtext">Ready to assign</div>
+                        </div>
                     </div>
-
 
                     <div class="search-row">
                         <input id="customerSearch" type="text" placeholder="Search name / room / mobile / voucher..." />
@@ -738,68 +848,91 @@
                         <button class="tab active" onclick="switchTab('active')">Active Customers</button>
                         <button class="tab" onclick="switchTab('expiring')">⚠️ Expiring Soon</button>
                         <button class="tab" onclick="switchTab('expired')">📦 Expired</button>
+                        <button class="tab" onclick="switchTab('vouchers')">🎫 Vouchers</button>
                     </div>
 
-            <div id="activeTab" class="tab-content active">
-                <table class="customer-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Room</th>
-                            <th>Mobile</th>
-                            <th>Voucher</th>
-                            <th>Price (SAR)</th>
-                            <th>Status</th>
-                            <th>Expiry</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="activeCustomersTable">
-                        <tr><td colspan="8" class="empty-state">No active customers</td></tr>
-                    </tbody>
-                </table>
-            </div>
+                    <div id="activeTab" class="tab-content active">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Mobile</th>
+                                    <th>Voucher</th>
+                                    <th>Price (SAR)</th>
+                                    <th>Status</th>
+                                    <th>Expiry</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeCustomersTable">
+                                <tr><td colspan="8" class="empty-state">No active customers</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-            <div id="expiringTab" class="tab-content">
-                <table class="customer-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Room</th>
-                            <th>Mobile</th>
-                            <th>Voucher</th>
-                            <th>Price (SAR)</th>
-                            <th>Status</th>
-                            <th>Expiry</th>
-                            <th>Days Left</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expiringCustomersTable">
-                        <tr><td colspan="9" class="empty-state">No expiring customers</td></tr>
-                    </tbody>
-                </table>
-            </div>
+                    <div id="expiringTab" class="tab-content">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Mobile</th>
+                                    <th>Voucher</th>
+                                    <th>Price (SAR)</th>
+                                    <th>Status</th>
+                                    <th>Expiry</th>
+                                    <th>Days Left</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiringCustomersTable">
+                                <tr><td colspan="9" class="empty-state">No expiring customers</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-            <div id="expiredTab" class="tab-content">
-                <table class="customer-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Room</th>
-                            <th>Mobile</th>
-                            <th>Voucher</th>
-                            <th>Price (SAR)</th>
-                            <th>Status</th>
-                            <th>Expired Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expiredCustomersTable">
-                        <tr><td colspan="8" class="empty-state">No expired customers</td></tr>
-                    </tbody>
-                </table>
-            </div>
+                    <div id="expiredTab" class="tab-content">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Mobile</th>
+                                    <th>Voucher</th>
+                                    <th>Price (SAR)</th>
+                                    <th>Status</th>
+                                    <th>Expired Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiredCustomersTable">
+                                <tr><td colspan="8" class="empty-state">No expired customers</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="vouchersTab" class="tab-content">
+                        <div style="margin-bottom: 20px;">
+                            <button class="btn btn-success" onclick="openVoucherModal()">➕ Add/Upload Vouchers</button>
+                            <button class="btn btn-info" onclick="openAssignVoucherModal()">➕ Assign Voucher to Customer</button>
+                        </div>
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Voucher Code</th>
+                                    <th>Status</th>
+                                    <th>Customer</th>
+                                    <th>Room</th>
+                                    <th>Assigned Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vouchersTable">
+                                <tr><td colspan="6" class="empty-state">No vouchers available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </main>
             </div>
         </div>
@@ -866,6 +999,123 @@
         </div>
     </div>
 
+    <!-- Voucher Management Modal -->
+    <div id="voucherModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">🎫 Voucher Management</div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px;">Upload Vouchers from Excel</h3>
+                <div class="file-upload" onclick="document.getElementById('voucherFile').click()">
+                    <input type="file" id="voucherFile" accept=".xlsx,.xls,.csv" onchange="handleVoucherFileUpload(event)">
+                    <p>📁 Click to upload Excel file with voucher codes</p>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">File should have a column named "voucher_code" or "code"</p>
+                </div>
+                <div id="voucherUploadResult" style="margin-top: 10px;"></div>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px;">Generate Random Vouchers</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Prefix</label>
+                        <input type="text" id="voucherPrefix" value="SKYBIRD" placeholder="SKYBIRD">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="voucherQuantity" value="10" min="1" max="100">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="generateVouchers()" style="width: 100%; margin-top: 10px;">Generate Vouchers</button>
+                <div id="voucherGenerateResult" style="margin-top: 10px;"></div>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div>
+                <h3 style="margin-bottom: 15px;">Recent Vouchers (<span id="voucherCount">0</span> total)</h3>
+                <div class="voucher-list" id="voucherList">
+                    <p class="empty-state">No vouchers yet</p>
+                </div>
+            </div>
+
+            <div class="form-buttons" style="margin-top: 20px;">
+                <button class="btn-cancel" onclick="closeVoucherModal()" style="flex: 1;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Voucher to Customer Modal -->
+    <div id="assignVoucherModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">➕ Assign Voucher to Customer</div>
+            
+            <div class="form-group">
+                <label>Select Available Voucher *</label>
+                <select id="assignVoucherCode" required>
+                    <option value="">-- Choose Voucher --</option>
+                </select>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">Only available (unassigned) vouchers are shown</p>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div class="form-group">
+                <label>Customer Full Name *</label>
+                <input type="text" id="assignFullName" placeholder="Customer name" required>
+            </div>
+            <div class="form-group">
+                <label>Room Number *</label>
+                <input type="text" id="assignRoomNo" placeholder="Room number" required>
+            </div>
+            <div class="form-group">
+                <label>Mobile Number *</label>
+                <input type="text" id="assignMobileNumber" placeholder="Mobile number" required>
+            </div>
+            <div class="form-group">
+                <label>Price (SAR) *</label>
+                <input type="number" id="assignPrice" placeholder="Price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Buy Date *</label>
+                <input type="date" id="assignBuyDate" required>
+            </div>
+            <div class="form-group">
+                <label>Validity Days *</label>
+                <select id="assignValidityDays" required>
+                    <option value="">Select days</option>
+                    <option value="7">7 Days</option>
+                    <option value="15">15 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="60">60 Days</option>
+                    <option value="90">90 Days</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Plan Name</label>
+                <input type="text" id="assignPlanName" placeholder="Plan name">
+            </div>
+            <div class="form-group">
+                <label>Payment Status *</label>
+                <select id="assignIsPaid" required>
+                    <option value="1">Paid</option>
+                    <option value="0">Unpaid</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea id="assignNotes" placeholder="Notes" rows="2"></textarea>
+            </div>
+
+            <div class="form-buttons">
+                <button class="btn-save" onclick="assignVoucherToCustomer()">Assign Voucher & Save Customer</button>
+                <button class="btn-cancel" onclick="closeAssignVoucherModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Panel Modal -->
     <div id="adminModal" class="modal">
         <div class="modal-content">
@@ -911,7 +1161,7 @@
         </div>
     </div>
 
-    <!-- Voice Assistant Modal (Free, Browser-based) -->
+    <!-- Voice Assistant Modal -->
     <div id="voiceModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">🎤 Voice Assistant</div>
@@ -936,13 +1186,14 @@
         const SUPABASE_URL = 'https://nayxxilobsifspqmzsre.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDAwNDQsImV4cCI6MjA5MDk3NjA0NH0.49lbgMZJiEwnsDsO98d5htlRLddVoq4H3DYCGpDR2pI';
         const TABLE_NAME = 'billing_customers';
+        const VOUCHER_TABLE = 'vouchers';
 
         let currentUser = null;
         let currentEditingId = null;
         let allCustomers = [];
+        let allVouchers = [];
         let customerSearchQuery = '';
 
-        // Supabase Auth session (required after RLS changes)
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let sbSession = null;
 
@@ -955,6 +1206,7 @@
                 showDashboard();
                 bindSearch();
                 loadCustomers();
+                loadVouchers();
             }
         });
 
@@ -974,7 +1226,7 @@
             renderCustomers();
         }
 
-        // Login (Supabase Auth)
+        // Login
         async function handleLogin() {
             const email = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -994,6 +1246,7 @@
             currentUser = { email: data.user?.email || email };
             showDashboard();
             loadCustomers();
+            loadVouchers();
         }
 
         // Logout
@@ -1004,7 +1257,6 @@
             location.reload();
         }
 
-        // Show Dashboard
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
@@ -1014,10 +1266,7 @@
         // Load Customers
         async function loadCustomers() {
             try {
-                if (!sbSession?.access_token) {
-                    showAlert('Please login again (session expired).', 'error');
-                    return;
-                }
+                if (!sbSession?.access_token) return;
 
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
@@ -1036,6 +1285,32 @@
                 }
             } catch (error) {
                 console.error('Error loading customers:', error);
+            }
+        }
+
+        // Load Vouchers
+        async function loadVouchers() {
+            try {
+                if (!sbSession?.access_token) return;
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}?order=created_at.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession.access_token}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    allVouchers = await response.json();
+                    updateVoucherStats();
+                    renderVouchers();
+                    updateAvailableVoucherDropdown();
+                }
+            } catch (error) {
+                console.error('Error loading vouchers:', error);
             }
         }
 
@@ -1062,11 +1337,16 @@
             if (profitEl) profitEl.textContent = `SAR ${profit.toFixed(2)}`;
         }
 
+        function updateVoucherStats() {
+            const available = allVouchers.filter(v => v.status === 'available').length;
+            document.getElementById('availableVouchersCount').textContent = available;
+            document.getElementById('voucherCount').textContent = allVouchers.length;
+        }
+
         function renderCustomers() {
             const today = new Date();
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            // Apply search filter (name / room / mobile / voucher)
             let list = allCustomers;
             if (customerSearchQuery) {
                 list = allCustomers.filter(c => {
@@ -1087,7 +1367,6 @@
             renderTable('expiredCustomersTable', expired, false, true);
         }
 
-        // Render Table
         function renderTable(tableId, customers, showDaysLeft = false, isExpired = false) {
             const tbody = document.getElementById(tableId);
             if (customers.length === 0) {
@@ -1111,7 +1390,7 @@
                         <td>${c.full_name}</td>
                         <td>${c.room_no}</td>
                         <td>${c.mobile_number}</td>
-                        <td>${c.voucher_code}</td>
+                        <td><span class="voucher-code">${c.voucher_code || '-'}</span></td>
                         <td>SAR ${Number(c.price || 0).toFixed(2)}</td>
                         <td><span class="status-badge ${c.is_paid ? 'status-paid' : 'status-unpaid'}">${c.is_paid ? 'Paid' : 'Unpaid'}</span></td>
                         <td>${new Date(c.expiry_date).toLocaleDateString()}</td>
@@ -1127,34 +1406,300 @@
             }).join('');
         }
 
+        function renderVouchers() {
+            const tbody = document.getElementById('vouchersTable');
+            const voucherList = document.getElementById('voucherList');
+            
+            if (allVouchers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No vouchers available</td></tr>`;
+                voucherList.innerHTML = '<p class="empty-state">No vouchers yet</p>';
+                return;
+            }
+
+            // Render in table
+            tbody.innerHTML = allVouchers.map(v => {
+                const customer = allCustomers.find(c => c.voucher_code === v.voucher_code);
+                return `
+                    <tr>
+                        <td><span class="voucher-code">${v.voucher_code}</span></td>
+                        <td><span class="status-badge status-${v.status}">${v.status}</span></td>
+                        <td>${customer ? customer.full_name : '-'}</td>
+                        <td>${customer ? customer.room_no : '-'}</td>
+                        <td>${v.assigned_at ? new Date(v.assigned_at).toLocaleDateString() : '-'}</td>
+                        <td>
+                            ${v.status === 'available' ? 
+                                `<button class="btn-small btn-assign" onclick="quickAssign('${v.voucher_code}')">Assign</button>` : 
+                                '<span style="color: #999;">Assigned</span>'
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Render in modal list (recent 20)
+            const recent = allVouchers.slice(0, 20);
+            voucherList.innerHTML = recent.map(v => `
+                <div class="voucher-item">
+                    <span class="voucher-code">${v.voucher_code}</span>
+                    <span class="status-badge status-${v.status}">${v.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateAvailableVoucherDropdown() {
+            const select = document.getElementById('assignVoucherCode');
+            const available = allVouchers.filter(v => v.status === 'available');
+            
+            select.innerHTML = '<option value="">-- Choose Voucher --</option>' +
+                available.map(v => `<option value="${v.voucher_code}">${v.voucher_code}</option>`).join('');
+        }
+
+        function quickAssign(voucherCode) {
+            document.getElementById('assignVoucherCode').value = voucherCode;
+            openAssignVoucherModal();
+        }
+
         // Switch Tab
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
-            if (tab === 'active') {
-                document.getElementById('activeTab').classList.add('active');
+            const tabMap = {
+                'active': { content: 'activeTab', nav: 'nav-active', tabIndex: 0 },
+                'expiring': { content: 'expiringTab', nav: 'nav-expiring', tabIndex: 1 },
+                'expired': { content: 'expiredTab', nav: 'nav-expired', tabIndex: 2 },
+                'vouchers': { content: 'vouchersTab', nav: 'nav-vouchers', tabIndex: 3 }
+            };
+
+            const map = tabMap[tab];
+            if (map) {
+                document.getElementById(map.content).classList.add('active');
                 const tabs = document.querySelectorAll('.tab');
-                if (tabs[0]) tabs[0].classList.add('active');
-                const nav = document.getElementById('nav-active');
+                if (tabs[map.tabIndex]) tabs[map.tabIndex].classList.add('active');
+                const nav = document.getElementById(map.nav);
                 if (nav) nav.classList.add('active');
-            } else if (tab === 'expiring') {
-                document.getElementById('expiringTab').classList.add('active');
-                const tabs = document.querySelectorAll('.tab');
-                if (tabs[1]) tabs[1].classList.add('active');
-                const nav = document.getElementById('nav-expiring');
-                if (nav) nav.classList.add('active');
-            } else if (tab === 'expired') {
-                document.getElementById('expiredTab').classList.add('active');
-                const tabs = document.querySelectorAll('.tab');
-                if (tabs[2]) tabs[2].classList.add('active');
-                const nav = document.getElementById('nav-expired');
-                if (nav) nav.classList.add('active');
+            }
+
+            if (tab === 'vouchers') {
+                loadVouchers();
             }
         }
 
-        // Add Customer Modal
+        // Voucher Modal Functions
+        function openVoucherModal() {
+            document.getElementById('voucherModal').classList.add('active');
+            loadVouchers();
+        }
+
+        function closeVoucherModal() {
+            document.getElementById('voucherModal').classList.remove('active');
+        }
+
+        function openAssignVoucherModal() {
+            document.getElementById('assignVoucherCode').value = '';
+            document.getElementById('assignFullName').value = '';
+            document.getElementById('assignRoomNo').value = '';
+            document.getElementById('assignMobileNumber').value = '';
+            document.getElementById('assignPrice').value = '';
+            document.getElementById('assignBuyDate').value = '';
+            document.getElementById('assignValidityDays').value = '';
+            document.getElementById('assignPlanName').value = '';
+            document.getElementById('assignIsPaid').value = '1';
+            document.getElementById('assignNotes').value = '';
+            
+            updateAvailableVoucherDropdown();
+            document.getElementById('assignVoucherModal').classList.add('active');
+        }
+
+        function closeAssignVoucherModal() {
+            document.getElementById('assignVoucherModal').classList.remove('active');
+        }
+
+        // Handle Excel Upload
+        function handleVoucherFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    // Find voucher code column
+                    const codes = [];
+                    jsonData.forEach(row => {
+                        const code = row.voucher_code || row.code || row.Voucher || row.Code || row.voucher || Object.values(row)[0];
+                        if (code && String(code).trim()) {
+                            codes.push(String(code).trim());
+                        }
+                    });
+
+                    if (codes.length === 0) {
+                        document.getElementById('voucherUploadResult').innerHTML = 
+                            '<span style="color: #d32f2f;">❌ No voucher codes found. Please ensure your file has a column named "voucher_code", "code", or similar.</span>';
+                        return;
+                    }
+
+                    uploadVouchers(codes);
+
+                } catch (err) {
+                    document.getElementById('voucherUploadResult').innerHTML = 
+                        '<span style="color: #d32f2f;">❌ Error reading file: ' + err.message + '</span>';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Upload vouchers to database
+        async function uploadVouchers(codes) {
+            let successCount = 0;
+            let duplicateCount = 0;
+
+            for (const code of codes) {
+                try {
+                    const response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                voucher_code: code,
+                                status: 'available'
+                            })
+                        }
+                    );
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        duplicateCount++;
+                    }
+                } catch (error) {
+                    duplicateCount++;
+                }
+            }
+
+            document.getElementById('voucherUploadResult').innerHTML = 
+                `<span style="color: #2e7d32;">✅ Uploaded: ${successCount} vouchers</span>` +
+                (duplicateCount > 0 ? `<br><span style="color: #FF9800;">⚠️ Skipped ${duplicateCount} duplicates</span>` : '');
+
+            loadVouchers();
+        }
+
+        // Generate Random Vouchers
+        async function generateVouchers() {
+            const prefix = document.getElementById('voucherPrefix').value.trim() || 'SKYBIRD';
+            const quantity = parseInt(document.getElementById('voucherQuantity').value) || 10;
+
+            const codes = [];
+            for (let i = 0; i < quantity; i++) {
+                const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const code = `${prefix}-${randomPart}-${Math.floor(1000 + Math.random() * 9000)}`;
+                codes.push(code);
+            }
+
+            document.getElementById('voucherGenerateResult').innerHTML = 
+                `<span style="color: #17a2b8;">⏳ Generating ${quantity} vouchers...</span>`;
+
+            await uploadVouchers(codes);
+
+            document.getElementById('voucherGenerateResult').innerHTML = 
+                `<span style="color: #28a745;">✅ Generated ${quantity} vouchers successfully!</span>`;
+        }
+
+        // Assign Voucher to Customer
+        async function assignVoucherToCustomer() {
+            const voucherCode = document.getElementById('assignVoucherCode').value;
+            const fullName = document.getElementById('assignFullName').value.trim();
+            const roomNo = document.getElementById('assignRoomNo').value.trim();
+            const mobileNumber = document.getElementById('assignMobileNumber').value.trim();
+            const price = parseFloat(document.getElementById('assignPrice').value) || 0;
+            const buyDate = document.getElementById('assignBuyDate').value;
+            const validityDays = parseInt(document.getElementById('assignValidityDays').value);
+            const planName = document.getElementById('assignPlanName').value.trim();
+            const isPaid = parseInt(document.getElementById('assignIsPaid').value);
+            const notes = document.getElementById('assignNotes').value.trim();
+
+            if (!voucherCode || !fullName || !roomNo || !mobileNumber || !buyDate || !validityDays) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Calculate expiry date
+            const buyDateObj = new Date(buyDate);
+            const expiryDate = new Date(buyDateObj.getTime() + validityDays * 24 * 60 * 60 * 1000);
+            const expiryDateStr = expiryDate.toISOString().split('T')[0];
+
+            try {
+                // Create customer
+                const customerResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            full_name: fullName,
+                            room_no: roomNo,
+                            mobile_number: mobileNumber,
+                            voucher_code: voucherCode,
+                            price: price,
+                            buy_date: buyDate,
+                            expiry_date: expiryDateStr,
+                            validity_days: validityDays,
+                            plan_name: planName,
+                            is_paid: isPaid,
+                            notes: notes
+                        })
+                    }
+                );
+
+                if (!customerResponse.ok) {
+                    throw new Error('Failed to create customer');
+                }
+
+                const customerData = await customerResponse.json();
+                const customerId = customerData[0]?.id;
+
+                // Update voucher status
+                await fetch(
+                    `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}?voucher_code=eq.${voucherCode}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: 'assigned',
+                            assigned_at: new Date().toISOString()
+                        })
+                    }
+                );
+
+                closeAssignVoucherModal();
+                loadCustomers();
+                loadVouchers();
+                showAlert(`Voucher ${voucherCode} assigned to ${fullName} successfully!`, 'success');
+
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Customer Modal Functions
         function openAddCustomerModal() {
             currentEditingId = null;
             document.getElementById('modalTitle').textContent = 'Add Customer';
@@ -1171,7 +1716,6 @@
             document.getElementById('customerModal').classList.add('active');
         }
 
-        // Edit Customer
         function editCustomer(id) {
             const customer = allCustomers.find(c => c.id === id);
             if (!customer) return;
@@ -1191,9 +1735,7 @@
             document.getElementById('customerModal').classList.add('active');
         }
 
-        // Save Customer
         async function saveCustomer() {
-            // Required fields
             const fullName = document.getElementById('fullName').value.trim();
             const roomNo = document.getElementById('roomNo').value.trim();
             const voucherCode = document.getElementById('voucherCode').value.trim();
@@ -1218,7 +1760,6 @@
                 notes: document.getElementById('notes').value
             };
 
-            // Calculate expiry date
             const buyDate = new Date(data.buy_date);
             const expiryDate = new Date(buyDate.getTime() + data.validity_days * 24 * 60 * 60 * 1000);
             data.expiry_date = expiryDate.toISOString().split('T')[0];
@@ -1266,7 +1807,6 @@
             }
         }
 
-        // Delete Customer
         async function deleteCustomer(id) {
             if (!confirm('Are you sure you want to delete this customer?')) return;
 
@@ -1291,12 +1831,11 @@
             }
         }
 
-        // Close Modal
         function closeCustomerModal() {
             document.getElementById('customerModal').classList.remove('active');
         }
 
-        // Admin Panel
+        // Admin Panel Functions
         function openAdminPanel() {
             document.getElementById('adminModal').classList.add('active');
             switchAdminTab('agents');
@@ -1312,7 +1851,6 @@
             document.getElementById('passwordTab').style.display = tab === 'password' ? 'block' : 'none';
         }
 
-        // Load Agents
         function loadAgents() {
             const agents = JSON.parse(localStorage.getItem('agents') || '[]');
             const agentsList = document.getElementById('agentsList');
@@ -1327,7 +1865,6 @@
             `).join('');
         }
 
-        // Add Agent
         function addAgent() {
             const name = document.getElementById('newAgentName').value;
             const email = document.getElementById('newAgentEmail').value;
@@ -1347,7 +1884,6 @@
             showAlert('Agent added successfully!', 'success');
         }
 
-        // Delete Agent
         function deleteAgent(idx) {
             const agents = JSON.parse(localStorage.getItem('agents') || '[]');
             agents.splice(idx, 1);
@@ -1355,7 +1891,6 @@
             loadAgents();
         }
 
-        // Change Password
         function changePassword() {
             const current = document.getElementById('currentPassword').value;
             const newPass = document.getElementById('newPassword').value;
@@ -1376,7 +1911,6 @@
                 return;
             }
 
-            // In a real app, this would be sent to backend
             localStorage.setItem('adminPassword', newPass);
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
@@ -1384,7 +1918,6 @@
             showAlert('Password changed successfully!', 'success');
         }
 
-        // Show Alert
         function showAlert(message, type) {
             const alertBox = document.getElementById('alertBox');
             alertBox.textContent = message;
@@ -1392,14 +1925,11 @@
             setTimeout(() => alertBox.classList.remove('show'), 5000);
         }
 
-        // -----------------------------
-        // Free Voice Assistant (Malayalam)
-        // -----------------------------
+        // Voice Assistant Functions
         let voiceRecognition = null;
         let voiceIsRunning = false;
         let lastFocusedEl = null;
 
-        // Track last focused input/textarea in customer modal
         document.addEventListener('focusin', (e) => {
             const el = e.target;
             if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
@@ -1441,7 +1971,6 @@
                 const next = (current ? (current + ' ') : '') + fullText.trim();
                 document.getElementById('voiceTranscript').value = next.trim();
 
-                // On final result, try auto-fill
                 const last = event.results[event.results.length - 1];
                 if (last && last.isFinal) {
                     tryAutoFillFromSpeech(last[0].transcript.trim());
@@ -1455,7 +1984,6 @@
 
             voiceRecognition.onend = () => {
                 if (voiceIsRunning) {
-                    // auto-restart to feel continuous
                     try { voiceRecognition.start(); } catch (e) {}
                 }
             };
@@ -1497,7 +2025,6 @@
             }
 
             if (el.tagName === 'SELECT') {
-                // Try set paid/unpaid
                 const t = text.toLowerCase();
                 if (t.includes('paid') || t.includes('പെയ്ഡ്')) el.value = '1';
                 else if (t.includes('unpaid') || t.includes('അൺപെയ്ഡ്') || t.includes('അന്‍പെയ്ഡ്')) el.value = '0';
@@ -1521,12 +2048,10 @@
                 return (m[1] || '').trim();
             };
 
-            // Support a few Malayalam keywords too
             const name = extractAfter(t, /(?:name|full name|പേര്|പേരു)\s*[:\-]?\s*(.+)$/i);
             const room = extractAfter(t, /(?:room|room number|റൂം|റൂമ്)\s*[:\-]?\s*([A-Za-z0-9\- ]+)$/i);
             const voucher = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*([A-Za-z0-9\-]+)$/i);
 
-            // Date: yyyy-mm-dd OR dd/mm/yyyy
             let buyDate = null;
             const dateIso = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
             if (dateIso) {
@@ -1543,7 +2068,6 @@
             if (lower.includes('unpaid') || lower.includes('അൺപെയ്ഡ്') || lower.includes('അന്‍പെയ്ഡ്')) isPaid = '0';
             if (lower.includes('paid') || lower.includes('പെയ്ഡ്')) isPaid = '1';
 
-            // “create new customer” command (Malayalam + English)
             const wantsNewCustomer = (
                 lower.includes('new customer') ||
                 lower.includes('add customer') ||
@@ -1554,7 +2078,6 @@
                 lower.includes('കസ്റ്റമര് ചേർക്കുക')
             );
 
-            // “save” command
             const wantsSave = (
                 lower.includes('save') ||
                 lower.includes('submit') ||
@@ -1592,18 +2115,15 @@
         function tryAutoFillFromSpeech(raw) {
             const p = parseCustomerFromSpeech(raw);
 
-            // If user says “new customer”, open the add customer modal automatically
             if (p.wantsNewCustomer) {
                 ensureCustomerModalOpen();
             }
 
-            // Only fill when customer modal is open
             const isCustomerModalOpen = document.getElementById('customerModal').classList.contains('active');
             if (!isCustomerModalOpen) return;
 
             fillCustomerFieldsFromParsed(p);
 
-            // If user said “save” and we have required fields, confirm and save
             if (p.wantsSave && hasMinimumCustomerFields()) {
                 const ok = confirm('Save this customer now?');
                 if (ok) saveCustomer();
