@@ -24,7 +24,6 @@
             margin: 0 auto;
         }
 
-        /* New layout: sidebar + main */
         .app-layout {
             display: flex;
             gap: 20px;
@@ -604,7 +603,9 @@
             background: #e3f2fd;
             padding: 4px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .file-upload {
@@ -955,8 +956,9 @@
                 <input type="text" id="mobileNumber" placeholder="Mobile number">
             </div>
             <div class="form-group">
-                <label>Voucher Code *</label>
-                <input type="text" id="voucherCode" placeholder="Voucher code" required>
+                <label>Voucher Code * (8 digits)</label>
+                <input type="text" id="voucherCode" placeholder="12345678" maxlength="8" pattern="\d{8}" required>
+                <small style="color: #666;">Must be exactly 8 digits (e.g., 12345678)</small>
             </div>
             <div class="form-group">
                 <label>Price *</label>
@@ -1008,8 +1010,8 @@
                 <h3 style="margin-bottom: 15px;">Upload Vouchers from Excel</h3>
                 <div class="file-upload" onclick="document.getElementById('voucherFile').click()">
                     <input type="file" id="voucherFile" accept=".xlsx,.xls,.csv" onchange="handleVoucherFileUpload(event)">
-                    <p>📁 Click to upload Excel file with voucher codes</p>
-                    <p style="font-size: 12px; color: #666; margin-top: 10px;">File should have a column named "voucher_code" or "code"</p>
+                    <p>📁 Click to upload Excel file with 8-digit voucher codes</p>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">File should contain 8-digit numbers (e.g., 12345678, 87654321)</p>
                 </div>
                 <div id="voucherUploadResult" style="margin-top: 10px;"></div>
             </div>
@@ -1017,18 +1019,14 @@
             <hr style="margin: 20px 0;">
 
             <div style="margin-bottom: 20px;">
-                <h3 style="margin-bottom: 15px;">Generate Random Vouchers</h3>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Prefix</label>
-                        <input type="text" id="voucherPrefix" value="SKYBIRD" placeholder="SKYBIRD">
-                    </div>
-                    <div class="form-group">
-                        <label>Quantity</label>
-                        <input type="number" id="voucherQuantity" value="10" min="1" max="100">
-                    </div>
+                <h3 style="margin-bottom: 15px;">Generate Random 8-Digit Vouchers</h3>
+                <div class="form-group">
+                    <label>Quantity to Generate</label>
+                    <input type="number" id="voucherQuantity" value="10" min="1" max="100">
                 </div>
-                <button class="btn btn-success" onclick="generateVouchers()" style="width: 100%; margin-top: 10px;">Generate Vouchers</button>
+                <button class="btn btn-success" onclick="generateVouchers()" style="width: 100%; margin-top: 10px;">
+                    Generate 8-Digit Vouchers
+                </button>
                 <div id="voucherGenerateResult" style="margin-top: 10px;"></div>
             </div>
 
@@ -1128,7 +1126,6 @@
             <div id="agentsTab" style="display: none;">
                 <h3 style="margin-bottom: 15px;">Manage Agents</h3>
                 <div id="agentsList" style="margin-bottom: 15px;">
-                    <!-- Agents will be listed here -->
                 </div>
                 <div class="form-group">
                     <label>Add New Agent</label>
@@ -1197,7 +1194,6 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let sbSession = null;
 
-        // Initialize
         window.addEventListener('load', async () => {
             const { data } = await sb.auth.getSession();
             sbSession = data?.session || null;
@@ -1226,7 +1222,6 @@
             renderCustomers();
         }
 
-        // Login
         async function handleLogin() {
             const email = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -1249,7 +1244,6 @@
             loadVouchers();
         }
 
-        // Logout
         async function handleLogout() {
             await sb.auth.signOut();
             currentUser = null;
@@ -1263,7 +1257,6 @@
             bindSearch();
         }
 
-        // Load Customers
         async function loadCustomers() {
             try {
                 if (!sbSession?.access_token) return;
@@ -1288,7 +1281,6 @@
             }
         }
 
-        // Load Vouchers
         async function loadVouchers() {
             try {
                 if (!sbSession?.access_token) return;
@@ -1314,7 +1306,6 @@
             }
         }
 
-        // Update Statistics
         function updateStats() {
             const today = new Date();
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -1416,7 +1407,6 @@
                 return;
             }
 
-            // Render in table
             tbody.innerHTML = allVouchers.map(v => {
                 const customer = allCustomers.find(c => c.voucher_code === v.voucher_code);
                 return `
@@ -1436,7 +1426,6 @@
                 `;
             }).join('');
 
-            // Render in modal list (recent 20)
             const recent = allVouchers.slice(0, 20);
             voucherList.innerHTML = recent.map(v => `
                 <div class="voucher-item">
@@ -1459,7 +1448,6 @@
             openAssignVoucherModal();
         }
 
-        // Switch Tab
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -1486,7 +1474,6 @@
             }
         }
 
-        // Voucher Modal Functions
         function openVoucherModal() {
             document.getElementById('voucherModal').classList.add('active');
             loadVouchers();
@@ -1516,7 +1503,6 @@
             document.getElementById('assignVoucherModal').classList.remove('active');
         }
 
-        // Handle Excel Upload
         function handleVoucherFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1529,22 +1515,30 @@
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
-                    // Find voucher code column
                     const codes = [];
+                    
                     jsonData.forEach(row => {
-                        const code = row.voucher_code || row.code || row.Voucher || row.Code || row.voucher || Object.values(row)[0];
-                        if (code && String(code).trim()) {
-                            codes.push(String(code).trim());
+                        const values = Object.values(row);
+                        for (const val of values) {
+                            const strVal = String(val).trim();
+                            if (/^\d{8}$/.test(strVal)) {
+                                codes.push(strVal);
+                            }
                         }
                     });
 
-                    if (codes.length === 0) {
+                    const uniqueCodes = [...new Set(codes)];
+
+                    if (uniqueCodes.length === 0) {
                         document.getElementById('voucherUploadResult').innerHTML = 
-                            '<span style="color: #d32f2f;">❌ No voucher codes found. Please ensure your file has a column named "voucher_code", "code", or similar.</span>';
+                            '<span style="color: #d32f2f;">❌ No valid 8-digit voucher codes found. Please ensure your file contains 8-digit numbers (e.g., 12345678).</span>';
                         return;
                     }
 
-                    uploadVouchers(codes);
+                    document.getElementById('voucherUploadResult').innerHTML = 
+                        `<span style="color: #17a2b8;">⏳ Found ${uniqueCodes.length} voucher codes, uploading...</span>`;
+
+                    uploadVouchers(uniqueCodes);
 
                 } catch (err) {
                     document.getElementById('voucherUploadResult').innerHTML = 
@@ -1554,7 +1548,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Upload vouchers to database
         async function uploadVouchers(codes) {
             let successCount = 0;
             let duplicateCount = 0;
@@ -1588,22 +1581,25 @@
             }
 
             document.getElementById('voucherUploadResult').innerHTML = 
-                `<span style="color: #2e7d32;">✅ Uploaded: ${successCount} vouchers</span>` +
+                `<span style="color: #28a745;">✅ Uploaded: ${successCount} vouchers</span>` +
                 (duplicateCount > 0 ? `<br><span style="color: #FF9800;">⚠️ Skipped ${duplicateCount} duplicates</span>` : '');
 
             loadVouchers();
         }
 
-        // Generate Random Vouchers
         async function generateVouchers() {
-            const prefix = document.getElementById('voucherPrefix').value.trim() || 'SKYBIRD';
             const quantity = parseInt(document.getElementById('voucherQuantity').value) || 10;
-
+            
             const codes = [];
-            for (let i = 0; i < quantity; i++) {
-                const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
-                const code = `${prefix}-${randomPart}-${Math.floor(1000 + Math.random() * 9000)}`;
-                codes.push(code);
+            const usedCodes = new Set(allVouchers.map(v => v.voucher_code));
+            
+            while (codes.length < quantity) {
+                const code = Math.floor(10000000 + Math.random() * 90000000).toString();
+                
+                if (!usedCodes.has(code) && !codes.includes(code)) {
+                    codes.push(code);
+                    usedCodes.add(code);
+                }
             }
 
             document.getElementById('voucherGenerateResult').innerHTML = 
@@ -1615,7 +1611,6 @@
                 `<span style="color: #28a745;">✅ Generated ${quantity} vouchers successfully!</span>`;
         }
 
-        // Assign Voucher to Customer
         async function assignVoucherToCustomer() {
             const voucherCode = document.getElementById('assignVoucherCode').value;
             const fullName = document.getElementById('assignFullName').value.trim();
@@ -1633,13 +1628,11 @@
                 return;
             }
 
-            // Calculate expiry date
             const buyDateObj = new Date(buyDate);
             const expiryDate = new Date(buyDateObj.getTime() + validityDays * 24 * 60 * 60 * 1000);
             const expiryDateStr = expiryDate.toISOString().split('T')[0];
 
             try {
-                // Create customer
                 const customerResponse = await fetch(
                     `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
                     {
@@ -1669,10 +1662,6 @@
                     throw new Error('Failed to create customer');
                 }
 
-                const customerData = await customerResponse.json();
-                const customerId = customerData[0]?.id;
-
-                // Update voucher status
                 await fetch(
                     `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}?voucher_code=eq.${voucherCode}`,
                     {
@@ -1699,7 +1688,6 @@
             }
         }
 
-        // Customer Modal Functions
         function openAddCustomerModal() {
             currentEditingId = null;
             document.getElementById('modalTitle').textContent = 'Add Customer';
@@ -1747,11 +1735,16 @@
                 return;
             }
 
+            if (!/^\d{8}$/.test(voucherCode)) {
+                showAlert('Voucher code must be exactly 8 digits (e.g., 12345678)', 'error');
+                return;
+            }
+
             const data = {
                 full_name: document.getElementById('fullName').value,
                 room_no: document.getElementById('roomNo').value,
                 mobile_number: (document.getElementById('mobileNumber').value || '0').trim(),
-                voucher_code: document.getElementById('voucherCode').value,
+                voucher_code: voucherCode,
                 price: parseFloat(document.getElementById('price').value),
                 buy_date: document.getElementById('buyDate').value,
                 validity_days: parseInt(document.getElementById('validityDays').value),
@@ -1835,7 +1828,6 @@
             document.getElementById('customerModal').classList.remove('active');
         }
 
-        // Admin Panel Functions
         function openAdminPanel() {
             document.getElementById('adminModal').classList.add('active');
             switchAdminTab('agents');
@@ -1925,7 +1917,6 @@
             setTimeout(() => alertBox.classList.remove('show'), 5000);
         }
 
-        // Voice Assistant Functions
         let voiceRecognition = null;
         let voiceIsRunning = false;
         let lastFocusedEl = null;
@@ -2050,7 +2041,7 @@
 
             const name = extractAfter(t, /(?:name|full name|പേര്|പേരു)\s*[:\-]?\s*(.+)$/i);
             const room = extractAfter(t, /(?:room|room number|റൂം|റൂമ്)\s*[:\-]?\s*([A-Za-z0-9\- ]+)$/i);
-            const voucher = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*([A-Za-z0-9\-]+)$/i);
+            const voucher = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*(\d{8})/i);
 
             let buyDate = null;
             const dateIso = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
