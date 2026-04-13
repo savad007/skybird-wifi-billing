@@ -787,8 +787,6 @@
                         <button class="btn btn-secondary" onclick="openAddCustomerModal()" style="width:100%;">➕ Add Customer</button>
                         <button class="btn btn-success" onclick="openVoucherModal()" style="width:100%;">🎫 Manage Vouchers</button>
                         <button class="btn btn-info" onclick="openAssignVoucherModal()" style="width:100%;">➕ Assign Voucher</button>
-                        <button class="btn btn-primary" onclick="openVoiceAssistant()" style="width:100%;" title="English voice input">🎤 Voice Assist</button>
-                        <button class="btn btn-secondary" onclick="window.location.href='omada-sync.html'" style="width:100%;">🔄 Omada Sync</button>
                         <button class="btn btn-primary" onclick="openAdminPanel()" style="width:100%;">⚙️ Admin</button>
                         <button class="btn btn-danger" onclick="handleLogout()" style="width:100%;">Logout</button>
                     </div>
@@ -801,7 +799,6 @@
                             <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
                             <button class="btn btn-success" onclick="openVoucherModal()">🎫 Vouchers</button>
                             <button class="btn btn-info" onclick="openAssignVoucherModal()">➕ Assign Voucher</button>
-                            <button class="btn btn-primary" onclick="openVoiceAssistant()" title="English voice input">🎤 Voice Assist</button>
                         </div>
                     </div>
 
@@ -1155,26 +1152,6 @@
             </div>
 
             <button class="btn btn-danger" onclick="closeAdminPanel()" style="width: 100%; margin-top: 20px;">Close</button>
-        </div>
-    </div>
-
-    <!-- Voice Assistant Modal -->
-    <div id="voiceModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">🎤 Voice Assistant</div>
-            <div id="voiceAlert" class="alert alert-warning show" style="display:block;">Tip: Click Start and speak in English. It can auto-fill Name/Room/Voucher/Date/Paid (and open New Customer).</div>
-            <div class="form-group">
-                <label>Recognized Text</label>
-                <textarea id="voiceTranscript" rows="4" placeholder="Speech will appear here..."></textarea>
-            </div>
-            <div class="form-buttons">
-                <button class="btn-save" id="voiceStartBtn" onclick="startVoiceAssistant()">Start</button>
-                <button class="btn-cancel" id="voiceStopBtn" onclick="stopVoiceAssistant()" disabled>Stop</button>
-            </div>
-            <div class="form-buttons" style="margin-top:10px;">
-                <button class="btn-save" onclick="applyVoiceTextToFocused()">Insert into focused field</button>
-                <button class="btn-cancel" onclick="closeVoiceAssistant()">Close</button>
-            </div>
         </div>
     </div>
 
@@ -1915,210 +1892,6 @@
             alertBox.textContent = message;
             alertBox.className = `alert show alert-${type}`;
             setTimeout(() => alertBox.classList.remove('show'), 5000);
-        }
-
-        let voiceRecognition = null;
-        let voiceIsRunning = false;
-        let lastFocusedEl = null;
-
-        document.addEventListener('focusin', (e) => {
-            const el = e.target;
-            if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
-                lastFocusedEl = el;
-            }
-        });
-
-        function openVoiceAssistant() {
-            document.getElementById('voiceTranscript').value = '';
-            document.getElementById('voiceModal').classList.add('active');
-            initVoiceRecognition();
-        }
-
-        function closeVoiceAssistant() {
-            stopVoiceAssistant();
-            document.getElementById('voiceModal').classList.remove('active');
-        }
-
-        function initVoiceRecognition() {
-            if (voiceRecognition) return;
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                showVoiceInfo('Speech recognition is not supported in this browser. Try Chrome.', 'error');
-                return;
-            }
-
-            voiceRecognition = new SpeechRecognition();
-            voiceRecognition.lang = 'en-US';
-            voiceRecognition.interimResults = true;
-            voiceRecognition.continuous = true;
-
-            voiceRecognition.onresult = (event) => {
-                let fullText = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    fullText += event.results[i][0].transcript;
-                }
-                const current = document.getElementById('voiceTranscript').value;
-                const next = (current ? (current + ' ') : '') + fullText.trim();
-                document.getElementById('voiceTranscript').value = next.trim();
-
-                const last = event.results[event.results.length - 1];
-                if (last && last.isFinal) {
-                    tryAutoFillFromSpeech(last[0].transcript.trim());
-                }
-            };
-
-            voiceRecognition.onerror = (e) => {
-                showVoiceInfo('Voice error: ' + (e.error || 'unknown'), 'error');
-                stopVoiceAssistant();
-            };
-
-            voiceRecognition.onend = () => {
-                if (voiceIsRunning) {
-                    try { voiceRecognition.start(); } catch (e) {}
-                }
-            };
-        }
-
-        function startVoiceAssistant() {
-            initVoiceRecognition();
-            if (!voiceRecognition) return;
-            voiceIsRunning = true;
-            document.getElementById('voiceStartBtn').disabled = true;
-            document.getElementById('voiceStopBtn').disabled = false;
-            showVoiceInfo('Listening... speak English (en-US).', 'success');
-            try { voiceRecognition.start(); } catch (e) {}
-        }
-
-        function stopVoiceAssistant() {
-            voiceIsRunning = false;
-            document.getElementById('voiceStartBtn').disabled = false;
-            document.getElementById('voiceStopBtn').disabled = true;
-            if (voiceRecognition) {
-                try { voiceRecognition.stop(); } catch (e) {}
-            }
-        }
-
-        function showVoiceInfo(message, type) {
-            const el = document.getElementById('voiceAlert');
-            el.textContent = message;
-            el.className = `alert show alert-${type}`;
-        }
-
-        function applyVoiceTextToFocused() {
-            const text = document.getElementById('voiceTranscript').value.trim();
-            if (!text) return;
-
-            const el = lastFocusedEl;
-            if (!el) {
-                showVoiceInfo('Click a field (Name/Room/Voucher/Date) first, then press Insert.', 'warning');
-                return;
-            }
-
-            if (el.tagName === 'SELECT') {
-                const t = text.toLowerCase();
-                if (t.includes('paid') || t.includes('പെയ്ഡ്')) el.value = '1';
-                else if (t.includes('unpaid') || t.includes('അൺപെയ്ഡ്') || t.includes('അന്‍പെയ്ഡ്')) el.value = '0';
-            } else {
-                el.value = text;
-            }
-            showVoiceInfo('Inserted into focused field.', 'success');
-        }
-
-        function normalizeSpeechText(s) {
-            return (s || '').trim();
-        }
-
-        function parseCustomerFromSpeech(raw) {
-            const t = normalizeSpeechText(raw);
-            const lower = t.toLowerCase();
-
-            const extractAfter = (text, kwRegex) => {
-                const m = text.match(kwRegex);
-                if (!m) return null;
-                return (m[1] || '').trim();
-            };
-
-            const name = extractAfter(t, /(?:name|full name|പേര്|പേരു)\s*[:\-]?\s*(.+)$/i);
-            const room = extractAfter(t, /(?:room|room number|റൂം|റൂമ്)\s*[:\-]?\s*([A-Za-z0-9\- ]+)$/i);
-            const voucher = extractAfter(t, /(?:voucher|voucher code|code|വൗച്ചർ|വൗച്ചര്)\s*[:\-]?\s*(\d{8})/i);
-
-            let buyDate = null;
-            const dateIso = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/i);
-            if (dateIso) {
-                buyDate = dateIso;
-            } else {
-                const dateSlash = extractAfter(t, /(?:date|buy date|തീയതി)\s*[:\-]?\s*([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4})/i);
-                if (dateSlash) {
-                    const [dd, mm, yyyy] = dateSlash.split('/');
-                    buyDate = `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-                }
-            }
-
-            let isPaid = null;
-            if (lower.includes('unpaid') || lower.includes('അൺപെയ്ഡ്') || lower.includes('അന്‍പെയ്ഡ്')) isPaid = '0';
-            if (lower.includes('paid') || lower.includes('പെയ്ഡ്')) isPaid = '1';
-
-            const wantsNewCustomer = (
-                lower.includes('new customer') ||
-                lower.includes('add customer') ||
-                lower.includes('create customer') ||
-                lower.includes('പുതിയ കസ്റ്റമർ') ||
-                lower.includes('പുതിയ കസ്റ്റമര്') ||
-                lower.includes('കസ്റ്റമർ ചേർക്കുക') ||
-                lower.includes('കസ്റ്റമര് ചേർക്കുക')
-            );
-
-            const wantsSave = (
-                lower.includes('save') ||
-                lower.includes('submit') ||
-                lower.includes('സേവ്') ||
-                lower.includes('സേവ് ചെയ്യുക')
-            );
-
-            return { name, room, voucher, buyDate, isPaid, wantsNewCustomer, wantsSave, raw: t };
-        }
-
-        function ensureCustomerModalOpen() {
-            const isOpen = document.getElementById('customerModal').classList.contains('active');
-            if (!isOpen) {
-                openAddCustomerModal();
-            }
-        }
-
-        function fillCustomerFieldsFromParsed(p) {
-            if (p.name) document.getElementById('fullName').value = p.name;
-            if (p.room) document.getElementById('roomNo').value = p.room;
-            if (p.voucher) document.getElementById('voucherCode').value = p.voucher;
-            if (p.buyDate) document.getElementById('buyDate').value = p.buyDate;
-            if (p.isPaid !== null) document.getElementById('isPaid').value = p.isPaid;
-        }
-
-        function hasMinimumCustomerFields() {
-            const fullName = document.getElementById('fullName').value.trim();
-            const roomNo = document.getElementById('roomNo').value.trim();
-            const voucherCode = document.getElementById('voucherCode').value.trim();
-            const buyDateVal = document.getElementById('buyDate').value;
-            const isPaidVal = document.getElementById('isPaid').value;
-            return !!(fullName && roomNo && voucherCode && buyDateVal && (isPaidVal === '0' || isPaidVal === '1'));
-        }
-
-        function tryAutoFillFromSpeech(raw) {
-            const p = parseCustomerFromSpeech(raw);
-
-            if (p.wantsNewCustomer) {
-                ensureCustomerModalOpen();
-            }
-
-            const isCustomerModalOpen = document.getElementById('customerModal').classList.contains('active');
-            if (!isCustomerModalOpen) return;
-
-            fillCustomerFieldsFromParsed(p);
-
-            if (p.wantsSave && hasMinimumCustomerFields()) {
-                const ok = confirm('Save this customer now?');
-                if (ok) saveCustomer();
-            }
         }
     </script>
 </body>
