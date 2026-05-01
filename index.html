@@ -239,6 +239,11 @@
             border-left-color: #17a2b8;
         }
 
+        .stat-card.purple {
+            border-left-color: #7b1fa2;
+        }
+
+        .stat-card.purple .stat-value { color: #7b1fa2; }
         .stat-card.success .stat-value { color: #2e7d32; }
         .stat-card.danger .stat-value { color: #d32f2f; }
         .stat-card.warning .stat-value { color: #e65100; }
@@ -272,6 +277,7 @@
             background: white;
             padding: 0 30px;
             border-radius: 12px 12px 0 0;
+            overflow-x: auto;
         }
 
         .tab {
@@ -284,6 +290,7 @@
             color: #999;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .tab.active {
@@ -378,6 +385,24 @@
             background: #fff3cd;
             color: #856404;
         }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .cat-internet { background: #e3f2fd; color: #1565c0; }
+        .cat-electricity { background: #fff9c4; color: #f9a825; }
+        .cat-rent { background: #f3e5f5; color: #7b1fa2; }
+        .cat-maintenance { background: #e8f5e9; color: #2e7d32; }
+        .cat-equipment { background: #e0f2f1; color: #00695c; }
+        .cat-salary { background: #fce4ec; color: #c62828; }
+        .cat-other { background: #f5f5f5; color: #616161; }
 
         .action-buttons {
             display: flex;
@@ -652,6 +677,67 @@
             border-bottom: none;
         }
 
+        /* Expense filter row */
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .filter-row select,
+        .filter-row input {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .filter-row select:focus,
+        .filter-row input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        /* Expense summary cards in expenses tab */
+        .expense-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .expense-summary-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .expense-summary-card .es-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .expense-summary-card .es-value {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .expense-summary-card .es-value.income { color: #2e7d32; }
+        .expense-summary-card .es-value.expense { color: #d32f2f; }
+        .expense-summary-card .es-value.net { color: #1565c0; }
+
+        /* Net profit indicator */
+        .net-positive { color: #2e7d32 !important; }
+        .net-negative { color: #d32f2f !important; }
+
         @media (max-width: 980px) {
             .app-layout {
                 flex-direction: column;
@@ -670,7 +756,7 @@
 
             .nav-item {
                 flex: 1;
-                min-width: 160px;
+                min-width: 140px;
                 text-align: center;
             }
         }
@@ -722,6 +808,11 @@
 
             .grid-2 {
                 grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
 
@@ -778,16 +869,18 @@
                 <aside class="sidebar">
                     <div class="brand"><img src="assets/skybird-logo.png" alt="Skybird"></div>
                     <div class="nav-group">
-                        <button class="nav-item active" id="nav-active" onclick="switchTab('active')">👥 Active</button>
-                        <button class="nav-item" id="nav-expiring" onclick="switchTab('expiring')">⚠️ Expiring</button>
-                        <button class="nav-item" id="nav-expired" onclick="switchTab('expired')">📦 Expired</button>
-                        <button class="nav-item" id="nav-vouchers" onclick="switchTab('vouchers')">🎫 Vouchers</button>
+                        <button class="nav-item active" id="nav-active" onclick="switchTab('active')">&#128101; Active</button>
+                        <button class="nav-item" id="nav-expiring" onclick="switchTab('expiring')">&#9888;&#65039; Expiring</button>
+                        <button class="nav-item" id="nav-expired" onclick="switchTab('expired')">&#128230; Expired</button>
+                        <button class="nav-item" id="nav-vouchers" onclick="switchTab('vouchers')">&#127915; Vouchers</button>
+                        <button class="nav-item" id="nav-expenses" onclick="switchTab('expenses')">&#128178; Expenses</button>
                     </div>
                     <div style="margin-top: 14px; display:flex; flex-direction:column; gap:10px;">
-                        <button class="btn btn-secondary" onclick="openAddCustomerModal()" style="width:100%;">➕ Add Customer</button>
-                        <button class="btn btn-success" onclick="openVoucherModal()" style="width:100%;">🎫 Manage Vouchers</button>
-                        <button class="btn btn-info" onclick="openAssignVoucherModal()" style="width:100%;">➕ Assign Voucher</button>
-                        <button class="btn btn-primary" onclick="openAdminPanel()" style="width:100%;">⚙️ Admin</button>
+                        <button class="btn btn-secondary" onclick="openAddCustomerModal()" style="width:100%;">&#10133; Add Customer</button>
+                        <button class="btn btn-success" onclick="openVoucherModal()" style="width:100%;">&#127915; Manage Vouchers</button>
+                        <button class="btn btn-info" onclick="openAssignVoucherModal()" style="width:100%;">&#10133; Assign Voucher</button>
+                        <button class="btn" onclick="openAddExpenseModal()" style="width:100%; background:#d32f2f; color:white;">&#128178; Add Expense</button>
+                        <button class="btn btn-primary" onclick="openAdminPanel()" style="width:100%;">&#9881;&#65039; Admin</button>
                         <button class="btn btn-danger" onclick="handleLogout()" style="width:100%;">Logout</button>
                     </div>
                 </aside>
@@ -796,42 +889,43 @@
                     <div class="header">
                         <h1>Dashboard</h1>
                         <div class="header-buttons">
-                            <button class="btn btn-secondary" onclick="openAddCustomerModal()">➕ Add Customer</button>
-                            <button class="btn btn-success" onclick="openVoucherModal()">🎫 Vouchers</button>
-                            <button class="btn btn-info" onclick="openAssignVoucherModal()">➕ Assign Voucher</button>
+                            <button class="btn btn-secondary" onclick="openAddCustomerModal()">&#10133; Add Customer</button>
+                            <button class="btn btn-success" onclick="openVoucherModal()">&#127915; Vouchers</button>
+                            <button class="btn btn-info" onclick="openAssignVoucherModal()">&#10133; Assign Voucher</button>
+                            <button class="btn" onclick="openAddExpenseModal()" style="background:#d32f2f; color:white;">&#128178; Add Expense</button>
                         </div>
                     </div>
 
                     <div class="stats-grid">
                         <div class="stat-card success">
-                            <div class="stat-label">Total Profit</div>
+                            <div class="stat-label">Total Income</div>
                             <div class="stat-value" id="totalProfit">SAR 0.00</div>
                             <div class="stat-subtext">Paid active total</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">Total Expenses</div>
+                            <div class="stat-value" id="totalExpenses">SAR 0.00</div>
+                            <div class="stat-subtext">All expenses</div>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="stat-label">Net Profit</div>
+                            <div class="stat-value" id="netProfit">SAR 0.00</div>
+                            <div class="stat-subtext">Income - Expenses</div>
                         </div>
                         <div class="stat-card success">
                             <div class="stat-label">Total Customers</div>
                             <div class="stat-value" id="totalCustomers">0</div>
                             <div class="stat-subtext">Active subscriptions</div>
                         </div>
-                        <div class="stat-card success">
-                            <div class="stat-label">Paid</div>
-                            <div class="stat-value" id="paidCount">0</div>
-                            <div class="stat-subtext">Payments received</div>
-                        </div>
-                        <div class="stat-card danger">
-                            <div class="stat-label">Unpaid</div>
-                            <div class="stat-value" id="unpaidCount">0</div>
-                            <div class="stat-subtext">Pending payments</div>
-                        </div>
                         <div class="stat-card warning">
+                            <div class="stat-label">Paid / Unpaid</div>
+                            <div class="stat-value" id="paidCount">0 / 0</div>
+                            <div class="stat-subtext">Payments status</div>
+                        </div>
+                        <div class="stat-card info">
                             <div class="stat-label">Expiring Soon</div>
                             <div class="stat-value" id="expiringCount">0</div>
                             <div class="stat-subtext">Next 7 days</div>
-                        </div>
-                        <div class="stat-card info">
-                            <div class="stat-label">Available Vouchers</div>
-                            <div class="stat-value" id="availableVouchersCount">0</div>
-                            <div class="stat-subtext">Ready to assign</div>
                         </div>
                     </div>
 
@@ -844,11 +938,13 @@
 
                     <div class="tabs">
                         <button class="tab active" onclick="switchTab('active')">Active Customers</button>
-                        <button class="tab" onclick="switchTab('expiring')">⚠️ Expiring Soon</button>
-                        <button class="tab" onclick="switchTab('expired')">📦 Expired</button>
-                        <button class="tab" onclick="switchTab('vouchers')">🎫 Vouchers</button>
+                        <button class="tab" onclick="switchTab('expiring')">&#9888;&#65039; Expiring Soon</button>
+                        <button class="tab" onclick="switchTab('expired')">&#128230; Expired</button>
+                        <button class="tab" onclick="switchTab('vouchers')">&#127915; Vouchers</button>
+                        <button class="tab" onclick="switchTab('expenses')">&#128178; Expenses</button>
                     </div>
 
+                    <!-- Active Tab -->
                     <div id="activeTab" class="tab-content active">
                         <table class="customer-table">
                             <thead>
@@ -869,6 +965,7 @@
                         </table>
                     </div>
 
+                    <!-- Expiring Tab -->
                     <div id="expiringTab" class="tab-content">
                         <table class="customer-table">
                             <thead>
@@ -890,6 +987,7 @@
                         </table>
                     </div>
 
+                    <!-- Expired Tab -->
                     <div id="expiredTab" class="tab-content">
                         <table class="customer-table">
                             <thead>
@@ -910,10 +1008,11 @@
                         </table>
                     </div>
 
+                    <!-- Vouchers Tab -->
                     <div id="vouchersTab" class="tab-content">
                         <div style="margin-bottom: 20px;">
-                            <button class="btn btn-success" onclick="openVoucherModal()">➕ Add/Upload Vouchers</button>
-                            <button class="btn btn-info" onclick="openAssignVoucherModal()">➕ Assign Voucher to Customer</button>
+                            <button class="btn btn-success" onclick="openVoucherModal()">&#10133; Add/Upload Vouchers</button>
+                            <button class="btn btn-info" onclick="openAssignVoucherModal()">&#10133; Assign Voucher to Customer</button>
                         </div>
                         <table class="customer-table">
                             <thead>
@@ -928,6 +1027,70 @@
                             </thead>
                             <tbody id="vouchersTable">
                                 <tr><td colspan="6" class="empty-state">No vouchers available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Expenses Tab -->
+                    <div id="expensesTab" class="tab-content">
+                        <!-- Expense Summary -->
+                        <div class="expense-summary">
+                            <div class="expense-summary-card">
+                                <div class="es-label">Total Income</div>
+                                <div class="es-value income" id="expSummaryIncome">SAR 0.00</div>
+                            </div>
+                            <div class="expense-summary-card">
+                                <div class="es-label">Total Expenses</div>
+                                <div class="es-value expense" id="expSummaryExpenses">SAR 0.00</div>
+                            </div>
+                            <div class="expense-summary-card">
+                                <div class="es-label">Net Profit</div>
+                                <div class="es-value net" id="expSummaryNet">SAR 0.00</div>
+                            </div>
+                            <div class="expense-summary-card">
+                                <div class="es-label">This Month Expenses</div>
+                                <div class="es-value expense" id="expSummaryThisMonth">SAR 0.00</div>
+                            </div>
+                        </div>
+
+                        <!-- Filter Row -->
+                        <div class="filter-row">
+                            <input type="text" id="expenseSearch" placeholder="Search expenses..." style="flex:1; min-width:150px;" oninput="renderExpenses()">
+                            <select id="expenseCategoryFilter" onchange="renderExpenses()">
+                                <option value="">All Categories</option>
+                                <option value="Internet">Internet / ISP</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="date" id="expenseDateFrom" onchange="renderExpenses()" title="From date">
+                            <input type="date" id="expenseDateTo" onchange="renderExpenses()" title="To date">
+                            <button class="btn btn-secondary" onclick="clearExpenseFilters()" style="padding:8px 14px;">Clear Filters</button>
+                        </div>
+
+                        <!-- Expense Action Buttons -->
+                        <div style="margin-bottom: 16px; display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn" onclick="openAddExpenseModal()" style="background:#d32f2f; color:white;">&#10133; Add Expense</button>
+                            <button class="btn btn-info" onclick="exportExpensesCSV()" style="font-size:13px;">&#128196; Export CSV</button>
+                        </div>
+
+                        <!-- Expenses Table -->
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Amount (SAR)</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTable">
+                                <tr><td colspan="6" class="empty-state">No expenses recorded yet</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1001,13 +1164,13 @@
     <!-- Voucher Management Modal -->
     <div id="voucherModal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">🎫 Voucher Management</div>
+            <div class="modal-header">&#127915; Voucher Management</div>
             
             <div style="margin-bottom: 20px;">
                 <h3 style="margin-bottom: 15px;">Upload Vouchers from Excel</h3>
                 <div class="file-upload" onclick="document.getElementById('voucherFile').click()">
                     <input type="file" id="voucherFile" accept=".xlsx,.xls,.csv" onchange="handleVoucherFileUpload(event)">
-                    <p>📁 Click to upload Excel file with 8-digit voucher codes</p>
+                    <p>&#128193; Click to upload Excel file with 8-digit voucher codes</p>
                     <p style="font-size: 12px; color: #666; margin-top: 10px;">File should contain 8-digit numbers (e.g., 12345678, 87654321)</p>
                 </div>
                 <div id="voucherUploadResult" style="margin-top: 10px;"></div>
@@ -1045,7 +1208,7 @@
     <!-- Assign Voucher to Customer Modal -->
     <div id="assignVoucherModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">➕ Assign Voucher to Customer</div>
+            <div class="modal-header">&#10133; Assign Voucher to Customer</div>
             
             <div class="form-group">
                 <label>Select Available Voucher *</label>
@@ -1111,13 +1274,55 @@
         </div>
     </div>
 
+    <!-- Add/Edit Expense Modal -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="expenseModalTitle">&#128178; Add Expense</div>
+            <div class="form-group">
+                <label>Category *</label>
+                <select id="expenseCategory" required>
+                    <option value="">Select Category</option>
+                    <option value="Internet">Internet / ISP</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Equipment">Equipment / Hardware</option>
+                    <option value="Salary">Salary</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description *</label>
+                <input type="text" id="expenseDescription" placeholder="e.g., Monthly internet bill" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Amount (SAR) *</label>
+                    <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Date *</label>
+                    <input type="date" id="expenseDate" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea id="expenseNotes" placeholder="Additional notes..." rows="3"></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-save" onclick="saveExpense()" style="background:#d32f2f;">Save Expense</button>
+                <button class="btn-cancel" onclick="closeExpenseModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Panel Modal -->
     <div id="adminModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">Admin Panel</div>
             <div style="margin-bottom: 20px;">
-                <button class="btn btn-primary" onclick="switchAdminTab('agents')" style="width: 100%; margin-bottom: 10px;">👥 Manage Agents</button>
-                <button class="btn btn-primary" onclick="switchAdminTab('password')" style="width: 100%;">🔐 Change Password</button>
+                <button class="btn btn-primary" onclick="switchAdminTab('agents')" style="width: 100%; margin-bottom: 10px;">&#128101; Manage Agents</button>
+                <button class="btn btn-primary" onclick="switchAdminTab('password')" style="width: 100%;">&#128274; Change Password</button>
             </div>
 
             <div id="agentsTab" style="display: none;">
@@ -1161,16 +1366,22 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDAwNDQsImV4cCI6MjA5MDk3NjA0NH0.49lbgMZJiEwnsDsO98d5htlRLddVoq4H3DYCGpDR2pI';
         const TABLE_NAME = 'billing_customers';
         const VOUCHER_TABLE = 'vouchers';
+        const EXPENSE_TABLE = 'expenses';
 
         let currentUser = null;
         let currentEditingId = null;
+        let currentEditingExpenseId = null;
         let allCustomers = [];
         let allVouchers = [];
+        let allExpenses = [];
         let customerSearchQuery = '';
 
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let sbSession = null;
 
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
         window.addEventListener('load', async () => {
             const { data } = await sb.auth.getSession();
             sbSession = data?.session || null;
@@ -1180,6 +1391,7 @@
                 bindSearch();
                 loadCustomers();
                 loadVouchers();
+                loadExpenses();
             }
         });
 
@@ -1199,6 +1411,9 @@
             renderCustomers();
         }
 
+        // ==========================================
+        // AUTH
+        // ==========================================
         async function handleLogin() {
             const email = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -1219,6 +1434,7 @@
             showDashboard();
             loadCustomers();
             loadVouchers();
+            loadExpenses();
         }
 
         async function handleLogout() {
@@ -1234,6 +1450,9 @@
             bindSearch();
         }
 
+        // ==========================================
+        // DATA LOADING
+        // ==========================================
         async function loadCustomers() {
             try {
                 if (!sbSession?.access_token) return;
@@ -1283,6 +1502,33 @@
             }
         }
 
+        async function loadExpenses() {
+            try {
+                if (!sbSession?.access_token) return;
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}?order=expense_date.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession.access_token}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    allExpenses = await response.json();
+                    updateStats();
+                    renderExpenses();
+                }
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+            }
+        }
+
+        // ==========================================
+        // STATS
+        // ==========================================
         function updateStats() {
             const today = new Date();
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -1291,18 +1537,45 @@
             const paidActive = active.filter(c => c.is_paid === 1);
             const paid = paidActive.length;
             const unpaid = active.filter(c => c.is_paid === 0).length;
-            const profit = paidActive.reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
+            const income = paidActive.reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
             const expiring = active.filter(c => {
                 const expiry = new Date(c.expiry_date);
                 return expiry >= today && expiry <= sevenDaysLater;
             }).length;
 
+            // Expenses totals
+            const totalExpenses = allExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+            const netProfit = income - totalExpenses;
+
+            // This month expenses
+            const now = new Date();
+            const thisMonthExpenses = allExpenses.filter(e => {
+                const d = new Date(e.expense_date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+            // Update dashboard cards
             document.getElementById('totalCustomers').textContent = active.length;
-            document.getElementById('paidCount').textContent = paid;
+            document.getElementById('paidCount').textContent = paid + ' / ' + unpaid;
             document.getElementById('unpaidCount').textContent = unpaid;
             document.getElementById('expiringCount').textContent = expiring;
+
             const profitEl = document.getElementById('totalProfit');
-            if (profitEl) profitEl.textContent = `SAR ${profit.toFixed(2)}`;
+            if (profitEl) profitEl.textContent = `SAR ${income.toFixed(2)}`;
+
+            document.getElementById('totalExpenses').textContent = `SAR ${totalExpenses.toFixed(2)}`;
+
+            const netEl = document.getElementById('netProfit');
+            netEl.textContent = `SAR ${netProfit.toFixed(2)}`;
+            netEl.className = 'stat-value ' + (netProfit >= 0 ? 'net-positive' : 'net-negative');
+
+            // Update expense tab summary
+            document.getElementById('expSummaryIncome').textContent = `SAR ${income.toFixed(2)}`;
+            document.getElementById('expSummaryExpenses').textContent = `SAR ${totalExpenses.toFixed(2)}`;
+            const expNetEl = document.getElementById('expSummaryNet');
+            expNetEl.textContent = `SAR ${netProfit.toFixed(2)}`;
+            expNetEl.className = 'es-value net ' + (netProfit >= 0 ? 'net-positive' : 'net-negative');
+            document.getElementById('expSummaryThisMonth').textContent = `SAR ${thisMonthExpenses.toFixed(2)}`;
         }
 
         function updateVoucherStats() {
@@ -1311,6 +1584,9 @@
             document.getElementById('voucherCount').textContent = allVouchers.length;
         }
 
+        // ==========================================
+        // CUSTOMER RENDERING
+        // ==========================================
         function renderCustomers() {
             const today = new Date();
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -1374,6 +1650,9 @@
             }).join('');
         }
 
+        // ==========================================
+        // VOUCHER RENDERING
+        // ==========================================
         function renderVouchers() {
             const tbody = document.getElementById('vouchersTable');
             const voucherList = document.getElementById('voucherList');
@@ -1425,16 +1704,97 @@
             openAssignVoucherModal();
         }
 
+        // ==========================================
+        // EXPENSE RENDERING
+        // ==========================================
+        function renderExpenses() {
+            const tbody = document.getElementById('expensesTable');
+            
+            let filtered = [...allExpenses];
+
+            // Search filter
+            const searchQuery = (document.getElementById('expenseSearch')?.value || '').trim().toLowerCase();
+            if (searchQuery) {
+                filtered = filtered.filter(e => {
+                    const hay = `${e.description || ''} ${e.category || ''} ${e.notes || ''} ${e.amount || ''}`.toLowerCase();
+                    return hay.includes(searchQuery);
+                });
+            }
+
+            // Category filter
+            const catFilter = document.getElementById('expenseCategoryFilter')?.value || '';
+            if (catFilter) {
+                filtered = filtered.filter(e => e.category === catFilter);
+            }
+
+            // Date range filter
+            const dateFrom = document.getElementById('expenseDateFrom')?.value || '';
+            const dateTo = document.getElementById('expenseDateTo')?.value || '';
+            if (dateFrom) {
+                filtered = filtered.filter(e => e.expense_date >= dateFrom);
+            }
+            if (dateTo) {
+                filtered = filtered.filter(e => e.expense_date <= dateTo);
+            }
+
+            // Calculate filtered totals
+            const filteredTotal = filtered.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No expenses found</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(e => {
+                const catClass = `cat-${(e.category || 'other').toLowerCase().replace(/[^a-z]/g, '')}`;
+                const formattedDate = new Date(e.expense_date).toLocaleDateString();
+
+                return `
+                    <tr>
+                        <td>${formattedDate}</td>
+                        <td><span class="category-badge ${catClass}">${e.category || 'Other'}</span></td>
+                        <td>${e.description || '-'}</td>
+                        <td style="font-weight:700; color:#d32f2f;">SAR ${Number(e.amount || 0).toFixed(2)}</td>
+                        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${e.notes || ''}">${e.notes || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-small btn-edit" onclick="editExpense(${e.id})">Edit</button>
+                                <button class="btn-small btn-delete" onclick="deleteExpense(${e.id})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('') + `
+                <tr style="background:#f5f5f5; font-weight:800;">
+                    <td colspan="3" style="text-align:right; padding-right:20px;">Total (${filtered.length} expenses):</td>
+                    <td style="color:#d32f2f;">SAR ${filteredTotal.toFixed(2)}</td>
+                    <td colspan="2"></td>
+                </tr>
+            `;
+        }
+
+        function clearExpenseFilters() {
+            document.getElementById('expenseSearch').value = '';
+            document.getElementById('expenseCategoryFilter').value = '';
+            document.getElementById('expenseDateFrom').value = '';
+            document.getElementById('expenseDateTo').value = '';
+            renderExpenses();
+        }
+
+        // ==========================================
+        // TAB SWITCHING
+        // ==========================================
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
             const tabMap = {
-                'active': { content: 'activeTab', nav: 'nav-active', tabIndex: 0 },
-                'expiring': { content: 'expiringTab', nav: 'nav-expiring', tabIndex: 1 },
-                'expired': { content: 'expiredTab', nav: 'nav-expired', tabIndex: 2 },
-                'vouchers': { content: 'vouchersTab', nav: 'nav-vouchers', tabIndex: 3 }
+                'active':    { content: 'activeTab',    nav: 'nav-active',    tabIndex: 0 },
+                'expiring':  { content: 'expiringTab',  nav: 'nav-expiring',  tabIndex: 1 },
+                'expired':   { content: 'expiredTab',   nav: 'nav-expired',   tabIndex: 2 },
+                'vouchers':  { content: 'vouchersTab',  nav: 'nav-vouchers',  tabIndex: 3 },
+                'expenses':  { content: 'expensesTab',  nav: 'nav-expenses',  tabIndex: 4 }
             };
 
             const map = tabMap[tab];
@@ -1446,11 +1806,13 @@
                 if (nav) nav.classList.add('active');
             }
 
-            if (tab === 'vouchers') {
-                loadVouchers();
-            }
+            if (tab === 'vouchers') loadVouchers();
+            if (tab === 'expenses') { loadExpenses(); }
         }
 
+        // ==========================================
+        // MODAL HELPERS
+        // ==========================================
         function openVoucherModal() {
             document.getElementById('voucherModal').classList.add('active');
             loadVouchers();
@@ -1480,6 +1842,169 @@
             document.getElementById('assignVoucherModal').classList.remove('active');
         }
 
+        function closeCustomerModal() {
+            document.getElementById('customerModal').classList.remove('active');
+        }
+
+        // ==========================================
+        // EXPENSE MODAL HELPERS
+        // ==========================================
+        function openAddExpenseModal() {
+            currentEditingExpenseId = null;
+            document.getElementById('expenseModalTitle').innerHTML = '&#128178; Add Expense';
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseNotes').value = '';
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function closeExpenseModal() {
+            document.getElementById('expenseModal').classList.remove('active');
+        }
+
+        function editExpense(id) {
+            const expense = allExpenses.find(e => e.id === id);
+            if (!expense) return;
+
+            currentEditingExpenseId = id;
+            document.getElementById('expenseModalTitle').innerHTML = '&#9998; Edit Expense';
+            document.getElementById('expenseCategory').value = expense.category || '';
+            document.getElementById('expenseDescription').value = expense.description || '';
+            document.getElementById('expenseAmount').value = expense.amount || '';
+            document.getElementById('expenseDate').value = expense.expense_date || '';
+            document.getElementById('expenseNotes').value = expense.notes || '';
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        // ==========================================
+        // EXPENSE CRUD
+        // ==========================================
+        async function saveExpense() {
+            const category = document.getElementById('expenseCategory').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const expenseDate = document.getElementById('expenseDate').value;
+            const notes = document.getElementById('expenseNotes').value.trim();
+
+            if (!category || !description || !amount || amount <= 0 || !expenseDate) {
+                showAlert('Please fill all required fields (Category, Description, Amount > 0, Date).', 'error');
+                return;
+            }
+
+            const data = {
+                category,
+                description,
+                amount,
+                expense_date: expenseDate,
+                notes
+            };
+
+            try {
+                let response;
+                if (currentEditingExpenseId) {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}?id=eq.${currentEditingExpenseId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    );
+                } else {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    );
+                }
+
+                if (response.ok) {
+                    closeExpenseModal();
+                    loadExpenses();
+                    showAlert(`Expense ${currentEditingExpenseId ? 'updated' : 'added'} successfully! SAR ${amount.toFixed(2)}`, 'success');
+                } else {
+                    const error = await response.text();
+                    showAlert('Error saving expense: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteExpense(id) {
+            if (!confirm('Are you sure you want to delete this expense?')) return;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}?id=eq.${id}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    loadExpenses();
+                    showAlert('Expense deleted successfully!', 'success');
+                } else {
+                    showAlert('Error deleting expense', 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // EXPORT EXPENSES CSV
+        // ==========================================
+        function exportExpensesCSV() {
+            if (allExpenses.length === 0) {
+                showAlert('No expenses to export.', 'error');
+                return;
+            }
+
+            let csv = 'Date,Category,Description,Amount (SAR),Notes\n';
+            allExpenses.forEach(e => {
+                const date = e.expense_date || '';
+                const cat = `"${(e.category || '').replace(/"/g, '""')}"`;
+                const desc = `"${(e.description || '').replace(/"/g, '""')}"`;
+                const amt = Number(e.amount || 0).toFixed(2);
+                const note = `"${(e.notes || '').replace(/"/g, '""')}"`;
+                csv += `${date},${cat},${desc},${amt},${note}\n`;
+            });
+
+            const total = allExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+            csv += `\n,,,,Total:,${total.toFixed(2)}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `skybird_expenses_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showAlert('Expenses exported as CSV!', 'success');
+        }
+
+        // ==========================================
+        // VOUCHER FILE UPLOAD
+        // ==========================================
         function handleVoucherFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1508,18 +2033,18 @@
 
                     if (uniqueCodes.length === 0) {
                         document.getElementById('voucherUploadResult').innerHTML = 
-                            '<span style="color: #d32f2f;">❌ No valid 8-digit voucher codes found. Please ensure your file contains 8-digit numbers (e.g., 12345678).</span>';
+                            '<span style="color: #d32f2f;">&#10060; No valid 8-digit voucher codes found.</span>';
                         return;
                     }
 
                     document.getElementById('voucherUploadResult').innerHTML = 
-                        `<span style="color: #17a2b8;">⏳ Found ${uniqueCodes.length} voucher codes, uploading...</span>`;
+                        `<span style="color: #17a2b8;">&#9203; Found ${uniqueCodes.length} voucher codes, uploading...</span>`;
 
                     uploadVouchers(uniqueCodes);
 
                 } catch (err) {
                     document.getElementById('voucherUploadResult').innerHTML = 
-                        '<span style="color: #d32f2f;">❌ Error reading file: ' + err.message + '</span>';
+                        '<span style="color: #d32f2f;">&#10060; Error reading file: ' + err.message + '</span>';
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1558,8 +2083,8 @@
             }
 
             document.getElementById('voucherUploadResult').innerHTML = 
-                `<span style="color: #28a745;">✅ Uploaded: ${successCount} vouchers</span>` +
-                (duplicateCount > 0 ? `<br><span style="color: #FF9800;">⚠️ Skipped ${duplicateCount} duplicates</span>` : '');
+                `<span style="color: #28a745;">&#9989; Uploaded: ${successCount} vouchers</span>` +
+                (duplicateCount > 0 ? `<br><span style="color: #FF9800;">&#9888;&#65039; Skipped ${duplicateCount} duplicates</span>` : '');
 
             loadVouchers();
         }
@@ -1580,14 +2105,17 @@
             }
 
             document.getElementById('voucherGenerateResult').innerHTML = 
-                `<span style="color: #17a2b8;">⏳ Generating ${quantity} vouchers...</span>`;
+                `<span style="color: #17a2b8;">&#9203; Generating ${quantity} vouchers...</span>`;
 
             await uploadVouchers(codes);
 
             document.getElementById('voucherGenerateResult').innerHTML = 
-                `<span style="color: #28a745;">✅ Generated ${quantity} vouchers successfully!</span>`;
+                `<span style="color: #28a745;">&#9989; Generated ${quantity} vouchers successfully!</span>`;
         }
 
+        // ==========================================
+        // ASSIGN VOUCHER
+        // ==========================================
         async function assignVoucherToCustomer() {
             const voucherCode = document.getElementById('assignVoucherCode').value;
             const fullName = document.getElementById('assignFullName').value.trim();
@@ -1665,6 +2193,9 @@
             }
         }
 
+        // ==========================================
+        // CUSTOMER CRUD
+        // ==========================================
         function openAddCustomerModal() {
             currentEditingId = null;
             document.getElementById('modalTitle').textContent = 'Add Customer';
@@ -1801,10 +2332,9 @@
             }
         }
 
-        function closeCustomerModal() {
-            document.getElementById('customerModal').classList.remove('active');
-        }
-
+        // ==========================================
+        // ADMIN PANEL
+        // ==========================================
         function openAdminPanel() {
             document.getElementById('adminModal').classList.add('active');
             switchAdminTab('agents');
@@ -1887,6 +2417,9 @@
             showAlert('Password changed successfully!', 'success');
         }
 
+        // ==========================================
+        // ALERTS
+        // ==========================================
         function showAlert(message, type) {
             const alertBox = document.getElementById('alertBox');
             alertBox.textContent = message;
