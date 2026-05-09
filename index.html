@@ -3,1475 +3,2433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Profit Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <title>Skybird WiFi Billing - Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root {
-            --bg: #0f1117;
-            --bg2: #161822;
-            --card: #1c1f2e;
-            --card-hover: #232740;
-            --border: #2a2e42;
-            --fg: #e8eaf0;
-            --muted: #7c809a;
-            --accent: #00d4aa;
-            --accent2: #f59e0b;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #00d4aa;
-            --expired: #ef4444;
-            --expiring: #f59e0b;
-            --active: #00d4aa;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--fg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-        h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
-
-        /* Ambient background */
-        .ambient-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; overflow: hidden;
-        }
-        .ambient-bg .blob {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.07;
-        }
-        .ambient-bg .blob1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -100px; animation: floatBlob 20s ease-in-out infinite; }
-        .ambient-bg .blob2 { width: 500px; height: 500px; background: var(--accent2); bottom: -150px; right: -100px; animation: floatBlob 25s ease-in-out infinite reverse; }
-        .ambient-bg .blob3 { width: 400px; height: 400px; background: #8b5cf6; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: floatBlob 18s ease-in-out infinite; }
-
-        @keyframes floatBlob {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(40px, -30px) scale(1.1); }
-            50% { transform: translate(-20px, 40px) scale(0.95); }
-            75% { transform: translate(30px, 20px) scale(1.05); }
+            padding: 20px;
         }
 
-        .main-content { position: relative; z-index: 1; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg2); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+        .app-layout {
+            display: flex;
+            gap: 20px;
+        }
 
-        /* Stat cards */
+        .sidebar {
+            width: 260px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 18px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .brand {
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand img {
+            max-width: 100%;
+            height: 44px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .login-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .login-logo img {
+            height: 54px;
+            object-fit: contain;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            width: 100%;
+            text-align: left;
+            padding: 12px 12px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            background: white;
+            cursor: pointer;
+            font-weight: 700;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .nav-item.active {
+            border-color: rgba(46,125,50,0.35);
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 14px;
+        }
+
+        .search-row input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-row input:focus {
+            border-color: rgba(46,125,50,0.6);
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #FF9800;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
         .stat-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            background: white;
+            padding: 10px 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+            min-height: 74px;
         }
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: var(--card-accent, var(--accent));
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .stat-card:hover { border-color: var(--card-accent, var(--accent)); transform: translateY(-2px); }
-        .stat-card:hover::before { opacity: 1; }
 
-        /* Table */
-        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .data-table thead th {
-            background: var(--bg2); padding: 14px 16px; text-align: left;
-            font-size: 12px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.05em; color: var(--muted); border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 2;
+        .stat-card.success {
+            border-left-color: #2e7d32;
         }
-        .data-table tbody tr {
-            transition: background 0.2s;
+
+        .stat-card.warning {
+            border-left-color: #FF9800;
         }
-        .data-table tbody tr:hover { background: var(--card-hover); }
-        .data-table tbody td {
-            padding: 14px 16px; border-bottom: 1px solid var(--border);
+
+        .stat-card.danger {
+            border-left-color: #d32f2f;
+        }
+
+        .stat-card.info {
+            border-left-color: #17a2b8;
+        }
+
+        .stat-card.purple {
+            border-left-color: #7b1fa2;
+        }
+
+        .stat-card.purple .stat-value { color: #7b1fa2; }
+        .stat-card.success .stat-value { color: #2e7d32; }
+        .stat-card.danger .stat-value { color: #d32f2f; }
+        .stat-card.warning .stat-value { color: #e65100; }
+        .stat-card.info .stat-value { color: #17a2b8; }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .stat-subtext {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            background: white;
+            padding: 0 30px;
+            border-radius: 12px 12px 0 0;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .customer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .customer-table th {
+            background: #f5f5f5;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+        }
+
+        .customer-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .customer-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .customer-row {
+            cursor: pointer;
+        }
+
+        .customer-row.near-expired {
+            background: #fff3e0 !important;
+            border-left: 4px solid #FF9800;
+        }
+
+        .customer-row.expired {
+            background: #ffebee !important;
+            border-left: 4px solid #d32f2f;
+            opacity: 0.7;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-paid {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-unpaid {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .status-expiring {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-expired {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-assigned {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .cat-internet { background: #e3f2fd; color: #1565c0; }
+        .cat-electricity { background: #fff9c4; color: #f9a825; }
+        .cat-rent { background: #f3e5f5; color: #7b1fa2; }
+        .cat-maintenance { background: #e8f5e9; color: #2e7d32; }
+        .cat-equipment { background: #e0f2f1; color: #00695c; }
+        .cat-salary { background: #fce4ec; color: #c62828; }
+        .cat-other { background: #f5f5f5; color: #616161; }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #5568d3;
+        }
+
+        .btn-delete {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #b71c1c;
+        }
+
+        .btn-assign {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-assign:hover {
+            background: #218838;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
             font-size: 14px;
         }
 
-        /* Status badges */
-        .badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 12px; border-radius: 20px; font-size: 12px;
-            font-weight: 600; letter-spacing: 0.02em;
-        }
-        .badge-active { background: rgba(0, 212, 170, 0.12); color: #00d4aa; }
-        .badge-expired { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-        .badge-expiring { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
-        .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
-        .badge-active .badge-dot { background: #00d4aa; animation: pulse-dot 2s ease-in-out infinite; }
-        .badge-expired .badge-dot { background: #ef4444; }
-        .badge-expiring .badge-dot { background: #f59e0b; animation: pulse-dot 1.5s ease-in-out infinite; }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.3); }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
         }
 
-        /* Buttons */
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 20px; border-radius: 10px; font-size: 14px;
-            font-weight: 600; cursor: pointer; transition: all 0.25s;
-            border: none; outline: none; font-family: 'DM Sans', sans-serif;
-        }
-        .btn-primary { background: var(--accent); color: #0f1117; }
-        .btn-primary:hover { background: #00eabb; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,212,170,0.3); }
-        .btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--border); }
-        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-danger { background: rgba(239,68,68,0.15); color: #ef4444; }
-        .btn-danger:hover { background: rgba(239,68,68,0.25); }
-        .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
-
-        /* Select / Input */
-        .form-select, .form-input {
-            background: var(--bg2); border: 1px solid var(--border);
-            color: var(--fg); padding: 10px 14px; border-radius: 10px;
-            font-size: 14px; font-family: 'DM Sans', sans-serif;
-            outline: none; transition: border-color 0.2s;
-            -webkit-appearance: none;
-        }
-        .form-select:focus, .form-input:focus { border-color: var(--accent); }
-        .form-select { padding-right: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237c809a' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px); z-index: 100;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .modal-box {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; padding: 32px; width: 90%; max-width: 560px;
-            transform: translateY(20px) scale(0.97); transition: transform 0.3s;
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
-
-        /* Toast */
-        .toast-container {
-            position: fixed; top: 24px; right: 24px; z-index: 200;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-        .toast {
-            background: var(--card); border: 1px solid var(--border);
-            padding: 14px 20px; border-radius: 12px; font-size: 14px;
-            display: flex; align-items: center; gap: 10px;
-            animation: slideInToast 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        .toast-success { border-left: 3px solid var(--success); }
-        .toast-error { border-left: 3px solid var(--danger); }
-        .toast-warning { border-left: 3px solid var(--warning); }
-
-        @keyframes slideInToast {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        /* Chart containers */
-        .chart-card {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 24px;
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        /* Amendment row */
-        .amendment-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 12px; background: var(--bg2); border-radius: 8px;
-            margin-bottom: 6px; font-size: 13px;
+        .form-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        /* Profit indicator */
-        .profit-positive { color: #00d4aa; }
-        .profit-negative { color: #ef4444; }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px; background: var(--bg2); border-right: 1px solid var(--border);
-            min-height: 100vh; padding: 24px 16px; position: fixed; left: 0; top: 0;
-            z-index: 50; transition: transform 0.3s;
-        }
-        .sidebar-link {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 10px; color: var(--muted);
-            font-size: 14px; font-weight: 500; cursor: pointer;
-            transition: all 0.2s; text-decoration: none;
-        }
-        .sidebar-link:hover { color: var(--fg); background: rgba(255,255,255,0.04); }
-        .sidebar-link.active { color: var(--accent); background: rgba(0,212,170,0.08); }
-        .sidebar-link i { width: 20px; text-align: center; }
-
-        .page-area { margin-left: 260px; padding: 32px; min-height: 100vh; }
-
-        /* Tabs */
-        .tab-btn {
-            padding: 8px 20px; border-radius: 8px; font-size: 13px;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
-            border: 1px solid transparent; background: transparent; color: var(--muted);
-        }
-        .tab-btn.active { background: rgba(0,212,170,0.1); color: var(--accent); border-color: rgba(0,212,170,0.2); }
-        .tab-btn:hover:not(.active) { color: var(--fg); }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .page-area { margin-left: 0; }
+        .form-buttons .btn-save {
+            background: #667eea;
+            color: white;
         }
 
-        /* Print styles for report */
-        @media print {
-            .sidebar, .no-print { display: none !important; }
-            .page-area { margin-left: 0 !important; padding: 16px !important; }
-            body { background: #fff !important; color: #000 !important; }
-            .stat-card, .chart-card { border: 1px solid #ddd !important; background: #fff !important; }
-            .data-table thead th { background: #f3f3f3 !important; color: #333 !important; }
-            .data-table tbody td { color: #333 !important; border-color: #ddd !important; }
+        .form-buttons .btn-save:hover {
+            background: #5568d3;
         }
 
-        /* Animations */
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .form-buttons .btn-cancel {
+            background: #eee;
+            color: #333;
+        }
 
-        .count-up { transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .form-buttons .btn-cancel:hover {
+            background: #ddd;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #d32f2f;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 4px solid #FF9800;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            border-left: 4px solid #2196f3;
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .login-box .form-group input {
+            margin-bottom: 15px;
+        }
+
+        .login-box .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+        }
+
+        .voucher-code {
+            font-family: monospace;
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f5f7fa;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .voucher-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .voucher-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .voucher-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Expense filter row */
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .filter-row select,
+        .filter-row input {
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .filter-row select:focus,
+        .filter-row input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        /* Expense summary cards in expenses tab */
+        .expense-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .expense-summary-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .expense-summary-card .es-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .expense-summary-card .es-value {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .expense-summary-card .es-value.income { color: #2e7d32; }
+        .expense-summary-card .es-value.expense { color: #d32f2f; }
+        .expense-summary-card .es-value.net { color: #1565c0; }
+
+        /* Net profit indicator */
+        .net-positive { color: #2e7d32 !important; }
+        .net-negative { color: #d32f2f !important; }
+
+        @media (max-width: 980px) {
+            .app-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+
+            .nav-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 140px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .header-buttons {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .header-buttons .btn {
+                flex: 1;
+                min-width: 150px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .tab-content {
+                overflow-x: auto;
+            }
+
+            .customer-table {
+                font-size: 12px;
+                min-width: 720px;
+            }
+
+            .customer-table th,
+            .customer-table td {
+                padding: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .tabs {
+                display: none;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding: 12px;
+            }
+
+            .sidebar {
+                padding: 14px;
+            }
+
+            .nav-item {
+                min-width: 120px;
+                padding: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-row button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Ambient background -->
-    <div class="ambient-bg">
-        <div class="blob blob1"></div>
-        <div class="blob blob2"></div>
-        <div class="blob blob3"></div>
-    </div>
-
-    <!-- Toast container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div style="margin-bottom: 32px; padding: 0 16px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-chart-line"></i> ProfitPulse
-            </h2>
-            <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Customer Profit Dashboard</p>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <a class="sidebar-link active" data-page="dashboard" onclick="switchPage('dashboard')">
-                <i class="fas fa-th-large"></i> Dashboard
-            </a>
-            <a class="sidebar-link" data-page="customers" onclick="switchPage('customers')">
-                <i class="fas fa-users"></i> Customers
-            </a>
-            <a class="sidebar-link" data-page="reports" onclick="switchPage('reports')">
-                <i class="fas fa-file-alt"></i> Monthly Reports
-            </a>
-            <a class="sidebar-link" data-page="amendments" onclick="switchPage('amendments')">
-                <i class="fas fa-edit"></i> Amendments
-            </a>
-        </div>
-
-        <div style="margin-top: auto; padding-top: 32px;">
-            <div style="padding: 16px; background: rgba(0,212,170,0.06); border-radius: 12px; border: 1px solid rgba(0,212,170,0.1);">
-                <p style="font-size: 12px; color: var(--accent); font-weight: 600;">Quick Tip</p>
-                <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Use monthly filters to generate detailed profit reports per period.</p>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-container">
+            <div class="login-box">
+                <div class="login-logo"><img src="assets/skybird-logo.png" alt="Skybird"></div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginUsername" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+                <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%; padding: 12px;">Login</button>
             </div>
         </div>
-    </nav>
 
-    <!-- Mobile menu toggle -->
-    <button class="btn btn-ghost no-print" id="menuToggle" onclick="document.getElementById('sidebar').classList.toggle('open')"
-        style="position: fixed; top: 16px; left: 16px; z-index: 60; display: none; padding: 8px 12px;">
-        <i class="fas fa-bars"></i>
-    </button>
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" style="display: none;">
+            <div class="app-layout">
+                <aside class="sidebar">
+                    <div class="brand"><img src="assets/skybird-logo.png" alt="Skybird"></div>
+                    <div class="nav-group">
+                        <button class="nav-item active" id="nav-active" onclick="switchTab('active')">&#128101; Active</button>
+                        <button class="nav-item" id="nav-expiring" onclick="switchTab('expiring')">&#9888;&#65039; Expiring</button>
+                        <button class="nav-item" id="nav-expired" onclick="switchTab('expired')">&#128230; Expired</button>
+                        <button class="nav-item" id="nav-vouchers" onclick="switchTab('vouchers')">&#127915; Vouchers</button>
+                        <button class="nav-item" id="nav-expenses" onclick="switchTab('expenses')">&#128178; Expenses</button>
+                    </div>
+                    <div style="margin-top: 14px; display:flex; flex-direction:column; gap:10px;">
+                        <button class="btn btn-secondary" onclick="openAddCustomerModal()" style="width:100%;">&#10133; Add Customer</button>
+                        <button class="btn btn-success" onclick="openVoucherModal()" style="width:100%;">&#127915; Manage Vouchers</button>
+                        <button class="btn btn-info" onclick="openAssignVoucherModal()" style="width:100%;">&#10133; Assign Voucher</button>
+                        <button class="btn" onclick="openAddExpenseModal()" style="width:100%; background:#d32f2f; color:white;">&#128178; Add Expense</button>
+                        <button class="btn btn-primary" onclick="openAdminPanel()" style="width:100%;">&#9881;&#65039; Admin</button>
+                        <button class="btn btn-danger" onclick="handleLogout()" style="width:100%;">Logout</button>
+                    </div>
+                </aside>
 
-    <!-- Main Content -->
-    <div class="page-area main-content">
+                <main class="main">
+                    <div class="header">
+                        <h1>Dashboard</h1>
+                        <div class="header-buttons">
+                            <button class="btn btn-secondary" onclick="openAddCustomerModal()">&#10133; Add Customer</button>
+                            <button class="btn btn-success" onclick="openVoucherModal()">&#127915; Vouchers</button>
+                            <button class="btn btn-info" onclick="openAssignVoucherModal()">&#10133; Assign Voucher</button>
+                            <button class="btn" onclick="openAddExpenseModal()" style="background:#d32f2f; color:white;">&#128178; Add Expense</button>
+                        </div>
+                    </div>
 
-        <!-- DASHBOARD PAGE -->
-        <section id="page-dashboard" class="fade-in">
-            <!-- Header -->
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700;">Dashboard Overview</h1>
-                    <p style="color: var(--muted); font-size: 14px; margin-top: 4px;">Real-time customer and profit analytics</p>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <select class="form-select no-print" id="dashMonthFilter" onchange="refreshDashboard()" style="min-width: 160px;">
-                        <option value="all">All Months</option>
-                    </select>
-                    <select class="form-select no-print" id="dashYearFilter" onchange="refreshDashboard()" style="min-width: 120px;">
-                        <option value="all">All Years</option>
-                    </select>
-                    <button class="btn btn-primary no-print" onclick="openAddCustomerModal()">
-                        <i class="fas fa-plus"></i> Add Customer
-                    </button>
-                </div>
+                    <div class="stats-grid">
+                        <div class="stat-card success">
+                            <div class="stat-label">Total Income</div>
+                            <div class="stat-value" id="totalProfit">SAR 0.00</div>
+                            <div class="stat-subtext">Paid active total</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">Total Expenses</div>
+                            <div class="stat-value" id="totalExpenses">SAR 0.00</div>
+                            <div class="stat-subtext">All expenses</div>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="stat-label">Net Profit</div>
+                            <div class="stat-value" id="netProfit">SAR 0.00</div>
+                            <div class="stat-subtext">Income - Expenses</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Total Customers</div>
+                            <div class="stat-value" id="totalCustomers">0</div>
+                            <div class="stat-subtext">Active subscriptions</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">Paid / Unpaid</div>
+                            <div class="stat-value" id="paidCount">0 / 0</div>
+                            <div class="stat-subtext">Payments status</div>
+                        </div>
+                        <div class="stat-card info">
+                            <div class="stat-label">Expiring Soon</div>
+                            <div class="stat-value" id="expiringCount">0</div>
+                            <div class="stat-subtext">Next 7 days</div>
+                        </div>
+                        <div class="stat-card info">
+                            <div class="stat-label">Available Vouchers</div>
+                            <div class="stat-value" id="availableVouchersCount">0</div>
+                            <div class="stat-subtext">Ready to assign</div>
+                        </div>
+                    </div>
+
+                    <div class="search-row">
+                        <input id="customerSearch" type="text" placeholder="Search name / room / mobile / voucher..." />
+                        <button class="btn btn-secondary" onclick="clearSearch()" style="padding:10px 14px;">Clear</button>
+                    </div>
+
+                    <div class="alert alert-warning" id="alertBox"></div>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('active')">Active Customers</button>
+                        <button class="tab" onclick="switchTab('expiring')">&#9888;&#65039; Expiring Soon</button>
+                        <button class="tab" onclick="switchTab('expired')">&#128230; Expired</button>
+                        <button class="tab" onclick="switchTab('vouchers')">&#127915; Vouchers</button>
+                        <button class="tab" onclick="switchTab('expenses')">&#128178; Expenses</button>
+                    </div>
+
+                    <!-- Active Tab -->
+                    <div id="activeTab" class="tab-content active">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Mobile</th>
+                                    <th>Voucher</th>
+                                    <th>Price (SAR)</th>
+                                    <th>Status</th>
+                                    <th>Expiry</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeCustomersTable">
+                                <tr><td colspan="8" class="empty-state">No active customers</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Expiring Tab -->
+                    <div id="expiringTab" class="tab-content">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Mobile</th>
+                                    <th>Voucher</th>
+                                    <th>Price (SAR)</th>
+                                    <th>Status</th>
+                                    <th>Expiry</th>
+                                    <th>Days Left</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiringCustomersTable">
+                                <tr><td colspan="9" class="empty-state">No expiring customers</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Expired Tab -->
+                    <div id="expiredTab" class="tab-content">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Room</th>
+                                    <th>Mobile</th>
+                                    <th>Voucher</th>
+                                    <th>Price (SAR)</th>
+                                    <th>Status</th>
+                                    <th>Expired Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiredCustomersTable">
+                                <tr><td colspan="8" class="empty-state">No expired customers</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Vouchers Tab -->
+                    <div id="vouchersTab" class="tab-content">
+                        <div style="margin-bottom: 20px;">
+                            <button class="btn btn-success" onclick="openVoucherModal()">&#10133; Add/Upload Vouchers</button>
+                            <button class="btn btn-info" onclick="openAssignVoucherModal()">&#10133; Assign Voucher to Customer</button>
+                        </div>
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Voucher Code</th>
+                                    <th>Status</th>
+                                    <th>Customer</th>
+                                    <th>Room</th>
+                                    <th>Assigned Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vouchersTable">
+                                <tr><td colspan="6" class="empty-state">No vouchers available</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Expenses Tab -->
+                    <div id="expensesTab" class="tab-content">
+                        <!-- Expense Summary -->
+                        <div class="expense-summary">
+                            <div class="expense-summary-card">
+                                <div class="es-label">Total Income</div>
+                                <div class="es-value income" id="expSummaryIncome">SAR 0.00</div>
+                            </div>
+                            <div class="expense-summary-card">
+                                <div class="es-label">Total Expenses</div>
+                                <div class="es-value expense" id="expSummaryExpenses">SAR 0.00</div>
+                            </div>
+                            <div class="expense-summary-card">
+                                <div class="es-label">Net Profit</div>
+                                <div class="es-value net" id="expSummaryNet">SAR 0.00</div>
+                            </div>
+                            <div class="expense-summary-card">
+                                <div class="es-label">This Month Expenses</div>
+                                <div class="es-value expense" id="expSummaryThisMonth">SAR 0.00</div>
+                            </div>
+                        </div>
+
+                        <!-- Filter Row -->
+                        <div class="filter-row">
+                            <input type="text" id="expenseSearch" placeholder="Search expenses..." style="flex:1; min-width:150px;" oninput="renderExpenses()">
+                            <select id="expenseCategoryFilter" onchange="renderExpenses()">
+                                <option value="">All Categories</option>
+                                <option value="Internet">Internet / ISP</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="date" id="expenseDateFrom" onchange="renderExpenses()" title="From date">
+                            <input type="date" id="expenseDateTo" onchange="renderExpenses()" title="To date">
+                            <button class="btn btn-secondary" onclick="clearExpenseFilters()" style="padding:8px 14px;">Clear Filters</button>
+                        </div>
+
+                        <!-- Expense Action Buttons -->
+                        <div style="margin-bottom: 16px; display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn" onclick="openAddExpenseModal()" style="background:#d32f2f; color:white;">&#10133; Add Expense</button>
+                            <button class="btn btn-info" onclick="exportExpensesCSV()" style="font-size:13px;">&#128196; Export CSV</button>
+                        </div>
+
+                        <!-- Expenses Table -->
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Amount (SAR)</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTable">
+                                <tr><td colspan="6" class="empty-state">No expenses recorded yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
             </div>
-
-            <!-- Stat Cards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 32px;" id="statCards">
-            </div>
-
-            <!-- Charts Row -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px;" id="chartsRow">
-                <div class="chart-card">
-                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Monthly Net Profit</h3>
-                    <canvas id="profitChart" height="260"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Customer Status Distribution</h3>
-                    <canvas id="statusChart" height="260"></canvas>
-                </div>
-            </div>
-
-            <!-- Recent customers table -->
-            <div class="chart-card">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <h3 style="font-size: 16px; font-weight: 600;">Recent Customers</h3>
-                    <button class="btn btn-ghost btn-sm no-print" onclick="switchPage('customers')">View All <i class="fas fa-arrow-right" style="font-size: 10px;"></i></button>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="data-table" id="dashCustomerTable">
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Plan</th>
-                                <th>Status</th>
-                                <th>Base Amount</th>
-                                <th>Amendments</th>
-                                <th>Net Profit</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- CUSTOMERS PAGE -->
-        <section id="page-customers" class="fade-in" style="display: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700;">Customer Management</h1>
-                    <p style="color: var(--muted); font-size: 14px; margin-top: 4px;">Manage all customers, track status and amendments</p>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <input type="text" class="form-input" id="customerSearch" placeholder="Search customers..." oninput="renderCustomerTable()" style="min-width: 200px;">
-                    <select class="form-select" id="customerStatusFilter" onchange="renderCustomerTable()">
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="expired">Expired</option>
-                        <option value="expiring_soon">Expiring Soon</option>
-                    </select>
-                    <button class="btn btn-primary" onclick="openAddCustomerModal()">
-                        <i class="fas fa-plus"></i> Add Customer
-                    </button>
-                </div>
-            </div>
-
-            <div class="chart-card" style="padding: 0; overflow: hidden;">
-                <div style="overflow-x: auto; max-height: 70vh;">
-                    <table class="data-table" id="fullCustomerTable">
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Email</th>
-                                <th>Plan</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Status</th>
-                                <th>Base Amount</th>
-                                <th>Amendments</th>
-                                <th>Net Profit</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- REPORTS PAGE -->
-        <section id="page-reports" class="fade-in" style="display: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700;">Monthly Reports</h1>
-                    <p style="color: var(--muted); font-size: 14px; margin-top: 4px;">Detailed profit breakdown by month</p>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <select class="form-select" id="reportMonthFilter" onchange="renderReport()">
-                        <option value="all">All Months</option>
-                    </select>
-                    <select class="form-select" id="reportYearFilter" onchange="renderReport()">
-                        <option value="all">All Years</option>
-                    </select>
-                    <button class="btn btn-ghost" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print Report
-                    </button>
-                </div>
-            </div>
-
-            <div id="reportContent"></div>
-        </section>
-
-        <!-- AMENDMENTS PAGE -->
-        <section id="page-amendments" class="fade-in" style="display: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700;">Amendments Log</h1>
-                    <p style="color: var(--muted); font-size: 14px; margin-top: 4px;">Track all customer plan amendments and their profit impact</p>
-                </div>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <select class="form-select" id="amendMonthFilter" onchange="renderAmendments()">
-                        <option value="all">All Months</option>
-                    </select>
-                    <select class="form-select" id="amendYearFilter" onchange="renderAmendments()">
-                        <option value="all">All Years</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="chart-card" style="padding: 0; overflow: hidden;">
-                <div style="overflow-x: auto; max-height: 75vh;">
-                    <table class="data-table" id="amendmentTable">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Description</th>
-                                <th>Type</th>
-                                <th>Amount Impact</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+        </div>
     </div>
 
     <!-- Add/Edit Customer Modal -->
-    <div class="modal-overlay" id="customerModal">
-        <div class="modal-box">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                <h3 style="font-size: 20px; font-weight: 700;" id="modalTitle">Add Customer</h3>
-                <button onclick="closeModal('customerModal')" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px;">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Add Customer</div>
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="fullName" placeholder="Customer name" required>
             </div>
-            <form id="customerForm" onsubmit="saveCustomer(event)">
-                <input type="hidden" id="custId">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Customer Name</label>
-                        <input type="text" class="form-input" id="custName" required style="width: 100%;">
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Email</label>
-                        <input type="email" class="form-input" id="custEmail" required style="width: 100%;">
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Phone</label>
-                        <input type="text" class="form-input" id="custPhone" style="width: 100%;">
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Plan</label>
-                        <select class="form-select" id="custPlan" style="width: 100%;">
-                            <option value="Basic">Basic - $99/mo</option>
-                            <option value="Standard">Standard - $199/mo</option>
-                            <option value="Premium">Premium - $399/mo</option>
-                            <option value="Enterprise">Enterprise - $799/mo</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Start Date</label>
-                        <input type="date" class="form-input" id="custStart" required style="width: 100%;">
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">End Date</label>
-                        <input type="date" class="form-input" id="custEnd" required style="width: 100%;">
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Base Amount ($)</label>
-                        <input type="number" class="form-input" id="custAmount" required min="0" step="0.01" style="width: 100%;">
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Status</label>
-                        <select class="form-select" id="custStatus" style="width: 100%;">
-                            <option value="active">Active</option>
-                            <option value="expired">Expired</option>
-                            <option value="expiring_soon">Expiring Soon</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                    <button type="button" class="btn btn-ghost" onclick="closeModal('customerModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Customer</button>
-                </div>
-            </form>
+            <div class="form-group">
+                <label>Room Number *</label>
+                <input type="text" id="roomNo" placeholder="Room number" required>
+            </div>
+            <div class="form-group">
+                <label>Mobile Number *</label>
+                <input type="text" id="mobileNumber" placeholder="Mobile number">
+            </div>
+            <div class="form-group">
+                <label>Voucher Code * (8 digits)</label>
+                <input type="text" id="voucherCode" placeholder="12345678" maxlength="8" pattern="\d{8}" required>
+                <small style="color: #666;">Must be exactly 8 digits (e.g., 12345678)</small>
+            </div>
+            <div class="form-group">
+                <label>Price *</label>
+                <input type="number" id="price" placeholder="Price" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Buy Date *</label>
+                <input type="date" id="buyDate" required>
+            </div>
+            <div class="form-group">
+                <label>Validity Days *</label>
+                <select id="validityDays" required>
+                    <option value="">Select days</option>
+                    <option value="7">7 Days</option>
+                    <option value="15">15 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="60">60 Days</option>
+                    <option value="90">90 Days</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Plan Name</label>
+                <input type="text" id="planName" placeholder="Plan name">
+            </div>
+            <div class="form-group">
+                <label>Payment Status *</label>
+                <select id="isPaid" required>
+                    <option value="1">Paid</option>
+                    <option value="0">Unpaid</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Reminder (optional)</label>
+                <textarea id="notes" placeholder="Reminder / note (optional)" rows="3"></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-save" onclick="saveCustomer()">Save Customer</button>
+                <button class="btn-cancel" onclick="closeCustomerModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
-    <!-- Amendment Modal -->
-    <div class="modal-overlay" id="amendmentModal">
-        <div class="modal-box">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                <h3 style="font-size: 20px; font-weight: 700;">Add Amendment</h3>
-                <button onclick="closeModal('amendmentModal')" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px;">
-                    <i class="fas fa-times"></i>
-                </button>
+    <!-- Voucher Management Modal -->
+    <div id="voucherModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">&#127915; Voucher Management</div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px;">Upload Vouchers from Excel</h3>
+                <div class="file-upload" onclick="document.getElementById('voucherFile').click()">
+                    <input type="file" id="voucherFile" accept=".xlsx,.xls,.csv" onchange="handleVoucherFileUpload(event)">
+                    <p>&#128193; Click to upload Excel file with 8-digit voucher codes</p>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">File should contain 8-digit numbers (e.g., 12345678, 87654321)</p>
+                </div>
+                <div id="voucherUploadResult" style="margin-top: 10px;"></div>
             </div>
-            <div id="amendCustInfo" style="margin-bottom: 16px; padding: 12px; background: var(--bg2); border-radius: 10px;"></div>
-            <form id="amendmentForm" onsubmit="saveAmendment(event)">
-                <input type="hidden" id="amendCustId">
-                <div style="display: grid; gap: 16px;">
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Description</label>
-                        <input type="text" class="form-input" id="amendDesc" required style="width: 100%;" placeholder="e.g. Plan upgrade, Discount applied...">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div>
-                            <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Type</label>
-                            <select class="form-select" id="amendType" style="width: 100%;">
-                                <option value="upgrade">Upgrade</option>
-                                <option value="downgrade">Downgrade</option>
-                                <option value="discount">Discount</option>
-                                <option value="addon">Add-on</option>
-                                <option value="credit">Credit</option>
-                                <option value="penalty">Penalty</option>
-                                <option value="adjustment">Adjustment</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Amount Impact ($)</label>
-                            <input type="number" class="form-input" id="amendAmount" required step="0.01" style="width: 100%;" placeholder="Use negative for deductions">
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px;">Date</label>
-                        <input type="date" class="form-input" id="amendDate" required style="width: 100%;">
-                    </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px;">Generate Random 8-Digit Vouchers</h3>
+                <div class="form-group">
+                    <label>Quantity to Generate</label>
+                    <input type="number" id="voucherQuantity" value="10" min="1" max="100">
                 </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                    <button type="button" class="btn btn-ghost" onclick="closeModal('amendmentModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Amendment</button>
+                <button class="btn btn-success" onclick="generateVouchers()" style="width: 100%; margin-top: 10px;">
+                    Generate 8-Digit Vouchers
+                </button>
+                <div id="voucherGenerateResult" style="margin-top: 10px;"></div>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div>
+                <h3 style="margin-bottom: 15px;">Recent Vouchers (<span id="voucherCount">0</span> total)</h3>
+                <div class="voucher-list" id="voucherList">
+                    <p class="empty-state">No vouchers yet</p>
                 </div>
-            </form>
+            </div>
+
+            <div class="form-buttons" style="margin-top: 20px;">
+                <button class="btn-cancel" onclick="closeVoucherModal()" style="flex: 1;">Close</button>
+            </div>
         </div>
     </div>
 
-    <!-- Customer Detail Modal -->
-    <div class="modal-overlay" id="detailModal">
-        <div class="modal-box" style="max-width: 680px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                <h3 style="font-size: 20px; font-weight: 700;">Customer Details</h3>
-                <button onclick="closeModal('detailModal')" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px;">
-                    <i class="fas fa-times"></i>
-                </button>
+    <!-- Assign Voucher to Customer Modal -->
+    <div id="assignVoucherModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">&#10133; Assign Voucher to Customer</div>
+            
+            <div class="form-group">
+                <label>Select Available Voucher *</label>
+                <select id="assignVoucherCode" required>
+                    <option value="">-- Choose Voucher --</option>
+                </select>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">Only available (unassigned) vouchers are shown</p>
             </div>
-            <div id="detailContent"></div>
+
+            <hr style="margin: 20px 0;">
+
+            <div class="form-group">
+                <label>Customer Full Name *</label>
+                <input type="text" id="assignFullName" placeholder="Customer name" required>
+            </div>
+            <div class="form-group">
+                <label>Room Number *</label>
+                <input type="text" id="assignRoomNo" placeholder="Room number" required>
+            </div>
+            <div class="form-group">
+                <label>Mobile Number *</label>
+                <input type="text" id="assignMobileNumber" placeholder="Mobile number" required>
+            </div>
+            <div class="form-group">
+                <label>Price (SAR) *</label>
+                <input type="number" id="assignPrice" placeholder="Price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label>Buy Date *</label>
+                <input type="date" id="assignBuyDate" required>
+            </div>
+            <div class="form-group">
+                <label>Validity Days *</label>
+                <select id="assignValidityDays" required>
+                    <option value="">Select days</option>
+                    <option value="7">7 Days</option>
+                    <option value="15">15 Days</option>
+                    <option value="30">30 Days</option>
+                    <option value="60">60 Days</option>
+                    <option value="90">90 Days</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Plan Name</label>
+                <input type="text" id="assignPlanName" placeholder="Plan name">
+            </div>
+            <div class="form-group">
+                <label>Payment Status *</label>
+                <select id="assignIsPaid" required>
+                    <option value="1">Paid</option>
+                    <option value="0">Unpaid</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea id="assignNotes" placeholder="Notes" rows="2"></textarea>
+            </div>
+
+            <div class="form-buttons">
+                <button class="btn-save" onclick="assignVoucherToCustomer()">Assign Voucher & Save Customer</button>
+                <button class="btn-cancel" onclick="closeAssignVoucherModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
-<script>
-// ===================== DATA STORE =====================
-const PLAN_AMOUNTS = { Basic: 99, Standard: 199, Premium: 399, Enterprise: 799 };
+    <!-- Add/Edit Expense Modal -->
+    <div id="expenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="expenseModalTitle">&#128178; Add Expense</div>
+            <div class="form-group">
+                <label>Category *</label>
+                <select id="expenseCategory" required>
+                    <option value="">Select Category</option>
+                    <option value="Internet">Internet / ISP</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Rent">Rent</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Equipment">Equipment / Hardware</option>
+                    <option value="Salary">Salary</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description *</label>
+                <input type="text" id="expenseDescription" placeholder="e.g., Monthly internet bill" required>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Amount (SAR) *</label>
+                    <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Date *</label>
+                    <input type="date" id="expenseDate" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Notes (optional)</label>
+                <textarea id="expenseNotes" placeholder="Additional notes..." rows="3"></textarea>
+            </div>
+            <div class="form-buttons">
+                <button class="btn-save" onclick="saveExpense()" style="background:#d32f2f;">Save Expense</button>
+                <button class="btn-cancel" onclick="closeExpenseModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-// Generate sample data spanning 2024-2025
-function generateSampleData() {
-    const names = [
-        'Acme Corp', 'Globex Inc', 'Initech', 'Umbrella Corp', 'Wayne Enterprises',
-        'Stark Industries', 'Cyberdyne Systems', 'Soylent Corp', 'Wonka Industries', 'Oscorp',
-        'Massive Dynamic', 'Bluth Company', 'Sterling Cooper', 'Piedmont', 'Hooli',
-        'Pied Piper', 'Dunder Mifflin', 'Spectre', 'Quantum Corp', 'Aperture Science',
-        'Tyrell Corp', 'Weyland-Yutani', 'MomCorp', 'Praxis', 'Rekall',
-        'Veidt Industries', 'Nakatomi', 'Dolores Corp', 'E Corp', 'Rancor Inc'
-    ];
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Admin Panel</div>
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="switchAdminTab('agents')" style="width: 100%; margin-bottom: 10px;">&#128101; Manage Agents</button>
+                <button class="btn btn-primary" onclick="switchAdminTab('password')" style="width: 100%;">&#128274; Change Password</button>
+            </div>
 
-    const customers = [];
-    const today = new Date();
+            <div id="agentsTab" style="display: none;">
+                <h3 style="margin-bottom: 15px;">Manage Agents</h3>
+                <div id="agentsList" style="margin-bottom: 15px;">
+                </div>
+                <div class="form-group">
+                    <label>Add New Agent</label>
+                    <input type="text" id="newAgentName" placeholder="Agent name">
+                </div>
+                <div class="form-group">
+                    <input type="email" id="newAgentEmail" placeholder="Agent email">
+                </div>
+                <button class="btn btn-primary" onclick="addAgent()" style="width: 100%;">Add Agent</button>
+            </div>
 
-    names.forEach((name, i) => {
-        const plans = ['Basic', 'Standard', 'Premium', 'Enterprise'];
-        const plan = plans[Math.floor(Math.random() * plans.length)];
-        const baseAmount = PLAN_AMOUNTS[plan];
+            <div id="passwordTab" style="display: none;">
+                <h3 style="margin-bottom: 15px;">Change Password</h3>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" placeholder="Current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="New password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm password">
+                </div>
+                <button class="btn btn-primary" onclick="changePassword()" style="width: 100%; margin-bottom: 10px;">Change Password</button>
+            </div>
 
-        // Spread start dates across 2024 and 2025
-        const startMonth = Math.floor(Math.random() * 18) - 5; // -5 to 12 (relative to Jan 2024)
-        const startDate = new Date(2024, startMonth, Math.floor(Math.random() * 28) + 1);
-        const durationMonths = [3, 6, 12, 24][Math.floor(Math.random() * 4)];
-        const endDate = new Date(startDate);
-        endDate.setMonth(endDate.getMonth() + durationMonths);
+            <button class="btn btn-danger" onclick="closeAdminPanel()" style="width: 100%; margin-top: 20px;">Close</button>
+        </div>
+    </div>
 
-        // Determine status
-        let status;
-        const daysUntilEnd = (endDate - today) / (1000 * 60 * 60 * 24);
-        if (daysUntilEnd < 0) status = 'expired';
-        else if (daysUntilEnd <= 30) status = 'expiring_soon';
-        else status = 'active';
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://nayxxilobsifspqmzsre.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5heXh4aWxvYnNpZnNwcW16c3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDAwNDQsImV4cCI6MjA5MDk3NjA0NH0.49lbgMZJiEwnsDsO98d5htlRLddVoq4H3DYCGpDR2pI';
+        const TABLE_NAME = 'billing_customers';
+        const VOUCHER_TABLE = 'vouchers';
+        const EXPENSE_TABLE = 'expenses';
 
-        // Generate amendments
-        const amendments = [];
-        const amendCount = Math.floor(Math.random() * 4);
-        const amendTypes = ['upgrade', 'downgrade', 'discount', 'addon', 'credit', 'penalty', 'adjustment'];
-        const amendDescs = {
-            upgrade: 'Plan upgrade applied',
-            downgrade: 'Plan downgrade applied',
-            discount: 'Loyalty discount',
-            addon: 'Additional feature add-on',
-            credit: 'Service credit issued',
-            penalty: 'Late payment penalty',
-            adjustment: 'Billing adjustment'
-        };
+        let currentUser = null;
+        let currentEditingId = null;
+        let currentEditingExpenseId = null;
+        let allCustomers = [];
+        let allVouchers = [];
+        let allExpenses = [];
+        let customerSearchQuery = '';
 
-        for (let j = 0; j < amendCount; j++) {
-            const amendDate = new Date(startDate);
-            amendDate.setMonth(amendDate.getMonth() + Math.floor(Math.random() * durationMonths));
-            if (amendDate > today) amendDate.setDate(today.getDate());
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let sbSession = null;
 
-            const type = amendTypes[Math.floor(Math.random() * amendTypes.length)];
-            let amount;
-            switch (type) {
-                case 'upgrade': amount = Math.floor(Math.random() * 200) + 50; break;
-                case 'downgrade': amount = -(Math.floor(Math.random() * 150) + 30); break;
-                case 'discount': amount = -(Math.floor(Math.random() * 80) + 10); break;
-                case 'addon': amount = Math.floor(Math.random() * 100) + 20; break;
-                case 'credit': amount = -(Math.floor(Math.random() * 50) + 10); break;
-                case 'penalty': amount = -(Math.floor(Math.random() * 60) + 15); break;
-                case 'adjustment': amount = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 80) + 10); break;
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        window.addEventListener('load', async () => {
+            const { data } = await sb.auth.getSession();
+            sbSession = data?.session || null;
+            if (sbSession) {
+                currentUser = { email: sbSession.user?.email || 'user' };
+                showDashboard();
+                bindSearch();
+                loadCustomers();
+                loadVouchers();
+                loadExpenses();
             }
+        });
 
-            amendments.push({
-                id: `am-${i}-${j}`,
-                date: amendDate.toISOString().split('T')[0],
-                description: amendDescs[type],
-                type: type,
-                amount: amount
+        function bindSearch() {
+            const input = document.getElementById('customerSearch');
+            if (!input) return;
+            input.addEventListener('input', () => {
+                customerSearchQuery = input.value.trim().toLowerCase();
+                renderCustomers();
             });
         }
 
-        customers.push({
-            id: `cust-${i}`,
-            name: name,
-            email: name.toLowerCase().replace(/\s+/g, '.') + '@company.com',
-            phone: `+1 ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
-            plan: plan,
-            startDate: startDate.toISOString().split('T')[0],
-            endDate: endDate.toISOString().split('T')[0],
-            baseAmount: baseAmount,
-            status: status,
-            amendments: amendments
-        });
-    });
-
-    return customers;
-}
-
-let customers = generateSampleData();
-let profitChart = null;
-let statusChart = null;
-
-// ===================== UTILITY FUNCTIONS =====================
-function formatCurrency(amount) {
-    const sign = amount < 0 ? '-' : '';
-    return sign + '$' + Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function getStatusBadge(status) {
-    const labels = { active: 'Active', expired: 'Expired', expiring_soon: 'Expiring Soon' };
-    return `<span class="badge badge-${status}"><span class="badge-dot"></span>${labels[status]}</span>`;
-}
-
-function getNetProfit(customer) {
-    return customer.baseAmount + customer.amendments.reduce((sum, a) => sum + a.amount, 0);
-}
-
-function getTotalAmendments(customer) {
-    return customer.amendments.reduce((sum, a) => sum + a.amount, 0);
-}
-
-function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
-    const colors = { success: '#00d4aa', error: '#ef4444', warning: '#f59e0b' };
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<i class="fas ${icons[type]}" style="color: ${colors[type]}"></i> ${message}`;
-    container.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100px)'; setTimeout(() => toast.remove(), 300); }, 3000);
-}
-
-function openModal(id) { document.getElementById(id).classList.add('show'); }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-function getMonthYearOptions() {
-    const months = new Set();
-    const years = new Set();
-    customers.forEach(c => {
-        const d = new Date(c.startDate);
-        months.add(d.getMonth());
-        years.add(d.getFullYear());
-        c.amendments.forEach(a => {
-            const ad = new Date(a.date);
-            months.add(ad.getMonth());
-            years.add(ad.getFullYear());
-        });
-    });
-    return { months: [...months].sort((a, b) => a - b), years: [...years].sort((a, b) => a - b) };
-}
-
-function populateFilters() {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const { months, years } = getMonthYearOptions();
-
-    ['dashMonthFilter', 'reportMonthFilter', 'amendMonthFilter'].forEach(id => {
-        const sel = document.getElementById(id);
-        const current = sel.value;
-        sel.innerHTML = '<option value="all">All Months</option>';
-        months.forEach(m => {
-            sel.innerHTML += `<option value="${m}">${monthNames[m]}</option>`;
-        });
-        sel.value = current || 'all';
-    });
-
-    ['dashYearFilter', 'reportYearFilter', 'amendYearFilter'].forEach(id => {
-        const sel = document.getElementById(id);
-        const current = sel.value;
-        sel.innerHTML = '<option value="all">All Years</option>';
-        years.forEach(y => {
-            sel.innerHTML += `<option value="${y}">${y}</option>`;
-        });
-        sel.value = current || 'all';
-    });
-}
-
-function filterByMonthYear(items, dateField, monthFilterId, yearFilterId) {
-    const month = document.getElementById(monthFilterId).value;
-    const year = document.getElementById(yearFilterId).value;
-    return items.filter(item => {
-        const d = new Date(item[dateField]);
-        if (month !== 'all' && d.getMonth() !== parseInt(month)) return false;
-        if (year !== 'all' && d.getFullYear() !== parseInt(year)) return false;
-        return true;
-    });
-}
-
-// ===================== PAGE SWITCHING =====================
-function switchPage(page) {
-    document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
-    document.getElementById(`page-${page}`).style.display = 'block';
-    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    document.querySelector(`.sidebar-link[data-page="${page}"]`).classList.add('active');
-    document.getElementById('sidebar').classList.remove('open');
-
-    if (page === 'dashboard') refreshDashboard();
-    else if (page === 'customers') renderCustomerTable();
-    else if (page === 'reports') renderReport();
-    else if (page === 'amendments') renderAmendments();
-}
-
-// ===================== DASHBOARD =====================
-function refreshDashboard() {
-    const month = document.getElementById('dashMonthFilter').value;
-    const year = document.getElementById('dashYearFilter').value;
-
-    // Filter customers
-    let filtered = customers.filter(c => {
-        const d = new Date(c.startDate);
-        if (month !== 'all' && d.getMonth() !== parseInt(month)) return false;
-        if (year !== 'all' && d.getFullYear() !== parseInt(year)) return false;
-        return true;
-    });
-
-    // Also include customers with amendments in the selected period
-    if (month !== 'all' || year !== 'all') {
-        const additional = customers.filter(c => {
-            if (filtered.includes(c)) return false;
-            return c.amendments.some(a => {
-                const ad = new Date(a.date);
-                if (month !== 'all' && ad.getMonth() !== parseInt(month)) return false;
-                if (year !== 'all' && ad.getFullYear() !== parseInt(year)) return false;
-                return true;
-            });
-        });
-        filtered = [...filtered, ...additional];
-    }
-
-    const activeCount = filtered.filter(c => c.status === 'active').length;
-    const expiredCount = filtered.filter(c => c.status === 'expired').length;
-    const expiringCount = filtered.filter(c => c.status === 'expiring_soon').length;
-    const totalBase = filtered.reduce((s, c) => s + c.baseAmount, 0);
-    const totalAmend = filtered.reduce((s, c) => s + getTotalAmendments(c), 0);
-    const netProfit = totalBase + totalAmend;
-
-    // Stat cards
-    document.getElementById('statCards').innerHTML = `
-        <div class="stat-card" style="--card-accent: #00d4aa;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <div style="width: 44px; height: 44px; background: rgba(0,212,170,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-users" style="color: #00d4aa;"></i>
-                </div>
-                <span style="font-size: 12px; color: var(--muted);">Total</span>
-            </div>
-            <p style="font-size: 32px; font-weight: 700;">${filtered.length}</p>
-            <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Total Customers</p>
-        </div>
-        <div class="stat-card" style="--card-accent: #00d4aa;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <div style="width: 44px; height: 44px; background: rgba(0,212,170,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-check-circle" style="color: #00d4aa;"></i>
-                </div>
-                <span style="font-size: 12px; color: #00d4aa; font-weight: 600;">${filtered.length ? Math.round(activeCount / filtered.length * 100) : 0}%</span>
-            </div>
-            <p style="font-size: 32px; font-weight: 700;">${activeCount}</p>
-            <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Active Customers</p>
-        </div>
-        <div class="stat-card" style="--card-accent: #ef4444;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <div style="width: 44px; height: 44px; background: rgba(239,68,68,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-times-circle" style="color: #ef4444;"></i>
-                </div>
-                <span style="font-size: 12px; color: #ef4444; font-weight: 600;">${filtered.length ? Math.round(expiredCount / filtered.length * 100) : 0}%</span>
-            </div>
-            <p style="font-size: 32px; font-weight: 700;">${expiredCount}</p>
-            <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Expired Customers</p>
-        </div>
-        <div class="stat-card" style="--card-accent: #f59e0b;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <div style="width: 44px; height: 44px; background: rgba(245,158,11,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                </div>
-                <span style="font-size: 12px; color: #f59e0b; font-weight: 600;">${filtered.length ? Math.round(expiringCount / filtered.length * 100) : 0}%</span>
-            </div>
-            <p style="font-size: 32px; font-weight: 700;">${expiringCount}</p>
-            <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Expiring Soon</p>
-        </div>
-        <div class="stat-card" style="--card-accent: #8b5cf6;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <div style="width: 44px; height: 44px; background: rgba(139,92,246,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-dollar-sign" style="color: #8b5cf6;"></i>
-                </div>
-                <span style="font-size: 12px; color: ${totalAmend >= 0 ? '#00d4aa' : '#ef4444'}; font-weight: 600;">${totalAmend >= 0 ? '+' : ''}${formatCurrency(totalAmend)}</span>
-            </div>
-            <p style="font-size: 32px; font-weight: 700;">${formatCurrency(netProfit)}</p>
-            <p style="font-size: 13px; color: var(--muted); margin-top: 4px;">Net Profit (Base + Amendments)</p>
-        </div>
-    `;
-
-    // Profit chart
-    renderProfitChart(year);
-
-    // Status chart
-    renderStatusChart(activeCount, expiredCount, expiringCount);
-
-    // Recent customers table
-    const tbody = document.querySelector('#dashCustomerTable tbody');
-    tbody.innerHTML = filtered.slice(0, 8).map(c => {
-        const net = getNetProfit(c);
-        const amendTotal = getTotalAmendments(c);
-        return `<tr>
-            <td style="font-weight: 600;">${c.name}</td>
-            <td><span style="background: rgba(139,92,246,0.1); color: #a78bfa; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">${c.plan}</span></td>
-            <td>${getStatusBadge(c.status)}</td>
-            <td>${formatCurrency(c.baseAmount)}</td>
-            <td class="${amendTotal >= 0 ? 'profit-positive' : 'profit-negative'}">${amendTotal >= 0 ? '+' : ''}${formatCurrency(amendTotal)}</td>
-            <td style="font-weight: 700;" class="${net >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(net)}</td>
-        </tr>`;
-    }).join('');
-}
-
-function renderProfitChart(yearFilter) {
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const year = document.getElementById('dashYearFilter').value;
-
-    // Calculate monthly profit
-    const monthlyData = Array(12).fill(0).map(() => ({ base: 0, amendments: 0 }));
-
-    customers.forEach(c => {
-        // Calculate proportional monthly revenue
-        const start = new Date(c.startDate);
-        const end = new Date(c.endDate);
-        const baseMonthly = c.baseAmount / Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24 * 30)));
-
-        for (let m = 0; m < 12; m++) {
-            const yearToUse = year !== 'all' ? parseInt(year) : 2025;
-            const monthDate = new Date(yearToUse, m, 15);
-            if (monthDate >= start && monthDate <= end) {
-                if (year === 'all' || start.getFullYear() === parseInt(year) || end.getFullYear() === parseInt(year)) {
-                    monthlyData[m].base += baseMonthly;
-                }
-            }
+        function clearSearch() {
+            customerSearchQuery = '';
+            const input = document.getElementById('customerSearch');
+            if (input) input.value = '';
+            renderCustomers();
         }
 
-        c.amendments.forEach(a => {
-            const ad = new Date(a.date);
-            if (year === 'all' || ad.getFullYear() === parseInt(year)) {
-                monthlyData[ad.getMonth()].amendments += a.amount;
+        // ==========================================
+        // AUTH
+        // ==========================================
+        async function handleLogin() {
+            const email = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Enter email and password');
+                return;
             }
-        });
-    });
 
-    const bases = monthlyData.map(d => Math.round(d.base));
-    const amends = monthlyData.map(d => Math.round(d.amendments));
-    const nets = monthlyData.map((d, i) => bases[i] + amends[i]);
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert('Login failed: ' + error.message);
+                return;
+            }
 
-    if (profitChart) profitChart.destroy();
+            sbSession = data.session;
+            currentUser = { email: data.user?.email || email };
+            showDashboard();
+            loadCustomers();
+            loadVouchers();
+            loadExpenses();
+        }
 
-    const ctx = document.getElementById('profitChart').getContext('2d');
-    profitChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: monthNames,
-            datasets: [
-                {
-                    label: 'Base Revenue',
-                    data: bases,
-                    backgroundColor: 'rgba(0, 212, 170, 0.6)',
-                    borderColor: '#00d4aa',
-                    borderWidth: 1,
-                    borderRadius: 4,
-                    stack: 'stack1'
-                },
-                {
-                    label: 'Amendments',
-                    data: amends,
-                    backgroundColor: amends.map(v => v >= 0 ? 'rgba(139, 92, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)'),
-                    borderColor: amends.map(v => v >= 0 ? '#8b5cf6' : '#ef4444'),
-                    borderWidth: 1,
-                    borderRadius: 4,
-                    stack: 'stack2'
-                },
-                {
-                    label: 'Net Profit',
-                    data: nets,
-                    type: 'line',
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#f59e0b',
-                    fill: true,
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { color: '#7c809a', font: { family: 'DM Sans', size: 11 } } },
-                tooltip: {
-                    backgroundColor: '#1c1f2e',
-                    titleColor: '#e8eaf0',
-                    bodyColor: '#7c809a',
-                    borderColor: '#2a2e42',
-                    borderWidth: 1,
-                    callbacks: {
-                        label: function(ctx) { return ctx.dataset.label + ': ' + formatCurrency(ctx.parsed.y); }
+        async function handleLogout() {
+            await sb.auth.signOut();
+            currentUser = null;
+            sbSession = null;
+            location.reload();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'block';
+            bindSearch();
+        }
+
+        // ==========================================
+        // DATA LOADING
+        // ==========================================
+        async function loadCustomers() {
+            try {
+                if (!sbSession?.access_token) return;
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession.access_token}`
+                        }
                     }
+                );
+
+                if (response.ok) {
+                    allCustomers = await response.json();
+                    updateStats();
+                    renderCustomers();
                 }
-            },
-            scales: {
-                x: { ticks: { color: '#7c809a', font: { family: 'DM Sans' } }, grid: { color: 'rgba(42,46,66,0.5)' } },
-                y: { ticks: { color: '#7c809a', font: { family: 'DM Sans' }, callback: v => '$' + v.toLocaleString() }, grid: { color: 'rgba(42,46,66,0.5)' } }
+            } catch (error) {
+                console.error('Error loading customers:', error);
             }
         }
-    });
-}
 
-function renderStatusChart(active, expired, expiring) {
-    if (statusChart) statusChart.destroy();
-    const ctx = document.getElementById('statusChart').getContext('2d');
-    statusChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Active', 'Expired', 'Expiring Soon'],
-            datasets: [{
-                data: [active, expired, expiring],
-                backgroundColor: ['rgba(0,212,170,0.8)', 'rgba(239,68,68,0.8)', 'rgba(245,158,11,0.8)'],
-                borderColor: ['#00d4aa', '#ef4444', '#f59e0b'],
-                borderWidth: 2,
-                hoverOffset: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: '#7c809a', font: { family: 'DM Sans', size: 12 }, padding: 20, usePointStyle: true }
-                },
-                tooltip: {
-                    backgroundColor: '#1c1f2e',
-                    titleColor: '#e8eaf0',
-                    bodyColor: '#7c809a',
-                    borderColor: '#2a2e42',
-                    borderWidth: 1
+        async function loadVouchers() {
+            try {
+                if (!sbSession?.access_token) return;
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}?order=created_at.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession.access_token}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    allVouchers = await response.json();
+                    updateVoucherStats();
+                    renderVouchers();
+                    updateAvailableVoucherDropdown();
                 }
+            } catch (error) {
+                console.error('Error loading vouchers:', error);
             }
         }
-    });
-}
 
-// ===================== CUSTOMERS PAGE =====================
-function renderCustomerTable() {
-    const search = document.getElementById('customerSearch').value.toLowerCase();
-    const statusFilter = document.getElementById('customerStatusFilter').value;
+        async function loadExpenses() {
+            try {
+                if (!sbSession?.access_token) return;
 
-    let filtered = customers.filter(c => {
-        if (statusFilter !== 'all' && c.status !== statusFilter) return false;
-        if (search && !c.name.toLowerCase().includes(search) && !c.email.toLowerCase().includes(search)) return false;
-        return true;
-    });
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}?order=expense_date.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession.access_token}`
+                        }
+                    }
+                );
 
-    const tbody = document.querySelector('#fullCustomerTable tbody');
-    tbody.innerHTML = filtered.map(c => {
-        const net = getNetProfit(c);
-        const amendTotal = getTotalAmendments(c);
-        return `<tr>
-            <td style="font-weight: 600;">${c.name}</td>
-            <td style="color: var(--muted); font-size: 13px;">${c.email}</td>
-            <td><span style="background: rgba(139,92,246,0.1); color: #a78bfa; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">${c.plan}</span></td>
-            <td style="font-size: 13px;">${c.startDate}</td>
-            <td style="font-size: 13px;">${c.endDate}</td>
-            <td>${getStatusBadge(c.status)}</td>
-            <td>${formatCurrency(c.baseAmount)}</td>
-            <td class="${amendTotal >= 0 ? 'profit-positive' : 'profit-negative'}" style="font-size: 13px;">${amendTotal >= 0 ? '+' : ''}${formatCurrency(amendTotal)}</td>
-            <td style="font-weight: 700;" class="${net >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(net)}</td>
-            <td>
-                <div style="display: flex; gap: 6px;">
-                    <button class="btn btn-ghost btn-sm" onclick="viewCustomer('${c.id}')" title="View"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-ghost btn-sm" onclick="editCustomer('${c.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-                    <button class="btn btn-ghost btn-sm" onclick="openAmendmentModal('${c.id}')" title="Add Amendment"><i class="fas fa-plus-circle"></i></button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCustomer('${c.id}')" title="Delete"><i class="fas fa-trash"></i></button>
-                </div>
-            </td>
-        </tr>`;
-    }).join('');
+                if (response.ok) {
+                    allExpenses = await response.json();
+                    updateStats();
+                    renderExpenses();
+                }
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+            }
+        }
 
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--muted);">No customers found</td></tr>`;
-    }
-}
+        // ==========================================
+        // STATS
+        // ==========================================
+        function updateStats() {
+            const today = new Date();
+            const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-// ===================== CUSTOMER CRUD =====================
-function openAddCustomerModal() {
-    document.getElementById('modalTitle').textContent = 'Add Customer';
-    document.getElementById('custId').value = '';
-    document.getElementById('customerForm').reset();
-    // Default dates
-    const today = new Date();
-    document.getElementById('custStart').value = today.toISOString().split('T')[0];
-    const nextYear = new Date(today);
-    nextYear.setFullYear(nextYear.getFullYear() + 1);
-    document.getElementById('custEnd').value = nextYear.toISOString().split('T')[0];
-    document.getElementById('custAmount').value = 99;
-    openModal('customerModal');
-}
+            const active = allCustomers.filter(c => new Date(c.expiry_date) >= today);
+            const paidActive = active.filter(c => c.is_paid === 1);
+            const paid = paidActive.length;
+            const unpaid = active.filter(c => c.is_paid === 0).length;
+            const income = paidActive.reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
+            const expiring = active.filter(c => {
+                const expiry = new Date(c.expiry_date);
+                return expiry >= today && expiry <= sevenDaysLater;
+            }).length;
 
-function editCustomer(id) {
-    const c = customers.find(c => c.id === id);
-    if (!c) return;
-    document.getElementById('modalTitle').textContent = 'Edit Customer';
-    document.getElementById('custId').value = c.id;
-    document.getElementById('custName').value = c.name;
-    document.getElementById('custEmail').value = c.email;
-    document.getElementById('custPhone').value = c.phone;
-    document.getElementById('custPlan').value = c.plan;
-    document.getElementById('custStart').value = c.startDate;
-    document.getElementById('custEnd').value = c.endDate;
-    document.getElementById('custAmount').value = c.baseAmount;
-    document.getElementById('custStatus').value = c.status;
-    openModal('customerModal');
-}
+            // Expenses totals
+            const totalExpenses = allExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+            const netProfit = income - totalExpenses;
 
-function saveCustomer(e) {
-    e.preventDefault();
-    const id = document.getElementById('custId').value;
-    const data = {
-        name: document.getElementById('custName').value,
-        email: document.getElementById('custEmail').value,
-        phone: document.getElementById('custPhone').value,
-        plan: document.getElementById('custPlan').value,
-        startDate: document.getElementById('custStart').value,
-        endDate: document.getElementById('custEnd').value,
-        baseAmount: parseFloat(document.getElementById('custAmount').value),
-        status: document.getElementById('custStatus').value
-    };
+            // This month expenses
+            const now = new Date();
+            const thisMonthExpenses = allExpenses.filter(e => {
+                const d = new Date(e.expense_date);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
-    if (id) {
-        const c = customers.find(c => c.id === id);
-        Object.assign(c, data);
-        showToast('Customer updated successfully');
-    } else {
-        data.id = 'cust-' + Date.now();
-        data.amendments = [];
-        customers.push(data);
-        showToast('Customer added successfully');
-    }
+            // Update dashboard cards
+            document.getElementById('totalCustomers').textContent = active.length;
+            document.getElementById('paidCount').textContent = paid + ' / ' + unpaid;
+            document.getElementById('expiringCount').textContent = expiring;
 
-    closeModal('customerModal');
-    populateFilters();
-    refreshDashboard();
-    renderCustomerTable();
-}
+            const profitEl = document.getElementById('totalProfit');
+            if (profitEl) profitEl.textContent = `SAR ${income.toFixed(2)}`;
 
-function deleteCustomer(id) {
-    const c = customers.find(c => c.id === id);
-    if (!c) return;
-    // Custom confirmation using a simple approach
-    if (confirm(`Delete "${c.name}"? This cannot be undone.`)) {
-        customers = customers.filter(c => c.id !== id);
-        showToast('Customer deleted', 'warning');
-        populateFilters();
-        refreshDashboard();
-        renderCustomerTable();
-    }
-}
+            document.getElementById('totalExpenses').textContent = `SAR ${totalExpenses.toFixed(2)}`;
 
-function viewCustomer(id) {
-    const c = customers.find(c => c.id === id);
-    if (!c) return;
-    const net = getNetProfit(c);
-    const amendTotal = getTotalAmendments(c);
+            const netEl = document.getElementById('netProfit');
+            netEl.textContent = `SAR ${netProfit.toFixed(2)}`;
+            netEl.className = 'stat-value ' + (netProfit >= 0 ? 'net-positive' : 'net-negative');
 
-    document.getElementById('detailContent').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-            <div>
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Customer Name</p>
-                <p style="font-weight: 600; font-size: 18px;">${c.name}</p>
-            </div>
-            <div>
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Status</p>
-                <p>${getStatusBadge(c.status)}</p>
-            </div>
-            <div>
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Email</p>
-                <p style="font-size: 14px;">${c.email}</p>
-            </div>
-            <div>
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Phone</p>
-                <p style="font-size: 14px;">${c.phone}</p>
-            </div>
-            <div>
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Plan</p>
-                <p><span style="background: rgba(139,92,246,0.1); color: #a78bfa; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">${c.plan}</span></p>
-            </div>
-            <div>
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">Period</p>
-                <p style="font-size: 14px;">${c.startDate} to ${c.endDate}</p>
-            </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-            <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                <p style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">Base Amount</p>
-                <p style="font-size: 22px; font-weight: 700;">${formatCurrency(c.baseAmount)}</p>
-            </div>
-            <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                <p style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">Amendments</p>
-                <p style="font-size: 22px; font-weight: 700;" class="${amendTotal >= 0 ? 'profit-positive' : 'profit-negative'}">${amendTotal >= 0 ? '+' : ''}${formatCurrency(amendTotal)}</p>
-            </div>
-            <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                <p style="font-size: 11px; color: var(--muted); margin-bottom: 4px;">Net Profit</p>
-                <p style="font-size: 22px; font-weight: 700;" class="${net >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(net)}</p>
-            </div>
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-            <h4 style="font-size: 15px; font-weight: 600;">Amendments History</h4>
-            <button class="btn btn-primary btn-sm" onclick="closeModal('detailModal'); openAmendmentModal('${c.id}')">
-                <i class="fas fa-plus"></i> Add
-            </button>
-        </div>
-        ${c.amendments.length === 0 ? '<p style="color: var(--muted); font-size: 13px; text-align: center; padding: 20px;">No amendments yet</p>' :
-        c.amendments.map(a => `
-            <div class="amendment-row">
-                <div>
-                    <span style="font-weight: 500;">${a.description}</span>
-                    <span style="color: var(--muted); font-size: 11px; margin-left: 8px;">${a.date}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="background: rgba(139,92,246,0.1); color: #a78bfa; padding: 2px 8px; border-radius: 4px; font-size: 11px; text-transform: capitalize;">${a.type}</span>
-                    <span class="${a.amount >= 0 ? 'profit-positive' : 'profit-negative'}" style="font-weight: 600;">${a.amount >= 0 ? '+' : ''}${formatCurrency(a.amount)}</span>
-                </div>
-            </div>
-        `).join('')}
-    `;
-    openModal('detailModal');
-}
+            // Update expense tab summary
+            document.getElementById('expSummaryIncome').textContent = `SAR ${income.toFixed(2)}`;
+            document.getElementById('expSummaryExpenses').textContent = `SAR ${totalExpenses.toFixed(2)}`;
+            const expNetEl = document.getElementById('expSummaryNet');
+            expNetEl.textContent = `SAR ${netProfit.toFixed(2)}`;
+            expNetEl.className = 'es-value net ' + (netProfit >= 0 ? 'net-positive' : 'net-negative');
+            document.getElementById('expSummaryThisMonth').textContent = `SAR ${thisMonthExpenses.toFixed(2)}`;
+        }
 
-// ===================== AMENDMENTS =====================
-function openAmendmentModal(custId) {
-    const c = customers.find(c => c.id === custId);
-    if (!c) return;
-    document.getElementById('amendCustId').value = custId;
-    document.getElementById('amendCustInfo').innerHTML = `
-        <p style="font-size: 12px; color: var(--muted);">Adding amendment for</p>
-        <p style="font-weight: 600; margin-top: 4px;">${c.name} <span style="color: var(--muted); font-weight: 400;">- ${c.plan} plan</span></p>
-        <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Current base: ${formatCurrency(c.baseAmount)} | Net: ${formatCurrency(getNetProfit(c))}</p>
-    `;
-    document.getElementById('amendmentForm').reset();
-    document.getElementById('amendDate').value = new Date().toISOString().split('T')[0];
-    openModal('amendmentModal');
-}
+        function updateVoucherStats() {
+            const available = allVouchers.filter(v => v.status === 'available').length;
+            document.getElementById('availableVouchersCount').textContent = available;
+            document.getElementById('voucherCount').textContent = allVouchers.length;
+        }
 
-function saveAmendment(e) {
-    e.preventDefault();
-    const custId = document.getElementById('amendCustId').value;
-    const c = customers.find(c => c.id === custId);
-    if (!c) return;
+        // ==========================================
+        // CUSTOMER RENDERING
+        // ==========================================
+        function renderCustomers() {
+            const today = new Date();
+            const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    const amendment = {
-        id: 'am-' + Date.now(),
-        date: document.getElementById('amendDate').value,
-        description: document.getElementById('amendDesc').value,
-        type: document.getElementById('amendType').value,
-        amount: parseFloat(document.getElementById('amendAmount').value)
-    };
+            let list = allCustomers;
+            if (customerSearchQuery) {
+                list = allCustomers.filter(c => {
+                    const hay = `${c.full_name || ''} ${c.room_no || ''} ${c.mobile_number || ''} ${c.voucher_code || ''}`.toLowerCase();
+                    return hay.includes(customerSearchQuery);
+                });
+            }
 
-    c.amendments.push(amendment);
-    closeModal('amendmentModal');
-    showToast(`Amendment added to ${c.name}: ${formatCurrency(amendment.amount)}`);
-    populateFilters();
-    refreshDashboard();
-    renderCustomerTable();
-}
-
-function renderAmendments() {
-    const month = document.getElementById('amendMonthFilter').value;
-    const year = document.getElementById('amendYearFilter').value;
-
-    let allAmendments = [];
-    customers.forEach(c => {
-        c.amendments.forEach(a => {
-            allAmendments.push({ ...a, customerName: c.name, customerId: c.id });
-        });
-    });
-
-    // Filter
-    if (month !== 'all' || year !== 'all') {
-        allAmendments = allAmendments.filter(a => {
-            const d = new Date(a.date);
-            if (month !== 'all' && d.getMonth() !== parseInt(month)) return false;
-            if (year !== 'all' && d.getFullYear() !== parseInt(year)) return false;
-            return true;
-        });
-    }
-
-    allAmendments.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    const tbody = document.querySelector('#amendmentTable tbody');
-    const typeColors = {
-        upgrade: '#00d4aa', downgrade: '#ef4444', discount: '#f59e0b',
-        addon: '#8b5cf6', credit: '#06b6d4', penalty: '#ef4444', adjustment: '#7c809a'
-    };
-
-    tbody.innerHTML = allAmendments.map(a => `
-        <tr>
-            <td style="font-size: 13px;">${a.date}</td>
-            <td style="font-weight: 600;">${a.customerName}</td>
-            <td style="font-size: 13px;">${a.description}</td>
-            <td><span style="background: ${typeColors[a.type]}22; color: ${typeColors[a.type]}; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: capitalize;">${a.type}</span></td>
-            <td class="${a.amount >= 0 ? 'profit-positive' : 'profit-negative'}" style="font-weight: 700;">${a.amount >= 0 ? '+' : ''}${formatCurrency(a.amount)}</td>
-        </tr>
-    `).join('');
-
-    if (allAmendments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--muted);">No amendments found for selected period</td></tr>`;
-    }
-}
-
-// ===================== REPORTS PAGE =====================
-function renderReport() {
-    const month = document.getElementById('reportMonthFilter').value;
-    const year = document.getElementById('reportYearFilter').value;
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-    let filtered = customers.filter(c => {
-        const d = new Date(c.startDate);
-        if (month !== 'all' && d.getMonth() !== parseInt(month)) return false;
-        if (year !== 'all' && d.getFullYear() !== parseInt(year)) return false;
-        return true;
-    });
-
-    // Also include customers with amendments in the period
-    if (month !== 'all' || year !== 'all') {
-        const additional = customers.filter(c => {
-            if (filtered.includes(c)) return false;
-            return c.amendments.some(a => {
-                const ad = new Date(a.date);
-                if (month !== 'all' && ad.getMonth() !== parseInt(month)) return false;
-                if (year !== 'all' && ad.getFullYear() !== parseInt(year)) return false;
-                return true;
+            const active = list.filter(c => new Date(c.expiry_date) >= today);
+            const expiring = active.filter(c => {
+                const expiry = new Date(c.expiry_date);
+                return expiry >= today && expiry <= sevenDaysLater;
             });
-        });
-        filtered = [...filtered, ...additional];
-    }
+            const expired = list.filter(c => new Date(c.expiry_date) < today);
 
-    const activeCount = filtered.filter(c => c.status === 'active').length;
-    const expiredCount = filtered.filter(c => c.status === 'expired').length;
-    const expiringCount = filtered.filter(c => c.status === 'expiring_soon').length;
-    const totalBase = filtered.reduce((s, c) => s + c.baseAmount, 0);
-    const totalAmend = filtered.reduce((s, c) => s + getTotalAmendments(c), 0);
-    const netProfit = totalBase + totalAmend;
+            renderTable('activeCustomersTable', active.filter(c => !expiring.includes(c)));
+            renderTable('expiringCustomersTable', expiring, true);
+            renderTable('expiredCustomersTable', expired, false, true);
+        }
 
-    // Group amendments by type
-    const amendByType = {};
-    filtered.forEach(c => {
-        c.amendments.forEach(a => {
-            const d = new Date(a.date);
-            if (month !== 'all' && d.getMonth() !== parseInt(month)) return;
-            if (year !== 'all' && d.getFullYear() !== parseInt(year)) return;
-            if (!amendByType[a.type]) amendByType[a.type] = { count: 0, total: 0 };
-            amendByType[a.type].count++;
-            amendByType[a.type].total += a.amount;
-        });
-    });
+        function renderTable(tableId, customers, showDaysLeft = false, isExpired = false) {
+            const tbody = document.getElementById(tableId);
+            if (customers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${showDaysLeft ? 9 : 8}" class="empty-state">No customers</td></tr>`;
+                return;
+            }
 
-    let periodLabel = 'All Time';
-    if (month !== 'all' && year !== 'all') periodLabel = `${monthNames[parseInt(month)]} ${year}`;
-    else if (month !== 'all') periodLabel = `${monthNames[parseInt(month)]} (All Years)`;
-    else if (year !== 'all') periodLabel = `Year ${year}`;
+            tbody.innerHTML = customers.map(c => {
+                const expiryDate = new Date(c.expiry_date);
+                const today = new Date();
+                const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                const statusClass = daysLeft <= 7 && daysLeft > 0 ? 'near-expired' : isExpired ? 'expired' : '';
 
-    document.getElementById('reportContent').innerHTML = `
-        <div class="chart-card" style="margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                <div>
-                    <h2 style="font-size: 22px; font-weight: 700;">${periodLabel} Report</h2>
-                    <p style="color: var(--muted); font-size: 13px; margin-top: 4px;">Generated on ${new Date().toLocaleDateString()}</p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 12px; color: var(--muted);">Net Profit</p>
-                    <p style="font-size: 28px; font-weight: 700;" class="${netProfit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(netProfit)}</p>
-                </div>
-            </div>
+                let daysColumn = '';
+                if (showDaysLeft) {
+                    daysColumn = `<td><span class="status-badge status-expiring">${daysLeft} days</span></td>`;
+                }
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                    <p style="font-size: 11px; color: var(--muted);">Total Customers</p>
-                    <p style="font-size: 24px; font-weight: 700; margin-top: 4px;">${filtered.length}</p>
-                </div>
-                <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                    <p style="font-size: 11px; color: #00d4aa;">Active</p>
-                    <p style="font-size: 24px; font-weight: 700; margin-top: 4px; color: #00d4aa;">${activeCount}</p>
-                </div>
-                <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                    <p style="font-size: 11px; color: #ef4444;">Expired</p>
-                    <p style="font-size: 24px; font-weight: 700; margin-top: 4px; color: #ef4444;">${expiredCount}</p>
-                </div>
-                <div style="background: var(--bg2); padding: 16px; border-radius: 12px; text-align: center;">
-                    <p style="font-size: 11px; color: #f59e0b;">Expiring Soon</p>
-                    <p style="font-size: 24px; font-weight: 700; margin-top: 4px; color: #f59e0b;">${expiringCount}</p>
-                </div>
-            </div>
+                return `
+                    <tr class="customer-row ${statusClass}">
+                        <td>${c.full_name}</td>
+                        <td>${c.room_no}</td>
+                        <td>${c.mobile_number}</td>
+                        <td><span class="voucher-code">${c.voucher_code || '-'}</span></td>
+                        <td>SAR ${Number(c.price || 0).toFixed(2)}</td>
+                        <td><span class="status-badge ${c.is_paid ? 'status-paid' : 'status-unpaid'}">${c.is_paid ? 'Paid' : 'Unpaid'}</span></td>
+                        <td>${new Date(c.expiry_date).toLocaleDateString()}</td>
+                        ${daysColumn}
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-small btn-edit" onclick="editCustomer(${c.id})">Edit</button>
+                                <button class="btn-small btn-delete" onclick="deleteCustomer(${c.id})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div style="background: var(--bg2); padding: 20px; border-radius: 12px;">
-                    <p style="font-size: 13px; font-weight: 600; margin-bottom: 12px;">Revenue Breakdown</p>
-                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-                        <span style="color: var(--muted); font-size: 13px;">Base Revenue</span>
-                        <span style="font-weight: 600; font-size: 14px;">${formatCurrency(totalBase)}</span>
+        // ==========================================
+        // VOUCHER RENDERING
+        // ==========================================
+        function renderVouchers() {
+            const tbody = document.getElementById('vouchersTable');
+            const voucherList = document.getElementById('voucherList');
+            
+            if (allVouchers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No vouchers available</td></tr>`;
+                voucherList.innerHTML = '<p class="empty-state">No vouchers yet</p>';
+                return;
+            }
+
+            tbody.innerHTML = allVouchers.map(v => {
+                const customer = allCustomers.find(c => c.voucher_code === v.voucher_code);
+                return `
+                    <tr>
+                        <td><span class="voucher-code">${v.voucher_code}</span></td>
+                        <td><span class="status-badge status-${v.status}">${v.status}</span></td>
+                        <td>${customer ? customer.full_name : '-'}</td>
+                        <td>${customer ? customer.room_no : '-'}</td>
+                        <td>${v.assigned_at ? new Date(v.assigned_at).toLocaleDateString() : '-'}</td>
+                        <td>
+                            ${v.status === 'available' ? 
+                                `<button class="btn-small btn-assign" onclick="quickAssign('${v.voucher_code}')">Assign</button>` : 
+                                '<span style="color: #999;">Assigned</span>'
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const recent = allVouchers.slice(0, 20);
+            voucherList.innerHTML = recent.map(v => `
+                <div class="voucher-item">
+                    <span class="voucher-code">${v.voucher_code}</span>
+                    <span class="status-badge status-${v.status}">${v.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateAvailableVoucherDropdown() {
+            const select = document.getElementById('assignVoucherCode');
+            const available = allVouchers.filter(v => v.status === 'available');
+            
+            select.innerHTML = '<option value="">-- Choose Voucher --</option>' +
+                available.map(v => `<option value="${v.voucher_code}">${v.voucher_code}</option>`).join('');
+        }
+
+        function quickAssign(voucherCode) {
+            document.getElementById('assignVoucherCode').value = voucherCode;
+            openAssignVoucherModal();
+        }
+
+        // ==========================================
+        // EXPENSE RENDERING
+        // ==========================================
+        function renderExpenses() {
+            const tbody = document.getElementById('expensesTable');
+            
+            let filtered = [...allExpenses];
+
+            // Search filter
+            const searchQuery = (document.getElementById('expenseSearch')?.value || '').trim().toLowerCase();
+            if (searchQuery) {
+                filtered = filtered.filter(e => {
+                    const hay = `${e.description || ''} ${e.category || ''} ${e.notes || ''} ${e.amount || ''}`.toLowerCase();
+                    return hay.includes(searchQuery);
+                });
+            }
+
+            // Category filter
+            const catFilter = document.getElementById('expenseCategoryFilter')?.value || '';
+            if (catFilter) {
+                filtered = filtered.filter(e => e.category === catFilter);
+            }
+
+            // Date range filter
+            const dateFrom = document.getElementById('expenseDateFrom')?.value || '';
+            const dateTo = document.getElementById('expenseDateTo')?.value || '';
+            if (dateFrom) {
+                filtered = filtered.filter(e => e.expense_date >= dateFrom);
+            }
+            if (dateTo) {
+                filtered = filtered.filter(e => e.expense_date <= dateTo);
+            }
+
+            // Calculate filtered totals
+            const filteredTotal = filtered.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No expenses found</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(e => {
+                const catClass = `cat-${(e.category || 'other').toLowerCase().replace(/[^a-z]/g, '')}`;
+                const formattedDate = new Date(e.expense_date).toLocaleDateString();
+
+                return `
+                    <tr>
+                        <td>${formattedDate}</td>
+                        <td><span class="category-badge ${catClass}">${e.category || 'Other'}</span></td>
+                        <td>${e.description || '-'}</td>
+                        <td style="font-weight:700; color:#d32f2f;">SAR ${Number(e.amount || 0).toFixed(2)}</td>
+                        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${e.notes || ''}">${e.notes || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-small btn-edit" onclick="editExpense(${e.id})">Edit</button>
+                                <button class="btn-small btn-delete" onclick="deleteExpense(${e.id})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('') + `
+                <tr style="background:#f5f5f5; font-weight:800;">
+                    <td colspan="3" style="text-align:right; padding-right:20px;">Total (${filtered.length} expenses):</td>
+                    <td style="color:#d32f2f;">SAR ${filteredTotal.toFixed(2)}</td>
+                    <td colspan="2"></td>
+                </tr>
+            `;
+        }
+
+        function clearExpenseFilters() {
+            document.getElementById('expenseSearch').value = '';
+            document.getElementById('expenseCategoryFilter').value = '';
+            document.getElementById('expenseDateFrom').value = '';
+            document.getElementById('expenseDateTo').value = '';
+            renderExpenses();
+        }
+
+        // ==========================================
+        // TAB SWITCHING
+        // ==========================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const tabMap = {
+                'active':    { content: 'activeTab',    nav: 'nav-active',    tabIndex: 0 },
+                'expiring':  { content: 'expiringTab',  nav: 'nav-expiring',  tabIndex: 1 },
+                'expired':   { content: 'expiredTab',   nav: 'nav-expired',   tabIndex: 2 },
+                'vouchers':  { content: 'vouchersTab',  nav: 'nav-vouchers',  tabIndex: 3 },
+                'expenses':  { content: 'expensesTab',  nav: 'nav-expenses',  tabIndex: 4 }
+            };
+
+            const map = tabMap[tab];
+            if (map) {
+                document.getElementById(map.content).classList.add('active');
+                const tabs = document.querySelectorAll('.tab');
+                if (tabs[map.tabIndex]) tabs[map.tabIndex].classList.add('active');
+                const nav = document.getElementById(map.nav);
+                if (nav) nav.classList.add('active');
+            }
+
+            if (tab === 'vouchers') loadVouchers();
+            if (tab === 'expenses') { loadExpenses(); }
+        }
+
+        // ==========================================
+        // MODAL HELPERS
+        // ==========================================
+        function openVoucherModal() {
+            document.getElementById('voucherModal').classList.add('active');
+            loadVouchers();
+        }
+
+        function closeVoucherModal() {
+            document.getElementById('voucherModal').classList.remove('active');
+        }
+
+        function openAssignVoucherModal() {
+            document.getElementById('assignVoucherCode').value = '';
+            document.getElementById('assignFullName').value = '';
+            document.getElementById('assignRoomNo').value = '';
+            document.getElementById('assignMobileNumber').value = '';
+            document.getElementById('assignPrice').value = '';
+            document.getElementById('assignBuyDate').value = '';
+            document.getElementById('assignValidityDays').value = '';
+            document.getElementById('assignPlanName').value = '';
+            document.getElementById('assignIsPaid').value = '1';
+            document.getElementById('assignNotes').value = '';
+            
+            updateAvailableVoucherDropdown();
+            document.getElementById('assignVoucherModal').classList.add('active');
+        }
+
+        function closeAssignVoucherModal() {
+            document.getElementById('assignVoucherModal').classList.remove('active');
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('customerModal').classList.remove('active');
+        }
+
+        // ==========================================
+        // EXPENSE MODAL HELPERS
+        // ==========================================
+        function openAddExpenseModal() {
+            currentEditingExpenseId = null;
+            document.getElementById('expenseModalTitle').innerHTML = '&#128178; Add Expense';
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseNotes').value = '';
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function closeExpenseModal() {
+            document.getElementById('expenseModal').classList.remove('active');
+        }
+
+        function editExpense(id) {
+            const expense = allExpenses.find(e => e.id === id);
+            if (!expense) return;
+
+            currentEditingExpenseId = id;
+            document.getElementById('expenseModalTitle').innerHTML = '&#9998; Edit Expense';
+            document.getElementById('expenseCategory').value = expense.category || '';
+            document.getElementById('expenseDescription').value = expense.description || '';
+            document.getElementById('expenseAmount').value = expense.amount || '';
+            document.getElementById('expenseDate').value = expense.expense_date || '';
+            document.getElementById('expenseNotes').value = expense.notes || '';
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        // ==========================================
+        // EXPENSE CRUD
+        // ==========================================
+        async function saveExpense() {
+            const category = document.getElementById('expenseCategory').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const expenseDate = document.getElementById('expenseDate').value;
+            const notes = document.getElementById('expenseNotes').value.trim();
+
+            if (!category || !description || !amount || amount <= 0 || !expenseDate) {
+                showAlert('Please fill all required fields (Category, Description, Amount > 0, Date).', 'error');
+                return;
+            }
+
+            const data = {
+                category,
+                description,
+                amount,
+                expense_date: expenseDate,
+                notes
+            };
+
+            try {
+                let response;
+                if (currentEditingExpenseId) {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}?id=eq.${currentEditingExpenseId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    );
+                } else {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    );
+                }
+
+                if (response.ok) {
+                    closeExpenseModal();
+                    loadExpenses();
+                    showAlert(`Expense ${currentEditingExpenseId ? 'updated' : 'added'} successfully! SAR ${amount.toFixed(2)}`, 'success');
+                } else {
+                    const error = await response.text();
+                    showAlert('Error saving expense: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteExpense(id) {
+            if (!confirm('Are you sure you want to delete this expense?')) return;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${EXPENSE_TABLE}?id=eq.${id}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    loadExpenses();
+                    showAlert('Expense deleted successfully!', 'success');
+                } else {
+                    showAlert('Error deleting expense', 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // EXPORT EXPENSES CSV
+        // ==========================================
+        function exportExpensesCSV() {
+            if (allExpenses.length === 0) {
+                showAlert('No expenses to export.', 'error');
+                return;
+            }
+
+            let csv = 'Date,Category,Description,Amount (SAR),Notes\n';
+            allExpenses.forEach(e => {
+                const date = e.expense_date || '';
+                const cat = `"${(e.category || '').replace(/"/g, '""')}"`;
+                const desc = `"${(e.description || '').replace(/"/g, '""')}"`;
+                const amt = Number(e.amount || 0).toFixed(2);
+                const note = `"${(e.notes || '').replace(/"/g, '""')}"`;
+                csv += `${date},${cat},${desc},${amt},${note}\n`;
+            });
+
+            const total = allExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+            csv += `\n,,,,Total:,${total.toFixed(2)}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `skybird_expenses_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showAlert('Expenses exported as CSV!', 'success');
+        }
+
+        // ==========================================
+        // VOUCHER FILE UPLOAD
+        // ==========================================
+        function handleVoucherFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    const codes = [];
+                    
+                    jsonData.forEach(row => {
+                        const values = Object.values(row);
+                        for (const val of values) {
+                            const strVal = String(val).trim();
+                            if (/^\d{8}$/.test(strVal)) {
+                                codes.push(strVal);
+                            }
+                        }
+                    });
+
+                    const uniqueCodes = [...new Set(codes)];
+
+                    if (uniqueCodes.length === 0) {
+                        document.getElementById('voucherUploadResult').innerHTML = 
+                            '<span style="color: #d32f2f;">&#10060; No valid 8-digit voucher codes found.</span>';
+                        return;
+                    }
+
+                    document.getElementById('voucherUploadResult').innerHTML = 
+                        `<span style="color: #17a2b8;">&#9203; Found ${uniqueCodes.length} voucher codes, uploading...</span>`;
+
+                    uploadVouchers(uniqueCodes);
+
+                } catch (err) {
+                    document.getElementById('voucherUploadResult').innerHTML = 
+                        '<span style="color: #d32f2f;">&#10060; Error reading file: ' + err.message + '</span>';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function uploadVouchers(codes) {
+            let successCount = 0;
+            let duplicateCount = 0;
+
+            for (const code of codes) {
+                try {
+                    const response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                voucher_code: code,
+                                status: 'available'
+                            })
+                        }
+                    );
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        duplicateCount++;
+                    }
+                } catch (error) {
+                    duplicateCount++;
+                }
+            }
+
+            document.getElementById('voucherUploadResult').innerHTML = 
+                `<span style="color: #28a745;">&#9989; Uploaded: ${successCount} vouchers</span>` +
+                (duplicateCount > 0 ? `<br><span style="color: #FF9800;">&#9888;&#65039; Skipped ${duplicateCount} duplicates</span>` : '');
+
+            loadVouchers();
+        }
+
+        async function generateVouchers() {
+            const quantity = parseInt(document.getElementById('voucherQuantity').value) || 10;
+            
+            const codes = [];
+            const usedCodes = new Set(allVouchers.map(v => v.voucher_code));
+            
+            while (codes.length < quantity) {
+                const code = Math.floor(10000000 + Math.random() * 90000000).toString();
+                
+                if (!usedCodes.has(code) && !codes.includes(code)) {
+                    codes.push(code);
+                    usedCodes.add(code);
+                }
+            }
+
+            document.getElementById('voucherGenerateResult').innerHTML = 
+                `<span style="color: #17a2b8;">&#9203; Generating ${quantity} vouchers...</span>`;
+
+            await uploadVouchers(codes);
+
+            document.getElementById('voucherGenerateResult').innerHTML = 
+                `<span style="color: #28a745;">&#9989; Generated ${quantity} vouchers successfully!</span>`;
+        }
+
+        // ==========================================
+        // ASSIGN VOUCHER
+        // ==========================================
+        async function assignVoucherToCustomer() {
+            const voucherCode = document.getElementById('assignVoucherCode').value;
+            const fullName = document.getElementById('assignFullName').value.trim();
+            const roomNo = document.getElementById('assignRoomNo').value.trim();
+            const mobileNumber = document.getElementById('assignMobileNumber').value.trim();
+            const price = parseFloat(document.getElementById('assignPrice').value) || 0;
+            const buyDate = document.getElementById('assignBuyDate').value;
+            const validityDays = parseInt(document.getElementById('assignValidityDays').value);
+            const planName = document.getElementById('assignPlanName').value.trim();
+            const isPaid = parseInt(document.getElementById('assignIsPaid').value);
+            const notes = document.getElementById('assignNotes').value.trim();
+
+            if (!voucherCode || !fullName || !roomNo || !mobileNumber || !buyDate || !validityDays) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            const buyDateObj = new Date(buyDate);
+            const expiryDate = new Date(buyDateObj.getTime() + validityDays * 24 * 60 * 60 * 1000);
+            const expiryDateStr = expiryDate.toISOString().split('T')[0];
+
+            try {
+                const customerResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            full_name: fullName,
+                            room_no: roomNo,
+                            mobile_number: mobileNumber,
+                            voucher_code: voucherCode,
+                            price: price,
+                            buy_date: buyDate,
+                            expiry_date: expiryDateStr,
+                            validity_days: validityDays,
+                            plan_name: planName,
+                            is_paid: isPaid,
+                            notes: notes
+                        })
+                    }
+                );
+
+                if (!customerResponse.ok) {
+                    throw new Error('Failed to create customer');
+                }
+
+                await fetch(
+                    `${SUPABASE_URL}/rest/v1/${VOUCHER_TABLE}?voucher_code=eq.${voucherCode}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: 'assigned',
+                            assigned_at: new Date().toISOString()
+                        })
+                    }
+                );
+
+                closeAssignVoucherModal();
+                loadCustomers();
+                loadVouchers();
+                showAlert(`Voucher ${voucherCode} assigned to ${fullName} successfully!`, 'success');
+
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // CUSTOMER CRUD
+        // ==========================================
+        function openAddCustomerModal() {
+            currentEditingId = null;
+            document.getElementById('modalTitle').textContent = 'Add Customer';
+            document.getElementById('fullName').value = '';
+            document.getElementById('roomNo').value = '';
+            document.getElementById('mobileNumber').value = '';
+            document.getElementById('voucherCode').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('buyDate').value = '';
+            document.getElementById('validityDays').value = '';
+            document.getElementById('planName').value = '';
+            document.getElementById('isPaid').value = '1';
+            document.getElementById('notes').value = '';
+            document.getElementById('customerModal').classList.add('active');
+        }
+
+        function editCustomer(id) {
+            const customer = allCustomers.find(c => c.id === id);
+            if (!customer) return;
+
+            currentEditingId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Customer';
+            document.getElementById('fullName').value = customer.full_name;
+            document.getElementById('roomNo').value = customer.room_no;
+            document.getElementById('mobileNumber').value = customer.mobile_number;
+            document.getElementById('voucherCode').value = customer.voucher_code;
+            document.getElementById('price').value = customer.price;
+            document.getElementById('buyDate').value = customer.buy_date;
+            document.getElementById('validityDays').value = customer.validity_days;
+            document.getElementById('planName').value = customer.plan_name || '';
+            document.getElementById('isPaid').value = customer.is_paid;
+            document.getElementById('notes').value = customer.notes || '';
+            document.getElementById('customerModal').classList.add('active');
+        }
+
+        async function saveCustomer() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const roomNo = document.getElementById('roomNo').value.trim();
+            const voucherCode = document.getElementById('voucherCode').value.trim();
+            const buyDateVal = document.getElementById('buyDate').value;
+            const isPaidVal = document.getElementById('isPaid').value;
+
+            if (!fullName || !roomNo || !voucherCode || !buyDateVal || isPaidVal === '') {
+                showAlert('Please fill the required fields: Name, Room, Voucher, Date, Paid/Unpaid.', 'error');
+                return;
+            }
+
+            if (!/^\d{8}$/.test(voucherCode)) {
+                showAlert('Voucher code must be exactly 8 digits (e.g., 12345678)', 'error');
+                return;
+            }
+
+            const data = {
+                full_name: document.getElementById('fullName').value,
+                room_no: document.getElementById('roomNo').value,
+                mobile_number: (document.getElementById('mobileNumber').value || '0').trim(),
+                voucher_code: voucherCode,
+                price: parseFloat(document.getElementById('price').value),
+                buy_date: document.getElementById('buyDate').value,
+                validity_days: parseInt(document.getElementById('validityDays').value),
+                plan_name: document.getElementById('planName').value,
+                is_paid: parseInt(document.getElementById('isPaid').value),
+                notes: document.getElementById('notes').value
+            };
+
+            const buyDate = new Date(data.buy_date);
+            const expiryDate = new Date(buyDate.getTime() + data.validity_days * 24 * 60 * 60 * 1000);
+            data.expiry_date = expiryDate.toISOString().split('T')[0];
+
+            try {
+                let response;
+                if (currentEditingId) {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${currentEditingId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    );
+                } else {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${sbSession?.access_token || ''}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    );
+                }
+
+                if (response.ok) {
+                    closeCustomerModal();
+                    loadCustomers();
+                    showAlert('Customer saved successfully!', 'success');
+                } else {
+                    const error = await response.text();
+                    showAlert('Error saving customer: ' + error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm('Are you sure you want to delete this customer?')) return;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.${id}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${sbSession?.access_token || ''}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    loadCustomers();
+                    showAlert('Customer deleted successfully!', 'success');
+                }
+            } catch (error) {
+                showAlert('Error deleting customer', 'error');
+            }
+        }
+
+        // ==========================================
+        // ADMIN PANEL
+        // ==========================================
+        function openAdminPanel() {
+            document.getElementById('adminModal').classList.add('active');
+            switchAdminTab('agents');
+            loadAgents();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').classList.remove('active');
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('agentsTab').style.display = tab === 'agents' ? 'block' : 'none';
+            document.getElementById('passwordTab').style.display = tab === 'password' ? 'block' : 'none';
+        }
+
+        function loadAgents() {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const agentsList = document.getElementById('agentsList');
+            agentsList.innerHTML = agents.map((agent, idx) => `
+                <div style="background: #f5f5f5; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${agent.name}</strong><br>
+                        <small>${agent.email}</small>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);">
-                        <span style="color: var(--muted); font-size: 13px;">Amendments Total</span>
-                        <span style="font-weight: 600; font-size: 14px;" class="${totalAmend >= 0 ? 'profit-positive' : 'profit-negative'}">${totalAmend >= 0 ? '+' : ''}${formatCurrency(totalAmend)}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-                        <span style="font-weight: 600; font-size: 14px;">Net Profit</span>
-                        <span style="font-weight: 700; font-size: 16px;" class="${netProfit >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(netProfit)}</span>
-                    </div>
+                    <button class="btn-small btn-delete" onclick="deleteAgent(${idx})">Delete</button>
                 </div>
-                <div style="background: var(--bg2); padding: 20px; border-radius: 12px;">
-                    <p style="font-size: 13px; font-weight: 600; margin-bottom: 12px;">Amendments by Type</p>
-                    ${Object.keys(amendByType).length === 0 ? '<p style="color: var(--muted); font-size: 13px;">No amendments in this period</p>' :
-                    Object.entries(amendByType).map(([type, data]) => `
-                        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border);">
-                            <span style="font-size: 13px; text-transform: capitalize;">${type} <span style="color: var(--muted);">(${data.count})</span></span>
-                            <span style="font-weight: 600; font-size: 13px;" class="${data.total >= 0 ? 'profit-positive' : 'profit-negative'}">${data.total >= 0 ? '+' : ''}${formatCurrency(data.total)}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
+            `).join('');
+        }
 
-        <div class="chart-card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 20px 24px 0;">
-                <h3 style="font-size: 16px; font-weight: 600;">Customer Details for ${periodLabel}</h3>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Plan</th>
-                            <th>Status</th>
-                            <th>Base</th>
-                            <th>Amendments</th>
-                            <th>Net Profit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filtered.map(c => {
-                            const net = getNetProfit(c);
-                            const am = getTotalAmendments(c);
-                            return `<tr>
-                                <td style="font-weight: 600;">${c.name}</td>
-                                <td style="text-transform: capitalize; font-size: 13px;">${c.plan}</td>
-                                <td>${getStatusBadge(c.status)}</td>
-                                <td>${formatCurrency(c.baseAmount)}</td>
-                                <td class="${am >= 0 ? 'profit-positive' : 'profit-negative'}" style="font-size: 13px;">${am >= 0 ? '+' : ''}${formatCurrency(am)}</td>
-                                <td style="font-weight: 700;" class="${net >= 0 ? 'profit-positive' : 'profit-negative'}">${formatCurrency(net)}</td>
-                            </tr>`;
-                        }).join('')}
-                        ${filtered.length === 0 ? `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">No data for this period</td></tr>` : ''}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `;
-}
+        function addAgent() {
+            const name = document.getElementById('newAgentName').value;
+            const email = document.getElementById('newAgentEmail').value;
 
-// ===================== PLAN AMOUNT AUTO-FILL =====================
-document.getElementById('custPlan').addEventListener('change', function() {
-    document.getElementById('custAmount').value = PLAN_AMOUNTS[this.value] || 99;
-});
+            if (!name || !email) {
+                alert('Please fill in all fields');
+                return;
+            }
 
-// ===================== RESPONSIVE MENU =====================
-function handleResize() {
-    const toggle = document.getElementById('menuToggle');
-    if (window.innerWidth <= 1024) {
-        toggle.style.display = 'flex';
-    } else {
-        toggle.style.display = 'none';
-        document.getElementById('sidebar').classList.remove('open');
-    }
-}
-window.addEventListener('resize', handleResize);
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            agents.push({ name, email });
+            localStorage.setItem('agents', JSON.stringify(agents));
 
-// ===================== INITIALIZE =====================
-function init() {
-    populateFilters();
-    refreshDashboard();
-    handleResize();
-}
+            document.getElementById('newAgentName').value = '';
+            document.getElementById('newAgentEmail').value = '';
+            loadAgents();
+            showAlert('Agent added successfully!', 'success');
+        }
 
-init();
-</script>
+        function deleteAgent(idx) {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            agents.splice(idx, 1);
+            localStorage.setItem('agents', JSON.stringify(agents));
+            loadAgents();
+        }
+
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+
+            if (current !== 'admin123') {
+                showAlert('Current password is incorrect', 'error');
+                return;
+            }
+
+            if (newPass !== confirm) {
+                showAlert('Passwords do not match', 'error');
+                return;
+            }
+
+            if (newPass.length < 6) {
+                showAlert('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            localStorage.setItem('adminPassword', newPass);
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            showAlert('Password changed successfully!', 'success');
+        }
+
+        // ==========================================
+        // ALERTS
+        // ==========================================
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert show alert-${type}`;
+            setTimeout(() => alertBox.classList.remove('show'), 5000);
+        }
+    </script>
 </body>
 </html>
