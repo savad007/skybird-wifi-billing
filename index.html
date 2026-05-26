@@ -9,19 +9,30 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(96, 165, 250, 0.35), transparent 30%),
+                radial-gradient(circle at top right, rgba(192, 132, 252, 0.22), transparent 28%),
+                linear-gradient(135deg, #0f172a 0%, #172554 45%, #1e293b 100%);
+            color: #e5eefb;
             min-height: 100vh;
             padding: 20px;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1380px; margin: 0 auto; }
         .app-layout { display: flex; gap: 20px; }
 
         .sidebar {
-            width: 260px; background: rgba(255,255,255,0.95);
-            border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 18px; height: fit-content; position: sticky; top: 20px;
+            width: 280px;
+            background: rgba(15, 23, 42, 0.68);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 24px;
+            box-shadow: 0 24px 50px rgba(2, 6, 23, 0.35);
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
         }
 
         .brand { margin-bottom: 14px; display: flex; align-items: center; justify-content: center; }
@@ -32,56 +43,74 @@
         .nav-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 
         .nav-item {
-            width: 100%; text-align: left; padding: 12px 12px;
-            border-radius: 10px; border: 1px solid #eee;
-            background: white; cursor: pointer; font-weight: 700;
-            color: #374151; transition: all 0.2s ease;
+            width: 100%; text-align: left; padding: 13px 14px;
+            border-radius: 14px; border: 1px solid rgba(148, 163, 184, 0.14);
+            background: rgba(255,255,255,0.08); cursor: pointer; font-weight: 700;
+            color: #dbeafe; transition: all 0.25s ease;
         }
-        .nav-item:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
-        .nav-item.active { border-color: rgba(46,125,50,0.35); background: #e8f5e9; color: #1b5e20; }
+        .nav-item:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(15,23,42,0.22); border-color: rgba(96,165,250,0.35); }
+        .nav-item.active { border-color: rgba(96,165,250,0.5); background: linear-gradient(135deg, rgba(59,130,246,0.28), rgba(139,92,246,0.22)); color: #ffffff; }
 
         .main { flex: 1; min-width: 0; }
 
         .search-row {
             display: flex; gap: 10px; align-items: center;
-            background: rgba(255,255,255,0.95); padding: 12px 14px;
-            border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 14px;
+            background: rgba(15, 23, 42, 0.6); padding: 14px 16px;
+            border-radius: 20px; border: 1px solid rgba(148, 163, 184, 0.14);
+            box-shadow: 0 20px 40px rgba(2,6,23,0.22); margin-bottom: 16px; backdrop-filter: blur(16px);
         }
-        .search-row input { flex: 1; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; outline: none; }
-        .search-row input:focus { border-color: rgba(46,125,50,0.6); box-shadow: 0 0 0 3px rgba(46,125,50,0.12); }
+        .search-row input { flex: 1; padding: 12px 14px; border: 1px solid rgba(148, 163, 184, 0.18); background: rgba(255,255,255,0.08); color: #f8fafc; border-radius: 12px; font-size: 14px; outline: none; }
+        .search-row input::placeholder { color: #94a3b8; }
+        .search-row input:focus { border-color: rgba(96,165,250,0.7); box-shadow: 0 0 0 4px rgba(59,130,246,0.14); }
 
         .header {
-            background: white; padding: 20px 30px; border-radius: 12px;
+            background: rgba(15, 23, 42, 0.72); padding: 24px 28px; border-radius: 26px;
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 22px; box-shadow: 0 24px 50px rgba(2,6,23,0.32);
+            border: 1px solid rgba(148, 163, 184, 0.16); backdrop-filter: blur(18px);
         }
-        .header h1 { color: #333; font-size: 28px; }
+        .header h1 { color: #f8fafc; font-size: 30px; letter-spacing: -0.03em; }
         .header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .btn {
-            padding: 10px 20px; border: none; border-radius: 8px;
-            cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s ease;
+            padding: 11px 20px; border: none; border-radius: 12px;
+            cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.25s ease;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
         }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
-        .btn-secondary { background: #FF9800; color: white; }
-        .btn-secondary:hover { background: #F57C00; transform: translateY(-2px); }
-        .btn-danger { background: #d32f2f; color: white; }
-        .btn-danger:hover { background: #b71c1c; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-success:hover { background: #218838; }
-        .btn-info { background: #17a2b8; color: white; }
-        .btn-info:hover { background: #138496; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; }
+        .btn-primary:hover { box-shadow: 0 14px 28px rgba(59,130,246,0.35); }
+        .btn-secondary { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; }
+        .btn-secondary:hover { box-shadow: 0 14px 28px rgba(249,115,22,0.32); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-danger:hover { box-shadow: 0 14px 28px rgba(220,38,38,0.3); }
+        .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .btn-success:hover { box-shadow: 0 14px 28px rgba(34,197,94,0.3); }
+        .btn-info { background: linear-gradient(135deg, #06b6d4, #2563eb); color: white; }
+        .btn-info:hover { box-shadow: 0 14px 28px rgba(37,99,235,0.3); }
 
         .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px; margin-bottom: 14px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px; margin-bottom: 18px;
         }
+        .stats-grid-enhanced { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 
         .stat-card {
-            background: white; padding: 10px 10px; border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-left: 4px solid #667eea; min-height: 74px;
+            background: rgba(255,255,255,0.96); padding: 16px 16px; border-radius: 20px;
+            box-shadow: 0 18px 30px rgba(15,23,42,0.14); border: 1px solid rgba(226,232,240,0.8); min-height: 94px;
+            position: relative; overflow: hidden;
         }
+        .stat-card::before {
+            content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: rgba(102,126,234,0.45);
+        }
+        .stat-card.primary::before { background: linear-gradient(90deg, #2563eb, #8b5cf6); }
+        .stat-card.success::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
+        .stat-card.warning::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
+        .stat-card.danger::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .stat-card.info::before { background: linear-gradient(90deg, #06b6d4, #2563eb); }
+        .stat-card.purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+        .stat-card.amber::before { background: linear-gradient(90deg, #f59e0b, #eab308); }
+        .stat-card.wide { grid-column: span 2; }
         .stat-card.success { border-left-color: #2e7d32; }
         .stat-card.warning { border-left-color: #FF9800; }
         .stat-card.danger { border-left-color: #d32f2f; }
@@ -96,9 +125,9 @@
         .stat-card.info .stat-value { color: #17a2b8; }
         .stat-card.amber .stat-value { color: #ff8f00; }
 
-        .stat-label { color: #6b7280; font-size: 11px; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.04em; }
-        .stat-value { font-size: 20px; font-weight: 800; color: #111827; }
-        .stat-subtext { font-size: 11px; color: #9ca3af; margin-top: 6px; }
+        .stat-label { color: #64748b; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.08em; font-weight: 800; }
+        .stat-value { font-size: 24px; font-weight: 900; color: #0f172a; line-height: 1.15; }
+        .stat-subtext { font-size: 11px; color: #94a3b8; margin-top: 8px; }
 
         .net-positive { color: #2e7d32 !important; }
         .net-negative { color: #d32f2f !important; }
@@ -106,21 +135,21 @@
         /* Monthly filter row */
         .month-filter-row {
             display: flex; gap: 10px; align-items: center;
-            background: rgba(255,255,255,0.95); padding: 12px 14px;
-            border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            margin-bottom: 14px; flex-wrap: wrap;
+            background: rgba(15, 23, 42, 0.6); padding: 14px 16px;
+            border-radius: 20px; box-shadow: 0 20px 40px rgba(2,6,23,0.22);
+            margin-bottom: 16px; flex-wrap: wrap; border: 1px solid rgba(148, 163, 184, 0.14); backdrop-filter: blur(16px);
         }
-        .month-filter-row label { font-weight: 700; font-size: 13px; color: #374151; white-space: nowrap; }
-        .month-filter-row select { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; outline: none; background: white; }
-        .month-filter-row select:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-        .filter-active-badge { display: none; background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .month-filter-row label { font-weight: 700; font-size: 13px; color: #cbd5e1; white-space: nowrap; }
+        .month-filter-row select { padding: 10px 12px; border: 1px solid rgba(148,163,184,0.18); border-radius: 10px; font-size: 13px; outline: none; background: rgba(255,255,255,0.08); color: #f8fafc; }
+        .month-filter-row select:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(59,130,246,0.12); }
+        .filter-active-badge { display: none; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
         .filter-active-badge.show { display: inline-block; }
 
         /* Monthly report card */
         .monthly-report-card {
-            display: none; background: white; border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 20px 24px;
-            margin-bottom: 14px; border-left: 5px solid #667eea;
+            display: none; background: rgba(255,255,255,0.97); border-radius: 22px;
+            box-shadow: 0 18px 34px rgba(15,23,42,0.16); padding: 22px 24px;
+            margin-bottom: 16px; border: 1px solid rgba(226,232,240,0.8);
         }
         .monthly-report-card.show { display: block; }
         .monthly-report-card h3 { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 14px; }
@@ -130,23 +159,24 @@
         .report-item .ri-value { font-size: 18px; font-weight: 800; margin-top: 4px; }
 
         .tabs {
-            display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee;
-            background: white; padding: 0 30px; border-radius: 12px 12px 0 0; overflow-x: auto;
+            display: flex; gap: 10px; margin-bottom: 0; border-bottom: 1px solid rgba(226,232,240,0.8);
+            background: rgba(255,255,255,0.97); padding: 0 22px; border-radius: 24px 24px 0 0; overflow-x: auto;
+            box-shadow: 0 18px 34px rgba(15,23,42,0.16);
         }
         .tab {
-            padding: 15px 20px; border: none; background: none; cursor: pointer;
-            font-size: 14px; font-weight: 600; color: #999;
-            border-bottom: 3px solid transparent; transition: all 0.3s ease; white-space: nowrap;
+            padding: 16px 18px; border: none; background: none; cursor: pointer;
+            font-size: 14px; font-weight: 700; color: #64748b;
+            border-bottom: 3px solid transparent; transition: all 0.25s ease; white-space: nowrap;
         }
-        .tab.active { color: #667eea; border-bottom-color: #667eea; }
+        .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
 
-        .tab-content { display: none; background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .tab-content { display: none; background: rgba(255,255,255,0.97); padding: 30px; border-radius: 0 0 24px 24px; box-shadow: 0 18px 34px rgba(15,23,42,0.16); }
         .tab-content.active { display: block; }
 
         .customer-table { width: 100%; border-collapse: collapse; }
-        .customer-table th { background: #f5f5f5; padding: 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 2px solid #eee; font-size: 13px; }
-        .customer-table td { padding: 15px; border-bottom: 1px solid #eee; font-size: 13px; }
-        .customer-table tr:hover { background: #f9f9f9; }
+        .customer-table th { background: #eff6ff; padding: 15px; text-align: left; font-weight: 700; color: #1e293b; border-bottom: 1px solid #dbeafe; font-size: 13px; }
+        .customer-table td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #334155; }
+        .customer-table tr:hover { background: #f8fafc; }
         .customer-row { cursor: pointer; }
         .customer-row.near-expired { background: #fff3e0 !important; border-left: 4px solid #FF9800; }
         .customer-row.expired { background: #ffebee !important; border-left: 4px solid #d32f2f; opacity: 0.7; }
@@ -184,8 +214,8 @@
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 12px; border: 1px solid #dbe3f0; border-radius: 10px; font-size: 14px; font-family: inherit; background: #f8fafc; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(59,130,246,0.12); }
 
         .form-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .form-buttons button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
@@ -226,12 +256,13 @@
         .filter-row select:focus, .filter-row input:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
 
         .expense-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .expense-summary-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; text-align: center; }
+        .expense-summary-card { background: linear-gradient(180deg, #ffffff, #f8fbff); border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 12px 24px rgba(15,23,42,0.08); }
         .expense-summary-card .es-label { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; }
         .expense-summary-card .es-value { font-size: 18px; font-weight: 800; margin-top: 4px; }
         .expense-summary-card .es-value.income { color: #2e7d32; }
         .expense-summary-card .es-value.expense { color: #d32f2f; }
         .expense-summary-card .es-value.net { color: #1565c0; }
+        .expense-summary-card .es-value.warning { color: #f59e0b; }
 
         @media (max-width: 980px) {
             .app-layout { flex-direction: column; }
@@ -333,22 +364,32 @@
                         <div class="report-grid" id="monthlyReportGrid"></div>
                     </div>
 
-                    <!-- Stats Grid - populated by SP -->
-                    <div class="stats-grid">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid stats-grid-enhanced">
+                        <div class="stat-card primary wide">
+                            <div class="stat-label">Total Amount</div>
+                            <div class="stat-value" id="totalAmount">SAR 0.00</div>
+                            <div class="stat-subtext">Paid + Not Paid</div>
+                        </div>
                         <div class="stat-card success">
-                            <div class="stat-label">Total Income</div>
-                            <div class="stat-value" id="totalProfit">SAR 0.00</div>
-                            <div class="stat-subtext">SUM(price)</div>
+                            <div class="stat-label">Paid Amount</div>
+                            <div class="stat-value" id="paidAmount">SAR 0.00</div>
+                            <div class="stat-subtext">Collected from paid customers</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">Not Paid Amount</div>
+                            <div class="stat-value" id="unpaidAmount">SAR 0.00</div>
+                            <div class="stat-subtext">Pending collection</div>
                         </div>
                         <div class="stat-card danger">
-                            <div class="stat-label">Total Expenses</div>
+                            <div class="stat-label">Expenses</div>
                             <div class="stat-value" id="totalExpenses">SAR 0.00</div>
-                            <div class="stat-subtext">SUM(expenses)</div>
+                            <div class="stat-subtext">All recorded expenses</div>
                         </div>
                         <div class="stat-card purple">
-                            <div class="stat-label">Net Profit</div>
+                            <div class="stat-label">Paid - Expense</div>
                             <div class="stat-value" id="netProfit">SAR 0.00</div>
-                            <div class="stat-subtext">Income - Expenses</div>
+                            <div class="stat-subtext">Paid amount minus expenses</div>
                         </div>
                         <div class="stat-card success">
                             <div class="stat-label">Active</div>
@@ -360,15 +401,15 @@
                             <div class="stat-value" id="expiringCount">0</div>
                             <div class="stat-subtext">Next 7 days</div>
                         </div>
-                        <div class="stat-card danger">
+                        <div class="stat-card danger soft-danger">
                             <div class="stat-label">Expired</div>
                             <div class="stat-value" id="expiredCustomers">0</div>
                             <div class="stat-subtext">Subscription ended</div>
                         </div>
                         <div class="stat-card info">
-                            <div class="stat-label">Paid / Unpaid</div>
+                            <div class="stat-label">Paid / Unpaid Count</div>
                             <div class="stat-value" id="paidCount">0 / 0</div>
-                            <div class="stat-subtext">Active payment</div>
+                            <div class="stat-subtext">Customer count</div>
                         </div>
                         <div class="stat-card info">
                             <div class="stat-label">Available Vouchers</div>
@@ -431,9 +472,11 @@
                     <!-- Expenses Tab -->
                     <div id="expensesTab" class="tab-content">
                         <div class="expense-summary">
-                            <div class="expense-summary-card"><div class="es-label">Total Income</div><div class="es-value income" id="expSummaryIncome">SAR 0.00</div></div>
-                            <div class="expense-summary-card"><div class="es-label">Total Expenses</div><div class="es-value expense" id="expSummaryExpenses">SAR 0.00</div></div>
-                            <div class="expense-summary-card"><div class="es-label">Net Profit</div><div class="es-value net" id="expSummaryNet">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Total Amount</div><div class="es-value income" id="expSummaryTotalAmount">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Paid Amount</div><div class="es-value income" id="expSummaryPaid">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Not Paid Amount</div><div class="es-value warning" id="expSummaryUnpaid">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Expenses</div><div class="es-value expense" id="expSummaryExpenses">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Paid - Expense</div><div class="es-value net" id="expSummaryNet">SAR 0.00</div></div>
                             <div class="expense-summary-card"><div class="es-label">This Month Expenses</div><div class="es-value expense" id="expSummaryThisMonth">SAR 0.00</div></div>
                         </div>
                         <div class="filter-row">
@@ -731,45 +774,23 @@
         }
 
         // ==========================================
-        // CALL STORED PROCEDURE FOR NET PROFIT
-        // Net Profit = SUM(price) - SUM(expenses)  -- YOUR LOGIC
+        // DASHBOARD CALCULATIONS
         // ==========================================
         async function loadDashboardStats() {
-            try {
-                if (!sbSession?.access_token) return;
-
-                const body = {};
-                if (filterMonth !== 'all') body.p_month = parseInt(filterMonth);
-                if (filterYear !== 'all') body.p_year = parseInt(filterYear);
-
-                const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_dashboard_stats`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${sbSession.access_token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                });
-
-                if (r.ok) {
-                    const stats = await r.json();
-                    updateDashboardFromSP(stats);
-                } else {
-                    // Fallback: client-side calculation
-                    console.warn('SP call failed, using client-side fallback');
-                    updateDashboardClientSide();
-                }
-            } catch (e) {
-                console.error('Error calling SP:', e);
-                updateDashboardClientSide();
-            }
+            updateDashboardClientSide();
         }
 
-        function updateDashboardFromSP(s) {
-            // Main stats cards
-            document.getElementById('totalProfit').textContent = `SAR ${Number(s.total_income || 0).toFixed(2)}`;
-            document.getElementById('totalExpenses').textContent = `SAR ${Number(s.total_expenses || 0).toFixed(2)}`;
+        function setMoneyValue(id, amount) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = `SAR ${Number(amount || 0).toFixed(2)}`;
+        }
+
+        function updateDashboardFromStats(s) {
+            setMoneyValue('totalAmount', s.total_amount);
+            setMoneyValue('paidAmount', s.paid_amount);
+            setMoneyValue('unpaidAmount', s.unpaid_amount);
+            setMoneyValue('totalExpenses', s.total_expenses);
 
             const netEl = document.getElementById('netProfit');
             netEl.textContent = `SAR ${Number(s.net_profit || 0).toFixed(2)}`;
@@ -780,21 +801,21 @@
             document.getElementById('expiredCustomers').textContent = s.expired_count || 0;
             document.getElementById('paidCount').textContent = `${s.paid_count || 0} / ${s.unpaid_count || 0}`;
 
-            // Expense tab summary
-            document.getElementById('expSummaryIncome').textContent = `SAR ${Number(s.total_income || 0).toFixed(2)}`;
-            document.getElementById('expSummaryExpenses').textContent = `SAR ${Number(s.total_expenses || 0).toFixed(2)}`;
+            setMoneyValue('expSummaryTotalAmount', s.total_amount);
+            setMoneyValue('expSummaryPaid', s.paid_amount);
+            setMoneyValue('expSummaryUnpaid', s.unpaid_amount);
+            setMoneyValue('expSummaryExpenses', s.total_expenses);
+
             const expNetEl = document.getElementById('expSummaryNet');
             expNetEl.textContent = `SAR ${Number(s.net_profit || 0).toFixed(2)}`;
             expNetEl.className = 'es-value net ' + ((s.net_profit || 0) >= 0 ? 'net-positive' : 'net-negative');
-            document.getElementById('expSummaryThisMonth').textContent = `SAR ${Number(s.this_month_expenses || 0).toFixed(2)}`;
+            setMoneyValue('expSummaryThisMonth', s.this_month_expenses);
 
-            // Monthly report card
             if (filterMonth !== 'all' || filterYear !== 'all') {
                 renderMonthlyReport(s);
             }
         }
 
-        // Fallback if SP is not created yet
         function updateDashboardClientSide() {
             const today = new Date();
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -816,12 +837,14 @@
             });
             const expired = list.filter(c => new Date(c.expiry_date) < today);
             const notExpiring = active.filter(c => !expiring.includes(c));
-            const paidActive = active.filter(c => c.is_paid === 1);
+            const paidCustomers = list.filter(c => Number(c.is_paid) === 1);
+            const unpaidCustomers = list.filter(c => Number(c.is_paid) !== 1);
 
-            // Net Profit = SUM(price) - SUM(expenses)
-            const income = paidActive.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
+            const totalAmount = list.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
+            const paidAmount = paidCustomers.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
+            const unpaidAmount = unpaidCustomers.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
             const totalExp = allExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-            const netProfit = income - totalExp;
+            const netProfit = paidAmount - totalExp;
 
             const now = new Date();
             const thisMonthExp = allExpenses.filter(e => {
@@ -829,15 +852,17 @@
                 return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
             }).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
-            updateDashboardFromSP({
-                total_income: income,
+            updateDashboardFromStats({
+                total_amount: totalAmount,
+                paid_amount: paidAmount,
+                unpaid_amount: unpaidAmount,
                 total_expenses: totalExp,
                 net_profit: netProfit,
                 active_count: notExpiring.length,
                 expired_count: expired.length,
                 expiring_count: expiring.length,
-                paid_count: paidActive.length,
-                unpaid_count: active.filter(c => c.is_paid === 0).length,
+                paid_count: paidCustomers.length,
+                unpaid_count: unpaidCustomers.length,
                 this_month_expenses: thisMonthExp
             });
         }
@@ -851,9 +876,11 @@
             document.getElementById('monthlyReportTitle').textContent = title;
 
             document.getElementById('monthlyReportGrid').innerHTML = `
-                <div class="report-item"><div class="ri-label">Income (SUM price)</div><div class="ri-value" style="color:#2e7d32;">SAR ${Number(s.total_income||0).toFixed(2)}</div></div>
-                <div class="report-item"><div class="ri-label">Expenses (SUM amount)</div><div class="ri-value" style="color:#d32f2f;">SAR ${Number(s.total_expenses||0).toFixed(2)}</div></div>
-                <div class="report-item"><div class="ri-label">Net Profit</div><div class="ri-value" style="color:${(s.net_profit||0)>=0?'#2e7d32':'#d32f2f'};">SAR ${Number(s.net_profit||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Total Amount</div><div class="ri-value" style="color:#2563eb;">SAR ${Number(s.total_amount||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Paid Amount</div><div class="ri-value" style="color:#2e7d32;">SAR ${Number(s.paid_amount||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Not Paid Amount</div><div class="ri-value" style="color:#f59e0b;">SAR ${Number(s.unpaid_amount||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Expenses</div><div class="ri-value" style="color:#d32f2f;">SAR ${Number(s.total_expenses||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Paid - Expense</div><div class="ri-value" style="color:${(s.net_profit||0)>=0?'#2e7d32':'#d32f2f'};">SAR ${Number(s.net_profit||0).toFixed(2)}</div></div>
                 <div class="report-item"><div class="ri-label">Active</div><div class="ri-value">${s.active_count||0}</div></div>
                 <div class="report-item"><div class="ri-label">Expiring Soon</div><div class="ri-value">${s.expiring_count||0}</div></div>
                 <div class="report-item"><div class="ri-label">Expired</div><div class="ri-value">${s.expired_count||0}</div></div>
