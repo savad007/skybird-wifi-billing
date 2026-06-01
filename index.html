@@ -292,6 +292,7 @@
             .search-row button { width: 100%; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <div class="container">
@@ -366,33 +367,14 @@
 
                     <!-- Stats Grid -->
                     <div class="stats-grid stats-grid-enhanced">
-                        <div class="stat-card primary wide">
-                            <div class="stat-label">Total Amount</div>
-                            <div class="stat-value" id="totalAmount">SAR 0.00</div>
-                            <div class="stat-subtext">Paid + Not Paid</div>
+                        <!-- Row 1: Customer Counts -->
+                        <div class="stat-card primary">
+                            <div class="stat-label">Total Customers</div>
+                            <div class="stat-value" id="totalCustomers">0</div>
+                            <div class="stat-subtext">All customers</div>
                         </div>
                         <div class="stat-card success">
-                            <div class="stat-label">Paid Amount</div>
-                            <div class="stat-value" id="paidAmount">SAR 0.00</div>
-                            <div class="stat-subtext">Collected from paid customers</div>
-                        </div>
-                        <div class="stat-card warning">
-                            <div class="stat-label">Not Paid Amount</div>
-                            <div class="stat-value" id="unpaidAmount">SAR 0.00</div>
-                            <div class="stat-subtext">Pending collection</div>
-                        </div>
-                        <div class="stat-card danger">
-                            <div class="stat-label">Expenses</div>
-                            <div class="stat-value" id="totalExpenses">SAR 0.00</div>
-                            <div class="stat-subtext">All recorded expenses</div>
-                        </div>
-                        <div class="stat-card purple">
-                            <div class="stat-label">Paid - Expense</div>
-                            <div class="stat-value" id="netProfit">SAR 0.00</div>
-                            <div class="stat-subtext">Paid amount minus expenses</div>
-                        </div>
-                        <div class="stat-card success">
-                            <div class="stat-label">Active</div>
+                            <div class="stat-label">Active Customers</div>
                             <div class="stat-value" id="activeCustomers">0</div>
                             <div class="stat-subtext">Current active</div>
                         </div>
@@ -401,15 +383,41 @@
                             <div class="stat-value" id="expiringCount">0</div>
                             <div class="stat-subtext">Next 7 days</div>
                         </div>
-                        <div class="stat-card danger soft-danger">
-                            <div class="stat-label">Expired</div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">Expired Customers</div>
                             <div class="stat-value" id="expiredCustomers">0</div>
                             <div class="stat-subtext">Subscription ended</div>
                         </div>
-                        <div class="stat-card info">
-                            <div class="stat-label">Paid / Unpaid Count</div>
-                            <div class="stat-value" id="paidCount">0 / 0</div>
-                            <div class="stat-subtext">Customer count</div>
+                        <!-- Row 2: Financial Cards -->
+                        <div class="stat-card primary wide">
+                            <div class="stat-label">Total Sales</div>
+                            <div class="stat-value" id="totalSales">SAR 0.00</div>
+                            <div class="stat-subtext">Sum of all customer prices (Paid + Unpaid + Active + Expired)</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Paid Amount</div>
+                            <div class="stat-value" id="paidAmount">SAR 0.00</div>
+                            <div class="stat-subtext">All paid customers (Active + Expired)</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">Unpaid Amount</div>
+                            <div class="stat-value" id="unpaidAmount">SAR 0.00</div>
+                            <div class="stat-subtext">All unpaid customers</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">Expenses</div>
+                            <div class="stat-value" id="totalExpenses">SAR 0.00</div>
+                            <div class="stat-subtext">All recorded expenses</div>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="stat-label">Profit</div>
+                            <div class="stat-value" id="netProfit">SAR 0.00</div>
+                            <div class="stat-subtext">Active Paid Revenue minus Expenses</div>
+                        </div>
+                        <div class="stat-card" style="border-left: 4px solid #8b5cf6;">
+                            <div class="stat-label">Paid Amount - Expenses</div>
+                            <div class="stat-value" id="paidMinusExpenses" style="color: #7c3aed;">SAR 0.00</div>
+                            <div class="stat-subtext">All Paid Amount minus All Expenses</div>
                         </div>
                         <div class="stat-card info">
                             <div class="stat-label">Available Vouchers</div>
@@ -472,11 +480,12 @@
                     <!-- Expenses Tab -->
                     <div id="expensesTab" class="tab-content">
                         <div class="expense-summary">
-                            <div class="expense-summary-card"><div class="es-label">Total Amount</div><div class="es-value income" id="expSummaryTotalAmount">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Total Sales</div><div class="es-value income" id="expSummaryTotalAmount">SAR 0.00</div></div>
                             <div class="expense-summary-card"><div class="es-label">Paid Amount</div><div class="es-value income" id="expSummaryPaid">SAR 0.00</div></div>
-                            <div class="expense-summary-card"><div class="es-label">Not Paid Amount</div><div class="es-value warning" id="expSummaryUnpaid">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Unpaid Amount</div><div class="es-value warning" id="expSummaryUnpaid">SAR 0.00</div></div>
                             <div class="expense-summary-card"><div class="es-label">Expenses</div><div class="es-value expense" id="expSummaryExpenses">SAR 0.00</div></div>
-                            <div class="expense-summary-card"><div class="es-label">Paid - Expense</div><div class="es-value net" id="expSummaryNet">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Profit</div><div class="es-value net" id="expSummaryNet">SAR 0.00</div></div>
+                            <div class="expense-summary-card"><div class="es-label">Paid - Expenses</div><div class="es-value" id="expSummaryPaidMinusExpenses" style="color:#7c3aed;">SAR 0.00</div></div>
                             <div class="expense-summary-card"><div class="es-label">This Month Expenses</div><div class="es-value expense" id="expSummaryThisMonth">SAR 0.00</div></div>
                         </div>
                         <div class="filter-row">
@@ -787,28 +796,42 @@
         }
 
         function updateDashboardFromStats(s) {
-            setMoneyValue('totalAmount', s.total_amount);
+            // Customer counts
+            document.getElementById('totalCustomers').textContent = s.total_customers || 0;
+            document.getElementById('activeCustomers').textContent = s.active_count || 0;
+            document.getElementById('expiringCount').textContent = s.expiring_count || 0;
+            document.getElementById('expiredCustomers').textContent = s.expired_count || 0;
+
+            // Financial values
+            setMoneyValue('totalSales', s.total_sales);
             setMoneyValue('paidAmount', s.paid_amount);
             setMoneyValue('unpaidAmount', s.unpaid_amount);
             setMoneyValue('totalExpenses', s.total_expenses);
 
             const netEl = document.getElementById('netProfit');
-            netEl.textContent = `SAR ${Number(s.net_profit || 0).toFixed(2)}`;
-            netEl.className = 'stat-value ' + ((s.net_profit || 0) >= 0 ? 'net-positive' : 'net-negative');
+            netEl.textContent = `SAR ${Number(s.profit || 0).toFixed(2)}`;
+            netEl.className = 'stat-value ' + ((s.profit || 0) >= 0 ? 'net-positive' : 'net-negative');
 
-            document.getElementById('activeCustomers').textContent = s.active_count || 0;
-            document.getElementById('expiringCount').textContent = s.expiring_count || 0;
-            document.getElementById('expiredCustomers').textContent = s.expired_count || 0;
-            document.getElementById('paidCount').textContent = `${s.paid_count || 0} / ${s.unpaid_count || 0}`;
+            const pmeEl = document.getElementById('paidMinusExpenses');
+            pmeEl.textContent = `SAR ${Number(s.paid_minus_expenses || 0).toFixed(2)}`;
+            pmeEl.className = 'stat-value ' + ((s.paid_minus_expenses || 0) >= 0 ? 'net-positive' : 'net-negative');
 
-            setMoneyValue('expSummaryTotalAmount', s.total_amount);
+            // Expenses tab summary
+            setMoneyValue('expSummaryTotalAmount', s.total_sales);
             setMoneyValue('expSummaryPaid', s.paid_amount);
             setMoneyValue('expSummaryUnpaid', s.unpaid_amount);
             setMoneyValue('expSummaryExpenses', s.total_expenses);
 
             const expNetEl = document.getElementById('expSummaryNet');
-            expNetEl.textContent = `SAR ${Number(s.net_profit || 0).toFixed(2)}`;
-            expNetEl.className = 'es-value net ' + ((s.net_profit || 0) >= 0 ? 'net-positive' : 'net-negative');
+            expNetEl.textContent = `SAR ${Number(s.profit || 0).toFixed(2)}`;
+            expNetEl.className = 'es-value net ' + ((s.profit || 0) >= 0 ? 'net-positive' : 'net-negative');
+
+            const expPmeEl = document.getElementById('expSummaryPaidMinusExpenses');
+            if (expPmeEl) {
+                expPmeEl.textContent = `SAR ${Number(s.paid_minus_expenses || 0).toFixed(2)}`;
+                expPmeEl.className = 'es-value ' + ((s.paid_minus_expenses || 0) >= 0 ? 'net-positive' : 'net-negative');
+            }
+
             setMoneyValue('expSummaryThisMonth', s.this_month_expenses);
 
             if (filterMonth !== 'all' || filterYear !== 'all') {
@@ -818,8 +841,10 @@
 
         function updateDashboardClientSide() {
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
+            // Apply month/year filter to customer list
             let list = allCustomers;
             if (filterMonth !== 'all' || filterYear !== 'all') {
                 list = allCustomers.filter(c => {
@@ -830,22 +855,46 @@
                 });
             }
 
+            // Categorize customers
             const active = list.filter(c => new Date(c.expiry_date) >= today);
             const expiring = active.filter(c => {
                 const e = new Date(c.expiry_date);
                 return e >= today && e <= sevenDaysLater;
             });
+            const notExpiring = active.filter(c => {
+                const e = new Date(c.expiry_date);
+                return e > sevenDaysLater;
+            });
             const expired = list.filter(c => new Date(c.expiry_date) < today);
-            const notExpiring = active.filter(c => !expiring.includes(c));
-            const paidCustomers = list.filter(c => Number(c.is_paid) === 1);
-            const unpaidCustomers = list.filter(c => Number(c.is_paid) !== 1);
 
-            const totalAmount = list.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
-            const paidAmount = paidCustomers.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
-            const unpaidAmount = unpaidCustomers.reduce((s, c) => s + (parseFloat(c.price) || 0), 0);
-            const totalExp = allExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-            const netProfit = paidAmount - totalExp;
+            // Financial calculations per requirements
+            // 1. Total Sales = Sum of ALL customer prices (all statuses, all expiry states)
+            const totalSales = list.reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
 
+            // 2. Paid Amount = Sum of all customers where is_paid = 1 (regardless of expiry)
+            const paidAmount = list
+                .filter(c => Number(c.is_paid) === 1)
+                .reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
+
+            // 3. Unpaid Amount = Sum of all customers where is_paid = 0 (regardless of expiry)
+            const unpaidAmount = list
+                .filter(c => Number(c.is_paid) !== 1)
+                .reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
+
+            // 4. Expenses = Sum of all expense amounts
+            const totalExpenses = allExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+
+            // 5. Profit = Active Paid Revenue - Total Expenses
+            //    Only customers who are BOTH Active (not expired) AND Paid
+            const activePaidRevenue = list
+                .filter(c => Number(c.is_paid) === 1 && new Date(c.expiry_date) >= today)
+                .reduce((sum, c) => sum + (parseFloat(c.price) || 0), 0);
+            const profit = activePaidRevenue - totalExpenses;
+
+            // Paid Amount - Expenses (all paid customers minus all expenses)
+            const paidMinusExpenses = paidAmount - totalExpenses;
+
+            // This month expenses
             const now = new Date();
             const thisMonthExp = allExpenses.filter(e => {
                 const d = new Date(e.expense_date);
@@ -853,16 +902,16 @@
             }).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
             updateDashboardFromStats({
-                total_amount: totalAmount,
+                total_customers: list.length,
+                total_sales: totalSales,
                 paid_amount: paidAmount,
                 unpaid_amount: unpaidAmount,
-                total_expenses: totalExp,
-                net_profit: netProfit,
-                active_count: notExpiring.length,
+                total_expenses: totalExpenses,
+                profit: profit,
+                paid_minus_expenses: paidMinusExpenses,
+                active_count: active.length,
                 expired_count: expired.length,
                 expiring_count: expiring.length,
-                paid_count: paidCustomers.length,
-                unpaid_count: unpaidCustomers.length,
                 this_month_expenses: thisMonthExp
             });
         }
@@ -876,11 +925,13 @@
             document.getElementById('monthlyReportTitle').textContent = title;
 
             document.getElementById('monthlyReportGrid').innerHTML = `
-                <div class="report-item"><div class="ri-label">Total Amount</div><div class="ri-value" style="color:#2563eb;">SAR ${Number(s.total_amount||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Total Sales</div><div class="ri-value" style="color:#2563eb;">SAR ${Number(s.total_sales||0).toFixed(2)}</div></div>
                 <div class="report-item"><div class="ri-label">Paid Amount</div><div class="ri-value" style="color:#2e7d32;">SAR ${Number(s.paid_amount||0).toFixed(2)}</div></div>
-                <div class="report-item"><div class="ri-label">Not Paid Amount</div><div class="ri-value" style="color:#f59e0b;">SAR ${Number(s.unpaid_amount||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Unpaid Amount</div><div class="ri-value" style="color:#f59e0b;">SAR ${Number(s.unpaid_amount||0).toFixed(2)}</div></div>
                 <div class="report-item"><div class="ri-label">Expenses</div><div class="ri-value" style="color:#d32f2f;">SAR ${Number(s.total_expenses||0).toFixed(2)}</div></div>
-                <div class="report-item"><div class="ri-label">Paid - Expense</div><div class="ri-value" style="color:${(s.net_profit||0)>=0?'#2e7d32':'#d32f2f'};">SAR ${Number(s.net_profit||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Profit</div><div class="ri-value" style="color:${(s.profit||0)>=0?'#2e7d32':'#d32f2f'};">SAR ${Number(s.profit||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Paid - Expenses</div><div class="ri-value" style="color:${(s.paid_minus_expenses||0)>=0?'#2e7d32':'#d32f2f'};">SAR ${Number(s.paid_minus_expenses||0).toFixed(2)}</div></div>
+                <div class="report-item"><div class="ri-label">Total Customers</div><div class="ri-value">${s.total_customers||0}</div></div>
                 <div class="report-item"><div class="ri-label">Active</div><div class="ri-value">${s.active_count||0}</div></div>
                 <div class="report-item"><div class="ri-label">Expiring Soon</div><div class="ri-value">${s.expiring_count||0}</div></div>
                 <div class="report-item"><div class="ri-label">Expired</div><div class="ri-value">${s.expired_count||0}</div></div>
@@ -898,6 +949,7 @@
         // ==========================================
         function renderCustomers() {
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
             let list = allCustomers;
@@ -923,9 +975,13 @@
                 const exp = new Date(c.expiry_date);
                 return exp >= today && exp <= sevenDaysLater;
             });
+            const notExpiring = active.filter(c => {
+                const exp = new Date(c.expiry_date);
+                return exp > sevenDaysLater;
+            });
             const expired = list.filter(c => new Date(c.expiry_date) < today);
 
-            renderTable('activeCustomersTable', active.filter(c => !expiring.includes(c)));
+            renderTable('activeCustomersTable', notExpiring);
             renderTable('expiringCustomersTable', expiring, true);
             renderTable('expiredCustomersTable', expired, false, true);
         }
